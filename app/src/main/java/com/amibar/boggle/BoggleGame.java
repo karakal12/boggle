@@ -38,6 +38,10 @@ public class BoggleGame {
         return sb.toString();
     }
 
+    public void endGame(){
+        System.out.println(foundWords);
+    }
+
     public boolean submitWord(){
         String formedWord = checkWord();
         if (!formedWord.isEmpty() && !foundWords.contains(formedWord)){
