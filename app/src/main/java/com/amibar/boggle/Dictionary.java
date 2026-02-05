@@ -1,15 +1,16 @@
 package com.amibar.boggle;
 
 
-import android.content.res.Resources;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public final class Dictionary {
+import javax.inject.Singleton;
+
+@Singleton
+public final class Dictionary{
     private Dictionary() {throw new UnsupportedOperationException("Dictionary is a singleton!");}
 
     static List<String> words;

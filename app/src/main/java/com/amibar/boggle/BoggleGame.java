@@ -61,7 +61,12 @@ public class BoggleGame {
         if (foundWords.contains(formedWord)) {
             return ALREADY_FOUND;
         }
-        return VALID;
+        if (Dictionary.contains(formedWord)){
+            score += wordScore(formedWord);
+            foundWords.add(formedWord);
+            return VALID;
+        }
+        return INVALID;
     }
 
     private int wordScore(String word) {
@@ -134,7 +139,7 @@ public class BoggleGame {
         private final char[] letters;
         private int selectedLetter;
 
-
+        @SuppressWarnings("unused")
         private Die(){
             throw new UnsupportedOperationException("Use Die.generateDice()");
         }
