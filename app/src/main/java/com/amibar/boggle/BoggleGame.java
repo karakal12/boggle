@@ -1,18 +1,20 @@
 package com.amibar.boggle;
 
-import android.util.Pair;
+import android.util.Log;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+
+import static com.amibar.boggle.BoggleGame.WordCheckResult.*;
 
 public class BoggleGame {
+    public static final long GAME_TIME_MILLIS = 120000; // 2 minutes
     private final ArrayList<Die> dice;
     private final ArrayDeque<Die> word;
     private final ArrayList<String> foundWords;
     private int score;
+    private boolean gameEnded;
 
     public BoggleGame(){
         dice = Die.generateDice();
@@ -22,6 +24,7 @@ public class BoggleGame {
         }
         foundWords = new ArrayList<>();
         word = new ArrayDeque<>();
+        gameEnded = false;
     }
 
     public int getScore() {
@@ -38,18 +41,27 @@ public class BoggleGame {
         return sb.toString();
     }
 
-    public void endGame(){
-        System.out.println(foundWords);
+    public boolean isEnded() {
+        return gameEnded;
     }
 
-    public boolean submitWord(){
-        String formedWord = checkWord();
-        if (!formedWord.isEmpty() && !foundWords.contains(formedWord)){
-            foundWords.add(formedWord);
-            score += wordScore(formedWord);
-            return true;
+    public void endGame(){
+        gameEnded = true;
+        Log.d("BoggleGame", "Game ended. Final score: " + score + ", Words found: " + foundWords);
+    }
+
+    public WordCheckResult submitWord(){
+        String formedWord = formWord();
+        if (formedWord.isBlank()){
+            return NULL_WORD;
         }
-        return false;
+        if (formedWord.length() < 3){
+            return TOO_SHORT;
+        }
+        if (foundWords.contains(formedWord)) {
+            return ALREADY_FOUND;
+        }
+        return VALID;
     }
 
     private int wordScore(String word) {
@@ -64,13 +76,12 @@ public class BoggleGame {
         }
     }
 
-    public String checkWord(){
+    public String formWord(){
         StringBuilder sb = new StringBuilder();
         while (!word.isEmpty()){
             sb.append(word.removeFirst().getLetter());
         }
-        String formedWord = sb.toString().toLowerCase();
-        return Dictionary.contains(formedWord) ? formedWord : "";
+        return sb.toString().toLowerCase();
     }
 
     public boolean selectDie(int index){
@@ -145,6 +156,24 @@ public class BoggleGame {
                 dice.add(new Die(config));
             }
             return dice;
+        }
+    }
+
+    public enum WordCheckResult {
+        VALID(R.string.word_valid),
+        INVALID(R.string.word_invalid),
+        ALREADY_FOUND(R.string.word_already_found),
+        TOO_SHORT(R.string.word_too_short),
+        NULL_WORD(R.string.word_null);
+
+        private final int messageId;
+
+        public int getMessageId() {
+            return messageId;
+        }
+
+        WordCheckResult(int messageId) {
+            this.messageId = messageId;
         }
     }
 }

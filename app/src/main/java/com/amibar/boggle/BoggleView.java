@@ -1,18 +1,19 @@
 package com.amibar.boggle;
 
+import static com.amibar.boggle.BoggleGame.WordCheckResult.VALID;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.WindowDecorActionBar;
+
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 public class BoggleView extends LinearLayout {
 
@@ -63,6 +64,12 @@ public class BoggleView extends LinearLayout {
         word = findViewById(R.id.tvWord);
         msg = findViewById(R.id.tvErrors);
         updateScore();
+
+        TextView timerText = findViewById(R.id.tvTime);
+        LinearProgressIndicator timerIndicator = findViewById(R.id.progressBar);
+
+        new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
+                ()-> game.endGame()).start();
     }
 
     private void onClickSubmit(View v) {
@@ -70,12 +77,10 @@ public class BoggleView extends LinearLayout {
             cell.setBackgroundColor(getColor(R.color.unselected));
         }
         String lastWord = game.getWord();
-        if (game.submitWord()) {
-            msg.setText("");
+        BoggleGame.WordCheckResult result = game.submitWord();
+        if (result == VALID)
             updateScore();
-        } else {
-            msg.setText(getContext().getString(R.string.invalid_word, lastWord));
-        }
+        msg.setText(getContext().getString(result.getMessageId(), lastWord));
         updateWord();
         lastSelected = null;
     }
@@ -84,9 +89,11 @@ public class BoggleView extends LinearLayout {
         this.score.setText(getContext().getString(R.string.score, game.getScore()));
     }
 
-    private OnClickListener cellOnClickListener(int index) {
+    private OnClickListener cellOnClickListener(int cellId) {
         return (view) -> {
-            if (game.selectDie(index)){
+            if (game.isEnded())
+                return;
+            if (game.selectDie(cellId)){
                 if (lastSelected != null) {
                     lastSelected.setBackgroundColor(getColor(R.color.selected));
                 }

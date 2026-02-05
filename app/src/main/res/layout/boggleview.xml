@@ -11,6 +11,7 @@
         android:gravity="center"
         android:orientation="horizontal">
         <TextView android:text="Time: "
+            android:id="@+id/tvTime"
             android:layout_margin="8dp"
             android:layout_height="wrap_content"  android:layout_width="wrap_content"/>
         <com.google.android.material.progressindicator.LinearProgressIndicator

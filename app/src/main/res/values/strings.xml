@@ -3,4 +3,9 @@
     <string name="word">Word:\"%1$s\"</string>
     <string name="score">Score: %1$d\n</string>
     <string name="invalid_word">%1$s is not a valid word</string>
+    <string name="word_valid"/>
+    <string name="word_invalid">\'%s\' is an invalid word</string>
+    <string name="word_already_found">\'%s\' was already found</string>
+    <string name="word_too_short"><![CDATA[\'%s\' is too short (<3)]]></string>
+    <string name="word_null" />
 </resources>
