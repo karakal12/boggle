@@ -1,24 +1,22 @@
-package com.amibar.boggle;
+package com.amibar.boggle.ui;
 
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.widget.TextView;
 
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 
 public class Timer implements Runnable {
     private final LinearProgressIndicator indicator;
     private final TextView timerText;
     private final long millisTime;
     private final long millisTimeBegan;
+    @SuppressWarnings("Deprecated")
     private final Handler handler = new Handler();
     private Runnable onTimerEnd;
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
 
     public Timer(TextView timerText, LinearProgressIndicator indicator, long timeInMillis,
                  Runnable onTimerEnd) {
@@ -29,6 +27,7 @@ public class Timer implements Runnable {
         this.onTimerEnd = onTimerEnd;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void run() {
         long elapsedTime = System.currentTimeMillis() - millisTimeBegan;
@@ -48,7 +47,7 @@ public class Timer implements Runnable {
         long remainingTime = millisTime - elapsedTime;
         long minutes = remainingTime / 60000;
         long seconds = (remainingTime % 60000) / 1000;
-        return String.format("%02d:%02d", minutes, seconds);
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
     }
 
     public void start(){

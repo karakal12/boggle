@@ -1,5 +1,9 @@
-package com.amibar.boggle;
+package com.amibar.boggle.engine;
 
+
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+
+import com.amibar.boggle.data.Dictionary;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +71,11 @@ public class GameSolver {
     }
     public Set<String> solve(char[][] board) {
         solutions = Collections.synchronizedSet(new HashSet<>());
-        new GameSolverTask(Dictionary.root, board, 0, 0, (short) 0, "").invoke();
+        List<GameSolverTask> tasks = new ArrayList<>();
+        for (int i = 0; i < board.length; i++)
+            for (int j = 0; j < board.length; j++)
+                tasks.add(new GameSolverTask(Dictionary.getRoot(), board, i, j, (short) 0, ""));
+        invokeAll(tasks);
         return solutions;
     }
 }

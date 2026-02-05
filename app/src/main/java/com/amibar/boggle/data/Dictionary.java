@@ -1,5 +1,7 @@
-package com.amibar.boggle;
+package com.amibar.boggle.data;
 
+
+import androidx.annotation.NonNull;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -9,9 +11,13 @@ import java.util.Scanner;
 public final class Dictionary{
     private Dictionary() {throw new UnsupportedOperationException("Dictionary is a singleton!");}
 
-    static DictNode root = new DictNode();
+    static private final DictNode root = new DictNode();
+    public static DictNode getRoot(){
+        return root;
+    }
 
-    static boolean contains(String word){
+
+    public static boolean contains(@NonNull String word){
         DictNode node = root;
         for(char ch : word.toCharArray()){
             if(!node.containsKey(ch)){
@@ -22,7 +28,7 @@ public final class Dictionary{
         return node.isEndOfWord;
     }
 
-    static void init(InputStream file){
+    public static void init(InputStream file){
         Scanner sc = new Scanner(file);
         while(sc.hasNextLine()){
             String word = sc.nextLine();
@@ -31,7 +37,7 @@ public final class Dictionary{
         sc.close();
     }
 
-    private static void insert(String word) {
+    private static void insert(@NonNull String word) {
         DictNode node = root;
         for(char ch : word.toCharArray()){
             if(!node.containsKey(ch)){

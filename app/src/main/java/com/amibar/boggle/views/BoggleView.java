@@ -1,6 +1,6 @@
-package com.amibar.boggle;
+package com.amibar.boggle.views;
 
-import static com.amibar.boggle.BoggleGame.WordCheckResult.VALID;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,6 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.amibar.boggle.R;
+import com.amibar.boggle.engine.BoggleGame;
+import com.amibar.boggle.engine.GameSolver;
+import com.amibar.boggle.ui.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 public class BoggleView extends LinearLayout {

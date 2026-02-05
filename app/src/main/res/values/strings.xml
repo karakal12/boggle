@@ -8,4 +8,11 @@
     <string name="word_already_found">\'%s\' was already found</string>
     <string name="word_too_short"><![CDATA[\'%s\' is too short (<3)]]></string>
     <string name="word_null" />
+    <string name="boggle">Boggle!</string>
+    <string name="submit">Submit</string>
+    <string name="single_player_button">Single Player</string>
+    <string name="boggle_welcome_message">Welcome to Boggle!</string>
+    <string name="multiplayer_button">Multiplayer</string>
+    <string name="friends_list_button">Friends List</string>
+    <string name="leaderboards_button">Leaderboards</string>
 </resources>

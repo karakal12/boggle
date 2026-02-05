@@ -1,4 +1,4 @@
-package com.amibar.boggle;
+package com.amibar.boggle.engine;
 
 import android.util.Log;
 
@@ -6,7 +6,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.amibar.boggle.BoggleGame.WordCheckResult.*;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.*;
+
+import com.amibar.boggle.R;
+import com.amibar.boggle.data.Dictionary;
 
 public class BoggleGame {
     public static final long GAME_TIME_MILLIS = 120000; // 2 minutes

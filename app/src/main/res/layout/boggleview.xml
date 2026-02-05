@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
-    android:layout_height="match_parent" android:layout_width="match_parent">
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
-        <TextView android:text="Time: "
+        <TextView
             android:id="@+id/tvTime"
             android:layout_margin="8dp"
             android:layout_height="wrap_content"  android:layout_width="wrap_content"/>
@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Boggle!"
+        android:text="@string/boggle"
         android:textSize="50sp"/>
 
     <TextView
@@ -45,28 +45,35 @@
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:id="@+id/glGameLayout">
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginEnd="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell" />
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell" />
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginEnd="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginEnd="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginBottom="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginBottom="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginBottom="@dimen/cellMargin"/>
-        <com.amibar.boggle.SquareTextView style="@style/BoggleCell"
+        <com.amibar.boggle.views.SquareTextView
+            style="@style/BoggleCell"
             android:layout_marginBottom="@dimen/cellMargin"
             android:layout_marginEnd="@dimen/cellMargin"/>
     </GridLayout>
@@ -83,7 +90,7 @@
         android:id="@+id/bSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Submit"/>
+        android:text="@string/submit"/>
 
     <TextView
         android:id="@+id/tvErrors"

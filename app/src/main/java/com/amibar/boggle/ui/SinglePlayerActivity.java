@@ -1,16 +1,14 @@
-package com.amibar.boggle;
+package com.amibar.boggle.ui;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.amibar.boggle.R;
 
 public class SinglePlayerActivity extends AppCompatActivity {
 

@@ -1,8 +1,7 @@
-package com.amibar.boggle;
+package com.amibar.boggle.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

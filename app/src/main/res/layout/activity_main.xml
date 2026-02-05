@@ -5,14 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <TextView
         android:id="@+id/mainTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Welcome to Boggle!"
+        android:text="@string/boggle_welcome_message"
         android:textSize="50sp"
         app:layout_constraintBottom_toTopOf="@+id/singlePlayerButton"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,7 +21,7 @@
         android:id="@+id/singlePlayerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Single Player"
+        android:text="@string/single_player_button"
         app:layout_constraintBottom_toTopOf="@+id/multiPlayerButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +31,7 @@
         android:id="@+id/multiPlayerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Multiplayer"
+        android:text="@string/multiplayer_button"
         app:layout_constraintBottom_toTopOf="@+id/friendsListButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
         android:id="@+id/friendsListButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Friends List"
+        android:text="@string/friends_list_button"
         app:layout_constraintBottom_toTopOf="@+id/leaderboardsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +51,7 @@
         android:id="@+id/leaderboardsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Leaderboards"
+        android:text="@string/leaderboards_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

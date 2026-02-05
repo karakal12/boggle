@@ -1,4 +1,4 @@
-package com.amibar.boggle;
+package com.amibar.boggle.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+import com.amibar.boggle.R;
+import com.amibar.boggle.data.Dictionary;
 
+@SuppressWarnings("FieldCanBeLocal")
+public class MainActivity extends AppCompatActivity {
     private Button singlePlayerButton;
     private Button multiPlayerButton;
     private Button friendsButton;
