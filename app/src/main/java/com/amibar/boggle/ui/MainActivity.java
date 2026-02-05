@@ -11,9 +11,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.amibar.boggle.R;
-import com.amibar.boggle.data.Dictionary;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class MainActivity extends AppCompatActivity {
     private Button singlePlayerButton;
     private Button multiPlayerButton;
@@ -34,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
-        Dictionary.init(getResources().openRawResource(R.raw.word_list));
         singlePlayerButton = findViewById(R.id.singlePlayerButton);
         multiPlayerButton = findViewById(R.id.multiPlayerButton);
         friendsButton = findViewById(R.id.friendsListButton);

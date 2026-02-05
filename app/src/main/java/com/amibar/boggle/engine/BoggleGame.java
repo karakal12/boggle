@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.*;
 
@@ -12,12 +13,20 @@ import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
 
 public class BoggleGame {
-    public static final long GAME_TIME_MILLIS = 120000; // 2 minutes
+    public static final long GAME_TIME_MILLIS = 180000; // 3 minutes
+
     private final ArrayList<Die> dice;
     private final ArrayDeque<Die> word;
     private final ArrayList<String> foundWords;
     private int score;
     private boolean gameEnded;
+    private OnGameEndListener onGameEndListener;
+
+    private final Set<String> solutions;
+
+    public interface OnGameEndListener {
+        void onGameEnd();
+    }
 
     public BoggleGame(){
         dice = Die.generateDice();
@@ -28,6 +37,14 @@ public class BoggleGame {
         foundWords = new ArrayList<>();
         word = new ArrayDeque<>();
         gameEnded = false;
+
+        solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
+        Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
+        Log.d("BoggleGame", "Solution: " + solutions);
+    }
+
+    public void setOnGameEndListener(OnGameEndListener listener) {
+        this.onGameEndListener = listener;
     }
 
     public int getScore() {
@@ -51,8 +68,16 @@ public class BoggleGame {
 
     public String getWord() {
         StringBuilder sb = new StringBuilder();
-        word.clone().forEach((it) -> sb.append(it.getLetter()));
+        for (Die d : word) {
+            char c = d.getLetter();
+            sb.append(c);
+            if (c == 'Q') sb.append('U');
+        }
         return sb.toString();
+    }
+
+    public Set<String> getSolutions() {
+        return solutions;
     }
 
     public boolean isEnded() {
@@ -62,6 +87,9 @@ public class BoggleGame {
     public void endGame(){
         gameEnded = true;
         Log.d("BoggleGame", "Game ended. Final score: " + score + ", Words found: " + foundWords);
+        if (onGameEndListener != null) {
+            onGameEndListener.onGameEnd();
+        }
     }
 
     public WordCheckResult submitWord(){
@@ -75,7 +103,7 @@ public class BoggleGame {
         if (foundWords.contains(formedWord)) {
             return ALREADY_FOUND;
         }
-        if (Dictionary.contains(formedWord)){
+        if (Dictionary.getInstance().contains(formedWord)){
             score += wordScore(formedWord);
             foundWords.add(formedWord);
             return VALID;
@@ -98,7 +126,9 @@ public class BoggleGame {
     public String formWord(){
         StringBuilder sb = new StringBuilder();
         while (!word.isEmpty()){
-            sb.append(word.removeFirst().getLetter());
+            char c = word.removeFirst().getLetter();
+            sb.append(c);
+            if (c == 'Q') sb.append('U');
         }
         return sb.toString().toLowerCase();
     }

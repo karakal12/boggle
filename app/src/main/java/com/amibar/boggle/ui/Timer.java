@@ -14,9 +14,9 @@ public class Timer implements Runnable {
     private final TextView timerText;
     private final long millisTime;
     private final long millisTimeBegan;
-    @SuppressWarnings("Deprecated")
+    @SuppressWarnings("deprecation")
     private final Handler handler = new Handler();
-    private Runnable onTimerEnd;
+    private final Runnable onTimerEnd;
 
     public Timer(TextView timerText, LinearProgressIndicator indicator, long timeInMillis,
                  Runnable onTimerEnd) {

@@ -14,6 +14,7 @@ import java.util.concurrent.RecursiveAction;
 
 public class GameSolver {
     private Set<String> solutions;
+
     class GameSolverTask extends RecursiveAction {
 
         private final Dictionary.DictNode root;
@@ -53,28 +54,50 @@ public class GameSolver {
                             if (x == 0 && y == 0) {
                                 continue;
                             }
-                            if (isSafe(i + x, j + y, visited) && board[i + x][j + y] == ch) {
-                                GameSolverTask task = new GameSolverTask(root.get(ch),
-                                        board, i + x, j + y, visited, string + ch);
-                                tasks.add(task);
+                            int nextI = i + x;
+                            int nextJ = j + y;
+                            if (isSafe(nextI, nextJ, visited) && board[nextI][nextJ] == ch) {
+                                char c = board[nextI][nextJ];
+                                Dictionary.DictNode nextNode = root.get(c);
+                                if (nextNode != null) {
+                                    String nextString = string + c;
+                                    if (c == 'q') {
+                                        nextNode = nextNode.get('u');
+                                        if (nextNode == null) continue;
+                                        nextString = string + "qu";
+                                    }
+                                    tasks.add(new GameSolverTask(nextNode, board, nextI, nextJ, visited, nextString));
+                                }
                             }
                         }
                     }
                 }
+                invokeAll(tasks);
             }
-            invokeAll(tasks);
         }
 
         private boolean isSafe(int i, int j, short visited) {
             return i >= 0 && i < board.length && j >= 0 && j < board.length && (visited & (1 << (i * board.length + j))) == 0;
         }
     }
-    public Set<String> solve(char[][] board) {
+    public Set<String> solve(char[][] board, Dictionary dictionary) {
         solutions = Collections.synchronizedSet(new HashSet<>());
         List<GameSolverTask> tasks = new ArrayList<>();
-        for (int i = 0; i < board.length; i++)
-            for (int j = 0; j < board.length; j++)
-                tasks.add(new GameSolverTask(Dictionary.getRoot(), board, i, j, (short) 0, ""));
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                char c = board[i][j];
+                Dictionary.DictNode node = dictionary.getRoot().get(c);
+                if (node != null) {
+                    String s = String.valueOf(c);
+                    if (c == 'q') {
+                        node = node.get('u');
+                        if (node == null) continue;
+                        s = "qu";
+                    }
+                    tasks.add(new GameSolverTask(node, board, i, j, (short) 0, s));
+                }
+            }
+        }
         invokeAll(tasks);
         return solutions;
     }

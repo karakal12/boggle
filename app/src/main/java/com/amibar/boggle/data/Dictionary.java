@@ -8,19 +8,27 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 
-public final class Dictionary{
-    private Dictionary() {throw new UnsupportedOperationException("Dictionary is a singleton!");}
+public final class Dictionary {
+    private static final Dictionary instance = new Dictionary();
+    private boolean isInitialized = false;
 
-    static private final DictNode root = new DictNode();
-    public static DictNode getRoot(){
+    private final DictNode root = new DictNode();
+
+    private Dictionary() {}
+
+    public static Dictionary getInstance() {
+        return instance;
+    }
+
+    public DictNode getRoot() {
         return root;
     }
 
-
-    public static boolean contains(@NonNull String word){
+    public boolean contains(@NonNull String word) {
         DictNode node = root;
-        for(char ch : word.toCharArray()){
-            if(!node.containsKey(ch)){
+        for (char ch : word.toLowerCase().toCharArray()) {
+            if (ch < 'a' || ch > 'z') return false;
+            if (!node.containsKey(ch)) {
                 return false;
             }
             node = node.get(ch);
@@ -28,19 +36,25 @@ public final class Dictionary{
         return node.isEndOfWord;
     }
 
-    public static void init(InputStream file){
+    public synchronized void init(InputStream file) {
+        if (isInitialized) return;
+        
         Scanner sc = new Scanner(file);
-        while(sc.hasNextLine()){
-            String word = sc.nextLine();
-            insert(word);
+        while (sc.hasNextLine()) {
+            String word = sc.nextLine().trim().toLowerCase();
+            if (!word.isEmpty()) {
+                insert(word);
+            }
         }
         sc.close();
+        isInitialized = true;
     }
 
-    private static void insert(@NonNull String word) {
+    private void insert(@NonNull String word) {
         DictNode node = root;
-        for(char ch : word.toCharArray()){
-            if(!node.containsKey(ch)){
+        for (char ch : word.toCharArray()) {
+            if (ch < 'a' || ch > 'z') continue;
+            if (!node.containsKey(ch)) {
                 node.put(ch, new DictNode());
             }
             node = node.get(ch);
@@ -48,7 +62,7 @@ public final class Dictionary{
         node.isEndOfWord = true;
     }
 
-    public static class DictNode{
+    public static class DictNode {
         static final int ALPHABET_SIZE = 26;
         private final DictNode[] children = new DictNode[ALPHABET_SIZE];
         private boolean isEndOfWord, isLeaf;
@@ -61,16 +75,22 @@ public final class Dictionary{
 
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         public boolean containsKey(char ch) {
-            return children[ch - 'a'] != null;
+            int index = ch - 'a';
+            return index >= 0 && index < ALPHABET_SIZE && children[index] != null;
         }
 
         public DictNode get(char ch) {
-            return children[ch - 'a'];
+            int index = ch - 'a';
+            if (index < 0 || index >= ALPHABET_SIZE) return null;
+            return children[index];
         }
 
         public void put(char ch, DictNode node) {
-            children[ch - 'a'] = node;
-            isLeaf = false;
+            int index = ch - 'a';
+            if (index >= 0 && index < ALPHABET_SIZE) {
+                children[index] = node;
+                isLeaf = false;
+            }
         }
 
         public boolean isEndOfWord() {
