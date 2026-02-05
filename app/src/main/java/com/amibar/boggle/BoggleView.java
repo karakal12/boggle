@@ -2,8 +2,10 @@ package com.amibar.boggle;
 
 import static com.amibar.boggle.BoggleGame.WordCheckResult.VALID;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -22,7 +24,6 @@ public class BoggleView extends LinearLayout {
     private TextView lastSelected;
 
     private TextView word;
-    private Button submit;
     private TextView msg;
     private TextView score;
 
@@ -41,11 +42,13 @@ public class BoggleView extends LinearLayout {
         initView();
     }
 
+    @SuppressWarnings("unused")
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView();
     }
 
+    @SuppressLint("SetTextI18n")
     private void initView(){
         inflate(getContext(), R.layout.boggleview, this);
 
@@ -57,7 +60,7 @@ public class BoggleView extends LinearLayout {
             cells[i].setOnClickListener(cellOnClickListener(i));
             cells[i].setText(""+game.getDie(i));
         }
-        submit = findViewById(R.id.bSubmit);
+        Button submit = findViewById(R.id.bSubmit);
         submit.setOnClickListener(this::onClickSubmit);
 
         score = findViewById(R.id.tvScore);
@@ -70,6 +73,8 @@ public class BoggleView extends LinearLayout {
 
         new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
                 ()-> game.endGame()).start();
+
+        Log.d("BoggleView", "solutions:" + new GameSolver().solve(game.getDice()).toString());
     }
 
     private void onClickSubmit(View v) {

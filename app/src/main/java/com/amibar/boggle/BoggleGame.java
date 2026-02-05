@@ -31,8 +31,19 @@ public class BoggleGame {
         return score;
     }
 
-    public ArrayList<String> getWords() {
+    @SuppressWarnings("unused")
+    public ArrayList<String> getFoundWords() {
         return foundWords;
+    }
+
+    public char[][] getDice(){
+        char[][] dice = new char[4][4];
+        for (int i = 0; i < 4; i++){
+            for (int j = 0; j < 4; j++){
+                dice[i][j] = (char) (this.dice.get(i * 4 + j).getLetter() - 'A' + 'a');
+            }
+        }
+        return dice;
     }
 
     public String getWord() {

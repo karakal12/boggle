@@ -2,33 +2,77 @@ package com.amibar.boggle;
 
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Scanner;
 
-import javax.inject.Singleton;
 
-@Singleton
 public final class Dictionary{
     private Dictionary() {throw new UnsupportedOperationException("Dictionary is a singleton!");}
 
-    static List<String> words;
+    static DictNode root = new DictNode();
 
     static boolean contains(String word){
-        return Collections.binarySearch(words, word) >= 0;
+        DictNode node = root;
+        for(char ch : word.toCharArray()){
+            if(!node.containsKey(ch)){
+                return false;
+            }
+            node = node.get(ch);
+        }
+        return node.isEndOfWord;
     }
 
     static void init(InputStream file){
-        words = createDict(file);
+        Scanner sc = new Scanner(file);
+        while(sc.hasNextLine()){
+            String word = sc.nextLine();
+            insert(word);
+        }
+        sc.close();
     }
 
-    private static ArrayList<String> createDict(InputStream file) {
-        ArrayList<String> list = new ArrayList<>();
-        Scanner reader = new Scanner(file);
-        while (reader.hasNext()){
-            list.add(reader.next());
+    private static void insert(String word) {
+        DictNode node = root;
+        for(char ch : word.toCharArray()){
+            if(!node.containsKey(ch)){
+                node.put(ch, new DictNode());
+            }
+            node = node.get(ch);
         }
-        return list;
+        node.isEndOfWord = true;
+    }
+
+    public static class DictNode{
+        static final int ALPHABET_SIZE = 26;
+        private final DictNode[] children = new DictNode[ALPHABET_SIZE];
+        private boolean isEndOfWord, isLeaf;
+
+        public DictNode() {
+            this.isEndOfWord = false;
+            this.isLeaf = true;
+            Arrays.fill(children, null);
+        }
+
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+        public boolean containsKey(char ch) {
+            return children[ch - 'a'] != null;
+        }
+
+        public DictNode get(char ch) {
+            return children[ch - 'a'];
+        }
+
+        public void put(char ch, DictNode node) {
+            children[ch - 'a'] = node;
+            isLeaf = false;
+        }
+
+        public boolean isEndOfWord() {
+            return isEndOfWord;
+        }
+
+        public boolean isLeaf() {
+            return isLeaf;
+        }
     }
 }
