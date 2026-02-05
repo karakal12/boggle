@@ -3,6 +3,7 @@ package com.amibar.boggle.views;
 import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
@@ -64,7 +65,7 @@ public class BoggleView extends LinearLayout {
         inflate(getContext(), R.layout.boggleview, this);
 
         game = new BoggleGame();
-        game.setOnGameEndListener(this::showGameEndDialog);
+        game.addOnGameEndListener(this::showGameEndDialog);
         
         cells = new TextView[16];
         GridLayout gl = findViewById(R.id.glGameLayout);
@@ -87,6 +88,10 @@ public class BoggleView extends LinearLayout {
 
         new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
                 ()-> game.endGame()).start();
+    }
+
+    public BoggleGame getGame() {
+        return game;
     }
 
     private void showGameEndDialog() {
@@ -113,7 +118,8 @@ public class BoggleView extends LinearLayout {
         new AlertDialog.Builder(getContext())
                 .setTitle("Game Over")
                 .setMessage(ssb)
-                .setPositiveButton("OK", null)
+                .setPositiveButton("OK", (dialog, which) -> ((Activity) getContext()).finish())
+                .setCancelable(false)
                 .show();
     }
 
