@@ -5,7 +5,9 @@ import android.util.Log;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.*;
 
@@ -20,7 +22,7 @@ public class BoggleGame {
     private final ArrayList<String> foundWords;
     private int score;
     private boolean gameEnded;
-    private OnGameEndListener onGameEndListener;
+    private final List<OnGameEndListener> onGameEndListeners = new CopyOnWriteArrayList<>();
 
     private final Set<String> solutions;
 
@@ -43,8 +45,8 @@ public class BoggleGame {
         Log.d("BoggleGame", "Solution: " + solutions);
     }
 
-    public void setOnGameEndListener(OnGameEndListener listener) {
-        this.onGameEndListener = listener;
+    public void addOnGameEndListener(OnGameEndListener listener) {
+        this.onGameEndListeners.add(listener);
     }
 
     public int getScore() {
@@ -85,10 +87,11 @@ public class BoggleGame {
     }
 
     public void endGame(){
+        if (gameEnded) return;
         gameEnded = true;
         Log.d("BoggleGame", "Game ended. Final score: " + score + ", Words found: " + foundWords);
-        if (onGameEndListener != null) {
-            onGameEndListener.onGameEnd();
+        for (OnGameEndListener listener : onGameEndListeners) {
+            listener.onGameEnd();
         }
     }
 

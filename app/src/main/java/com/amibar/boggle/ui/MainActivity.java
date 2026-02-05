@@ -3,8 +3,11 @@ package com.amibar.boggle.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -18,6 +21,16 @@ public class MainActivity extends AppCompatActivity {
     private Button multiPlayerButton;
     private Button friendsButton;
     private Button leaderboardsButton;
+
+    private final ActivityResultLauncher<Intent> singlePlayerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    int score = result.getData().getIntExtra(SinglePlayerActivity.EXTRA_SCORE, 0);
+                    Toast.makeText(this, "Game finished! Your score: " + score, Toast.LENGTH_LONG).show();
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         friendsButton = findViewById(R.id.friendsListButton);
         leaderboardsButton = findViewById(R.id.leaderboardsButton);
 
-        singlePlayerButton.setOnClickListener(v -> startActivity(new Intent(this, SinglePlayerActivity.class)));
+        singlePlayerButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SinglePlayerActivity.class);
+            singlePlayerLauncher.launch(intent);
+        });
     }
 }

@@ -3,6 +3,7 @@ package com.amibar.boggle.views;
 import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
@@ -64,7 +65,7 @@ public class BoggleView extends LinearLayout {
         inflate(getContext(), R.layout.boggleview, this);
 
         game = new BoggleGame();
-        game.setOnGameEndListener(this::showGameEndDialog);
+        game.addOnGameEndListener(this::showGameEndDialog);
         
         cells = new TextView[16];
         GridLayout gl = findViewById(R.id.glGameLayout);
@@ -78,15 +79,22 @@ public class BoggleView extends LinearLayout {
         submit.setOnClickListener(this::onClickSubmit);
 
         score = findViewById(R.id.tvScore);
-        word = findViewById(R.id.tvWord);
-        msg = findViewById(R.id.tvErrors);
         updateScore();
+
+        word = findViewById(R.id.tvWord);
+        updateWord();
+
+        msg = findViewById(R.id.tvErrors);
 
         TextView timerText = findViewById(R.id.tvTime);
         LinearProgressIndicator timerIndicator = findViewById(R.id.progressBar);
 
         new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
                 ()-> game.endGame()).start();
+    }
+
+    public BoggleGame getGame() {
+        return game;
     }
 
     private void showGameEndDialog() {
@@ -96,7 +104,7 @@ public class BoggleView extends LinearLayout {
 
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         ssb.append("Your score: ").append(String.valueOf(game.getScore())).append("\n\n");
-        ssb.append("Words found by solver (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
+        ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
         
         for (int i = 0; i < sortedSolutions.size(); i++) {
             String s = sortedSolutions.get(i);
@@ -113,7 +121,8 @@ public class BoggleView extends LinearLayout {
         new AlertDialog.Builder(getContext())
                 .setTitle("Game Over")
                 .setMessage(ssb)
-                .setPositiveButton("OK", null)
+                .setPositiveButton("OK", (dialog, which) -> ((Activity) getContext()).finish())
+                .setCancelable(false)
                 .show();
     }
 
