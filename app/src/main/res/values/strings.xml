@@ -3,7 +3,7 @@
     <string name="word">Word:\"%1$s\"</string>
     <string name="score">Score: %1$d\n</string>
     <string name="invalid_word">%1$s is not a valid word</string>
-    <string name="word_valid"/>
+    <string name="word_valid" />
     <string name="word_invalid">\'%s\' is an invalid word</string>
     <string name="word_already_found">\'%s\' was already found</string>
     <string name="word_too_short"><![CDATA[\'%s\' is too short (<3)]]></string>
@@ -15,4 +15,6 @@
     <string name="multiplayer_button">Multiplayer</string>
     <string name="friends_list_button">Friends List</string>
     <string name="leaderboards_button">Leaderboards</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
 </resources>
