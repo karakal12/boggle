@@ -3,7 +3,6 @@ package com.amibar.boggle.views;
 import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
@@ -18,10 +17,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.engine.BoggleGame;
+import com.amibar.boggle.ui.GameEndDialogFragment;
 import com.amibar.boggle.ui.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -103,7 +103,7 @@ public class BoggleView extends LinearLayout {
         List<String> foundByPlayer = game.getFoundWords();
 
         SpannableStringBuilder ssb = new SpannableStringBuilder();
-        ssb.append("Your score: ").append(String.valueOf(game.getScore())).append("\n\n");
+//        ssb.append("Your score: ").append(String.valueOf(game.getScore())).append("\n\n");
         ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
         
         for (int i = 0; i < sortedSolutions.size(); i++) {
@@ -114,16 +114,20 @@ public class BoggleView extends LinearLayout {
                 ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             if (i < sortedSolutions.size() - 1) {
-                ssb.append(", ");
+                ssb.append('\n');
             }
         }
 
-        new AlertDialog.Builder(getContext())
-                .setTitle("Game Over")
-                .setMessage(ssb)
-                .setPositiveButton("OK", (dialog, which) -> ((Activity) getContext()).finish())
-                .setCancelable(false)
-                .show();
+//        new AlertDialog.Builder(getContext())
+//                .setTitle("Game Over")
+//                .setMessage(ssb)
+//                .setPositiveButton("OK", (dialog, which) -> ((Activity) getContext()).finish())
+//                .setCancelable(false)
+//                .show();
+
+        GameEndDialogFragment.newInstance(ssb, score.getText().toString()).show(
+                ((FragmentActivity) getContext()).getSupportFragmentManager(),
+                GameEndDialogFragment.TAG);
     }
 
     private void onClickSubmit(View v) {

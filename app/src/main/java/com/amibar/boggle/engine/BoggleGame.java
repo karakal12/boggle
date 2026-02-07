@@ -15,7 +15,7 @@ import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
 
 public class BoggleGame {
-    public static final long GAME_TIME_MILLIS = 180000; // 3 minutes
+    public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
 
     private final ArrayList<Die> dice;
     private final ArrayDeque<Die> word;
