@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,15 +15,15 @@ import androidx.fragment.app.DialogFragment;
 import com.amibar.boggle.R;
 
 
-public class GameEndDialogFragment extends DialogFragment {
-    public static final String TAG = "GameEndDialogFragment";
+public class SinglePlayerGameEndDialogFragment extends DialogFragment {
+    public static final String TAG = "SinglePlayerGameEndDialogFragment";
 
     private static final String ARG_SPANNABLE_TEXT = "arg_spannable_text";
     private static final String ARG_SCORE = "arg_score";
 
 
-    public static GameEndDialogFragment newInstance(CharSequence text, CharSequence score) {
-        GameEndDialogFragment fragment = new GameEndDialogFragment();
+    public static SinglePlayerGameEndDialogFragment newInstance(CharSequence text, CharSequence score) {
+        SinglePlayerGameEndDialogFragment fragment = new SinglePlayerGameEndDialogFragment();
         Bundle args = new Bundle();
         args.putCharSequence(ARG_SPANNABLE_TEXT, text);
         args.putCharSequence(ARG_SCORE, score);
@@ -39,7 +38,7 @@ public class GameEndDialogFragment extends DialogFragment {
         CharSequence text = getArguments().getCharSequence(ARG_SPANNABLE_TEXT);
         CharSequence score = getArguments().getCharSequence(ARG_SCORE);
 
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_game_end_dialog, null);
+        View view = getLayoutInflater().inflate(R.layout.fragment_game_end_dialog, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 

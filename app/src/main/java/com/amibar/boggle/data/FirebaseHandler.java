@@ -22,6 +22,14 @@ public class FirebaseHandler {
         return instance;
     }
 
+    public static synchronized FirebaseAuth getAuth() {
+        return getInstance().mAuth;
+    }
+
+    public static synchronized FirebaseDatabase getDatabase() {
+        return getInstance().mDatabase;
+    }
+
     public FirebaseUser getCurrentUser() {
         return mAuth.getCurrentUser();
     }

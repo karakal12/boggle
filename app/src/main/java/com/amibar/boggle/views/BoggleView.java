@@ -4,10 +4,6 @@ import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -17,17 +13,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.engine.BoggleGame;
-import com.amibar.boggle.ui.GameEndDialogFragment;
 import com.amibar.boggle.ui.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class BoggleView extends LinearLayout {
 
@@ -65,7 +55,6 @@ public class BoggleView extends LinearLayout {
         inflate(getContext(), R.layout.boggleview, this);
 
         game = new BoggleGame();
-        game.addOnGameEndListener(this::showGameEndDialog);
         
         cells = new TextView[16];
         GridLayout gl = findViewById(R.id.glGameLayout);
@@ -95,39 +84,6 @@ public class BoggleView extends LinearLayout {
 
     public BoggleGame getGame() {
         return game;
-    }
-
-    private void showGameEndDialog() {
-        List<String> sortedSolutions = new ArrayList<>(game.getSolutions());
-        Collections.sort(sortedSolutions);
-        List<String> foundByPlayer = game.getFoundWords();
-
-        SpannableStringBuilder ssb = new SpannableStringBuilder();
-//        ssb.append("Your score: ").append(String.valueOf(game.getScore())).append("\n\n");
-        ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
-        
-        for (int i = 0; i < sortedSolutions.size(); i++) {
-            String s = sortedSolutions.get(i);
-            int start = ssb.length();
-            ssb.append(s);
-            if (foundByPlayer.contains(s)) {
-                ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            if (i < sortedSolutions.size() - 1) {
-                ssb.append('\n');
-            }
-        }
-
-//        new AlertDialog.Builder(getContext())
-//                .setTitle("Game Over")
-//                .setMessage(ssb)
-//                .setPositiveButton("OK", (dialog, which) -> ((Activity) getContext()).finish())
-//                .setCancelable(false)
-//                .show();
-
-        GameEndDialogFragment.newInstance(ssb, score.getText().toString()).show(
-                ((FragmentActivity) getContext()).getSupportFragmentManager(),
-                GameEndDialogFragment.TAG);
     }
 
     private void onClickSubmit(View v) {

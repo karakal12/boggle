@@ -12,13 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Boggle">
         <activity
-            android:name=".ui.LoginActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.SinglePlayerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.main_menu.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

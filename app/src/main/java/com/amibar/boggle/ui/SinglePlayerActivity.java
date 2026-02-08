@@ -1,7 +1,11 @@
 package com.amibar.boggle.ui;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,7 +14,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.amibar.boggle.R;
+import com.amibar.boggle.engine.BoggleGame;
 import com.amibar.boggle.views.BoggleView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SinglePlayerActivity extends AppCompatActivity {
 
@@ -28,12 +37,38 @@ public class SinglePlayerActivity extends AppCompatActivity {
         });
 
         BoggleView boggleView = findViewById(R.id.boggle_view);
-        boggleView.getGame().addOnGameEndListener(() -> {
+        BoggleGame game = boggleView.getGame();
+        game.addOnGameEndListener(() -> {
             Intent data = new Intent();
-            data.putExtra(EXTRA_SCORE, boggleView.getGame().getScore());
+            data.putExtra(EXTRA_SCORE, game.getScore());
             setResult(RESULT_OK, data);
-            // We don't finish() here because BoggleView shows a dialog first.
-            // The activity result is set, and it will be delivered when the activity finishes.
+
+            showGameEndDialog(game);
         });
+    }
+
+    private void showGameEndDialog(BoggleGame game) {
+        List<String> sortedSolutions = new ArrayList<>(game.getSolutions());
+        Collections.sort(sortedSolutions);
+        List<String> foundByPlayer = game.getFoundWords();
+
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
+
+        for (int i = 0; i < sortedSolutions.size(); i++) {
+            String s = sortedSolutions.get(i);
+            int start = ssb.length();
+            ssb.append(s);
+            if (foundByPlayer.contains(s)) {
+                ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            if (i < sortedSolutions.size() - 1) {
+                ssb.append('\n');
+            }
+        }
+
+        SinglePlayerGameEndDialogFragment.newInstance(ssb, getString(R.string.score, game.getScore())).show(
+                getSupportFragmentManager(),
+                SinglePlayerGameEndDialogFragment.TAG);
     }
 }
