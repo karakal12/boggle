@@ -11,6 +11,8 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -28,6 +30,7 @@ public class BoggleView extends LinearLayout {
     private TextView word;
     private TextView msg;
     private TextView score;
+
 
     public BoggleView(@NonNull Context context) {
         super(context);
@@ -49,13 +52,12 @@ public class BoggleView extends LinearLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView();
     }
-
     @SuppressLint("SetTextI18n")
     private void initView(){
-        inflate(getContext(), R.layout.boggleview, this);
+        inflate(getContext(), R.layout.view_boggle, this);
 
         game = new BoggleGame();
-        
+
         cells = new TextView[16];
         GridLayout gl = findViewById(R.id.glGameLayout);
         for (int i = 0; i < gl.getChildCount(); i++) {
@@ -88,8 +90,9 @@ public class BoggleView extends LinearLayout {
 
     private void onClickSubmit(View v) {
         if (game.isEnded()) return;
-        for (TextView cell : cells){
-            cell.setBackgroundColor(getColor(R.color.unselected));
+        int unselectedColor = getColor(R.color.unselected);
+        for (TextView cell : cells) {
+            cell.setBackgroundColor(unselectedColor);
         }
         String lastWord = game.getWord();
         BoggleGame.WordCheckResult result = game.submitWord();
@@ -119,7 +122,7 @@ public class BoggleView extends LinearLayout {
         };
     }
 
-    private int getColor(int colorRes) {
+    private @ColorInt int getColor(@ColorRes int colorRes){
         return getContext().getColor(colorRes);
     }
 

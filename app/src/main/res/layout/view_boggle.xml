@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_height="match_parent"
@@ -13,7 +14,8 @@
         <TextView
             android:id="@+id/tvTime"
             android:layout_margin="8dp"
-            android:layout_height="wrap_content"  android:layout_width="wrap_content"/>
+            android:layout_height="wrap_content"  android:layout_width="wrap_content"
+            android:textColor="?android:attr/textColorPrimaryNoDisable"/>
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,7 +23,8 @@
             android:indeterminate="false"
             android:max="60"
             android:progress="60"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            app:indicatorColor="?android:attr/colorSecondary"/>
     </LinearLayout>
 
     <TextView
@@ -30,7 +33,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/boggle"
-        android:textSize="50sp"/>
+        android:textSize="50sp"
+        android:textColor="?android:attr/textColorPrimaryNoDisable"/>
 
     <TextView
         android:id="@+id/tvScore"
@@ -43,7 +47,7 @@
         android:columnCount="4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black"
+        android:background="?android:attr/colorForeground"
         android:id="@+id/glGameLayout">
         <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
         <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
@@ -97,6 +101,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="@color/black"/>
+        android:textColor="?android:attr/textColorPrimary"/>
 
 </LinearLayout>

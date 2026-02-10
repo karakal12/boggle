@@ -1,6 +1,7 @@
 package com.amibar.boggle.ui.main_menu;
 
 import android.app.ProgressDialog;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +31,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Objects;
 
 public class SignUpFragment extends DialogFragment {
@@ -90,11 +91,11 @@ public class SignUpFragment extends DialogFragment {
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                 .build()));
 
-        signup_button.setOnClickListener(v -> handleSignUp());
+        signup_button.setOnClickListener(v -> createUser());
     }
 
     @SuppressWarnings("deprecation")
-    private void handleSignUp() {
+    private void createUser() {
         String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
         String email = Objects.requireNonNull(ETEmail.getText()).toString().trim();
         String password = Objects.requireNonNull(ETPassword.getText()).toString().trim();
@@ -118,8 +119,12 @@ public class SignUpFragment extends DialogFragment {
                             String base64Image = null;
                             if (selectedImageUri != null) {
                                 try {
-                                    base64Image = ImageUtils.uriToBase64(requireContext().getContentResolver().openInputStream(selectedImageUri));
-                                } catch (FileNotFoundException ignored){}
+                                    base64Image = ImageUtils.uriToBase64(selectedImageUri, requireContext());
+                                } catch (IOException e) {
+                                    // Handle the exception by logging it and setting a default image
+                                    Log.e(TAG, "Error converting image to Base64", e);
+                                    base64Image = ImageUtils.bitmapToBase64(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person));
+                                }
                             }
                             updateProfile(user, displayName, base64Image, pd);
                         }
@@ -159,7 +164,7 @@ public class SignUpFragment extends DialogFragment {
     @SuppressWarnings("deprecation")
     private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
         pd.setMessage("Saving User Data...");
-        User newUser = new User(user.getUid(), displayName, user.getEmail(), base64Image);
+        User newUser = new User(displayName, user.getEmail(), base64Image);
 
         FirebaseHandler.getInstance().getUserRef().setValue(newUser)
                 .addOnCompleteListener(task -> {
