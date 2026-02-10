@@ -116,14 +116,13 @@ public class BoggleGame {
 
     private int wordScore(String word) {
         int wordLength = word.length();
-        switch (wordLength) {
-            case 3:
-            case 4: return 1;
-            case 5: return 2;
-            case 6: return 3;
-            case 7: return 5;
-            default: return wordLength >= 8 ? 11 : 0;
-        }
+        return switch (wordLength) {
+            case 3, 4 -> 1;
+            case 5 -> 2;
+            case 6 -> 3;
+            case 7 -> 5;
+            default -> wordLength >= 8 ? 11 : 0;
+        };
     }
 
     public String formWord(){

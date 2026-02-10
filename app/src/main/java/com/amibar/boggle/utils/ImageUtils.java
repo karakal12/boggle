@@ -6,16 +6,14 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+
 
 public class ImageUtils {
     private final static String TAG = "ImageUtils";
 
-    static public String uriToBase64(InputStream inputStream) {
+    static public String bitmapToBase64(Bitmap bitmap) {
         try {
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            // Compress the image to keep the Base64 string size reasonable for Realtime Database
             bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
             byte[] byteArray = outputStream.toByteArray();
             return Base64.encodeToString(byteArray, Base64.DEFAULT);

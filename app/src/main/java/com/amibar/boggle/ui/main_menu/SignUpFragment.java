@@ -1,6 +1,8 @@
 package com.amibar.boggle.ui.main_menu;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -90,11 +92,11 @@ public class SignUpFragment extends DialogFragment {
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                 .build()));
 
-        signup_button.setOnClickListener(v -> handleSignUp());
+        signup_button.setOnClickListener(v -> createUser());
     }
 
     @SuppressWarnings("deprecation")
-    private void handleSignUp() {
+    private void createUser() {
         String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
         String email = Objects.requireNonNull(ETEmail.getText()).toString().trim();
         String password = Objects.requireNonNull(ETPassword.getText()).toString().trim();
@@ -118,7 +120,8 @@ public class SignUpFragment extends DialogFragment {
                             String base64Image = null;
                             if (selectedImageUri != null) {
                                 try {
-                                    base64Image = ImageUtils.uriToBase64(requireContext().getContentResolver().openInputStream(selectedImageUri));
+                                    Bitmap bitmap = BitmapFactory.decodeStream(requireContext().getContentResolver().openInputStream(selectedImageUri));
+                                    base64Image = ImageUtils.bitmapToBase64(bitmap);
                                 } catch (FileNotFoundException ignored){}
                             }
                             updateProfile(user, displayName, base64Image, pd);
@@ -159,7 +162,7 @@ public class SignUpFragment extends DialogFragment {
     @SuppressWarnings("deprecation")
     private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
         pd.setMessage("Saving User Data...");
-        User newUser = new User(user.getUid(), displayName, user.getEmail(), base64Image);
+        User newUser = new User(displayName, user.getEmail(), base64Image);
 
         FirebaseHandler.getInstance().getUserRef().setValue(newUser)
                 .addOnCompleteListener(task -> {
