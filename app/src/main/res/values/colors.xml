@@ -4,19 +4,19 @@
     <color name="primary_variant">#1976D2</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="secondary">#FFC107</color>
-    <color name="secondary_variant">#FFA000</color>
+    <color name="secondary">#FFE082</color>
+    <color name="secondary_variant">#FFD54F</color>
     <color name="on_secondary">#000000</color>
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Game specific colors -->
-    <color name="unselected">#FFFFFF</color>
-    <color name="selected">#FFE082</color> <!-- Light Amber -->
-    <color name="lastSelected">#FFD54F</color> <!-- Amber -->
+    <!-- Game colors -->
+    <color name="unselected">?android:attr/colorBackground</color>
+    <color name="selected">?attr/colorSecondary</color>
+    <color name="lastSelected">?attr/colorSecondaryVariant</color>
 
-    <!-- Legacy template colors (optional to keep, but let's clean up) -->
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

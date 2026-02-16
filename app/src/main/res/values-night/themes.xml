@@ -15,8 +15,7 @@
         <!-- Background and surface colors -->
         <item name="android:colorBackground">#121212</item>
         <item name="colorSurface">#1E1E1E</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
+<!--        <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>-->
 
-        <!-- Customize your theme here. -->
     </style>
 </resources>

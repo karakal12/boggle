@@ -5,11 +5,11 @@
     <color name="on_primary">#000000</color>
 
     <color name="secondary">#FFE082</color>
-    <color name="secondary_variant">#FFE082</color>
+    <color name="secondary_variant">#FFD54F</color>
     <color name="on_secondary">#000000</color>
 
-    <!-- Game specific colors for Dark Mode -->
-    <color name="unselected">#1E1E1E</color>
-    <color name="selected">#37474F</color> <!-- Dark Blue Grey -->
-    <color name="lastSelected">#546E7A</color> <!-- Lighter Blue Grey -->
+    <!-- Game colors for Dark Mode -->
+<!--    <color name="unselected">#1E1E1E</color>-->
+<!--    <color name="selected">#1976D2</color>-->
+<!--    <color name="lastSelected">#90CAF9</color>-->
 </resources>
