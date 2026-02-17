@@ -2,34 +2,42 @@ package com.amibar.boggle.engine;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
+import com.amibar.boggle.utils.MathUtilsKt;
+
+import org.apache.commons.math3.complex.Quaternion;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder.Callback {
-    public static final double OOSQRT2 = 0.70710678118654752440084436210484903928483593768847;
+    public static final int scale = 10;
     private Choreographer choreographer;
 
     private final SurfaceView surfaceView;
     private Canvas bitmapCanvas;
     private Bitmap bitmap;
+    private @ColorInt int[] pixelBuffer;
+    private Vector3D[] rayDirections;
+    private Rect scaledSize;
+    private Rect bitmapSize;
 
-    private double[] zBuffer;
 
-    private static final double thetaSpacing = 0.07;
-    private static final double phiSpacing = 0.02;
-
-    private static final double R1 = 1;
-    private static final double R2 = 2;
-    private static final double K2 = 10;
+    private static final double R1 = 1; // minor radius
+    private static final double R2 = 2; // major radius
+    private static final double K2 = 100;
+    public static final Vector3D ORIGIN = new Vector3D(0, 0, -K2);
     private double K1;
+    private Quaternion torusRotation;
+    private static final Vector3D lightDirection = new Vector3D(0, 1, -1).normalize();
 
-    private double A = 0, B = 0;
+
     private boolean isSurfaceReady = false;
 
     public DonutRenderer(SurfaceView surfaceView) {
@@ -37,7 +45,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         surfaceView.getHolder().addCallback(this);
         if (surfaceView.getHolder().getSurface().isValid()) {
             isSurfaceReady = true;
-            initResources(surfaceView.getWidth(), surfaceView.getHeight());
+            initResources(surfaceView.getWidth() / scale, surfaceView.getHeight() / scale);
         }
     }
 
@@ -49,11 +57,31 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
             bitmap.recycle();
         }
 
+        if (pixelBuffer == null || pixelBuffer.length != width * height) {
+            pixelBuffer = new int[width * height];
+        }
+
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bitmapCanvas = new Canvas(bitmap);
         bitmapCanvas.drawColor(0xff000000);
-        K1 = (width * K2 * 3 / (8f * (R1 + R2)));
-        zBuffer = new double[width * height];
+
+        // K1 calculation: scales the object based on width
+        K1 = (width * K2 * 3.0 / (8.0 * (R1 + R2)));
+
+        scaledSize = new Rect(0, 0, surfaceView.getWidth(), surfaceView.getHeight());
+        bitmapSize = new Rect(0, 0, width, height);
+        if (torusRotation == null) {
+            torusRotation = new Quaternion(1, 0, 0, 0);
+        }
+
+        rayDirections = new Vector3D[width * height];
+        for (int i = 0; i < width * height; i++) {
+            int x = i % width - width / 2;
+            int y = i / width - height / 2;
+
+
+            rayDirections[i] = new Vector3D(x, y, K1).normalize();
+        }
     }
 
     @Override
@@ -61,8 +89,8 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         if (choreographer == null) return;
 
         if (isSurfaceReady) {
-            int width = surfaceView.getWidth();
-            int height = surfaceView.getHeight();
+            int width = surfaceView.getWidth() / scale;
+            int height = surfaceView.getHeight() / scale;
             if (width > 0 && height > 0) {
                 initResources(width, height);
 
@@ -70,7 +98,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
                     drawDonut();
                     Canvas surfaceCanvas = surfaceView.getHolder().lockCanvas();
                     if (surfaceCanvas != null) {
-                        surfaceCanvas.drawBitmap(bitmap, 0, 0, null);
+                        surfaceCanvas.drawBitmap(bitmap, bitmapSize, scaledSize, null);
                         surfaceView.getHolder().unlockCanvasAndPost(surfaceCanvas);
                     }
                 }
@@ -78,55 +106,40 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         }
 
         choreographer.postFrameCallback(this);
-        A += 0.01;
-        B += 0.04;
+        // Spin the donut
+        torusRotation = torusRotation.multiply(new Quaternion(0.999, 0.01, 0.02, 0.03)).normalize();
     }
 
     private void drawDonut() {
         if (bitmapCanvas == null || bitmap == null) return;
 
-        bitmapCanvas.drawColor(0xff000000);
-        Arrays.fill(zBuffer, 0.0);
 
-        double cosA = Math.cos(A), sinA = Math.sin(A);
-        double cosB = Math.cos(B), sinB = Math.sin(B);
 
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        for (double theta = 0; theta < 2 * Math.PI; theta += thetaSpacing) {
-            double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
+        for (int i = 0; i < pixelBuffer.length; i++) {
 
-            for (double phi = 0; phi < 2 * Math.PI; phi += phiSpacing) {
-                double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+            // R2 is major radius, R1 is minor radius
+            double t = MathUtilsKt.rayIntersectTorus(ORIGIN, rayDirections[i], torusRotation, R2, R1);
 
-                double circleX = R2 + R1 * cosTheta;
-                double circleY = R1 * sinTheta;
-
-                double x = circleX * (cosB * cosPhi + sinA * sinB * sinPhi) - circleY * cosA * sinB;
-                double y = circleX * (sinB * cosPhi - sinA * cosB * sinPhi) + circleY * cosA * cosB;
-                double z = K2 + cosA * circleX * sinPhi + circleY * sinA;
-                double ooz = 1 / z;
-
-                int screenX = (int) ((double) width / 2 + K1 * x * ooz);
-                int screenY = (int) ((double) height / 2 - K1 * y * ooz);
-
-                if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
-                    double L = cosPhi * cosTheta * sinB - cosA * cosTheta * sinPhi -
-                            sinA * sinTheta + cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi);
-
-                    if (L > 0) {
-                        int index = screenX + screenY * width;
-                        if (ooz > zBuffer[index]) {
-                            zBuffer[index] = ooz;
-                            int intensity = (int) (255 * L * OOSQRT2);
-                            int color = Color.argb(255, intensity, intensity, intensity);
-                            bitmap.setPixel(screenX, screenY, color);
-                        }
-                    }
-                }
+            if (t == Double.POSITIVE_INFINITY || Double.isNaN(t)) {
+                pixelBuffer[i] = 0xff000000;
+                continue;
             }
+
+            Vector3D intersection = ORIGIN.add(rayDirections[i].scalarMultiply(t));
+            Vector3D normal = MathUtilsKt.getTorusNormal(intersection, torusRotation, R2);
+
+            double lightIntensity = Math.max(0, lightDirection.dotProduct(normal));
+
+            // Correct color bitmasking
+            int luminance = (int) (lightIntensity * 200) + 55;
+            @ColorInt int color = 0xff000000 | (luminance << 16) | (luminance << 8) | luminance;
+
+            pixelBuffer[i] = color;
         }
+        bitmap.setPixels(pixelBuffer, 0, width, 0, 0, width, height);
     }
 
     public void startRender() {
@@ -154,7 +167,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        initResources(width, height);
+        initResources(width / scale, height / scale);
     }
 
     @Override

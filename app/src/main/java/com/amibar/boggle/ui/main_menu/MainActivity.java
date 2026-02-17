@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI() {
+    void updateUI() {
         boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
         FirebaseUser user = FirebaseHandler.getInstance().getCurrentUser();
 

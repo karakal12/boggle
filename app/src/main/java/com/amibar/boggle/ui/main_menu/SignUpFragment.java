@@ -171,6 +171,7 @@ public class SignUpFragment extends DialogFragment {
                     pd.dismiss();
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), "User created successfully!", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) requireActivity()).updateUI();
                         dismiss();
                     } else {
                         Toast.makeText(requireContext(), "Failed to save user data", Toast.LENGTH_SHORT).show();

@@ -1,8 +1,10 @@
 package com.amibar.boggle.ui;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
