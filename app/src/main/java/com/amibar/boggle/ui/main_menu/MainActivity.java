@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -27,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.User;
+import com.amibar.boggle.ui.DonutActivity;
 import com.amibar.boggle.ui.SinglePlayerActivity;
 import com.amibar.boggle.utils.ImageUtils;
 import com.google.android.material.navigation.NavigationView;
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private Button multiPlayerButton;
     private Button friendsButton;
     private Button leaderboardsButton;
+    private ImageView donutButton;
 
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
@@ -60,13 +61,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        OnApplyWindowInsetsListener onApplyWindowInsetsListener = (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-        };
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content), onApplyWindowInsetsListener);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view), onApplyWindowInsetsListener);
+        });
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         init();
         setupAuthStateListener();
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         multiPlayerButton = findViewById(R.id.multiPlayerButton);
         friendsButton = findViewById(R.id.friendsListButton);
         leaderboardsButton = findViewById(R.id.leaderboardsButton);
+        donutButton = findViewById(R.id.donutButton);
         drawerLayout = findViewById(R.id.main);
         toolbar = findViewById(R.id.toolbar);
         navigationView = findViewById(R.id.nav_view);
@@ -88,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
             singlePlayerLauncher.launch(intent);
         });
 
+        donutButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, DonutActivity.class);
+            startActivity(intent);
+        });
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 

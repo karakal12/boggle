@@ -80,6 +80,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendsListButton" />
 
+        <ImageView
+            android:id="@+id/donutButton"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_donut"
+            app:layout_constraintBottom_toBottomOf="@id/main_content"
+            app:layout_constraintEnd_toEndOf="@id/main_content" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
