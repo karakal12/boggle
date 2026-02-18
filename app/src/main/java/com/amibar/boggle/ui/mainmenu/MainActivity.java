@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.main_menu;
+package com.amibar.boggle.ui.mainmenu;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,7 +27,7 @@ import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.ui.DonutActivity;
-import com.amibar.boggle.ui.SinglePlayerActivity;
+import com.amibar.boggle.ui.singleplayer.SinglePlayerActivity;
 import com.amibar.boggle.utils.ImageUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;

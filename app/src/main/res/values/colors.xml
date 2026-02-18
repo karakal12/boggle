@@ -11,10 +11,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="background">#F5F5F5</color>
+
     <!-- Game colors -->
-    <color name="unselected">?android:attr/colorBackground</color>
-    <color name="selected">?attr/colorSecondary</color>
-    <color name="lastSelected">?attr/colorSecondaryVariant</color>
+
+    <color name="selected">#FFE082</color>
+    <color name="last_selected">#FFBA39</color>
 
 
     <color name="purple_200">#FFBB86FC</color>

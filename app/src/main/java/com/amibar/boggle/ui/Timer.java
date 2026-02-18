@@ -16,10 +16,14 @@ public class Timer implements Runnable {
     private final long millisTimeBegan;
     @SuppressWarnings("deprecation")
     private final Handler handler = new Handler();
-    private final Runnable onTimerEnd;
+    private final OnTimerEndListener onTimerEnd;
+
+    public interface OnTimerEndListener{
+        void onTimerEnd();
+    }
 
     public Timer(TextView timerText, LinearProgressIndicator indicator, long timeInMillis,
-                 Runnable onTimerEnd) {
+                 OnTimerEndListener onTimerEnd) {
         this.indicator = indicator;
         this.millisTimeBegan = System.currentTimeMillis();
         this.millisTime = timeInMillis;
@@ -37,7 +41,7 @@ public class Timer implements Runnable {
         if (elapsedTime >= millisTime) {
             timerText.setText("00:00");
             indicator.setProgress(indicator.getMax());
-            onTimerEnd.run();
+            onTimerEnd.onTimerEnd();
             return;
         }
         handler.postDelayed(this, 1000L - (elapsedTime % 1000L));

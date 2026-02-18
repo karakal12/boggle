@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.main_menu;
+package com.amibar.boggle.ui.mainmenu;
 
 import android.app.ProgressDialog;
 import android.graphics.BitmapFactory;

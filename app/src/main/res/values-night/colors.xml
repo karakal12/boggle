@@ -8,6 +8,11 @@
     <color name="secondary_variant">#FFD54F</color>
     <color name="on_secondary">#000000</color>
 
+    <color name="background">#121212</color>
+
+    <color name="selected">#FFE491</color>
+    <color name="last_selected">#FFD54F</color>
+
     <!-- Game colors for Dark Mode -->
 <!--    <color name="unselected">#1E1E1E</color>-->
 <!--    <color name="selected">#1976D2</color>-->

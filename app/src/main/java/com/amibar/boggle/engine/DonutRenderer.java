@@ -2,7 +2,8 @@ package com.amibar.boggle.engine;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.Choreographer;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -10,16 +11,26 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 
 import java.util.Arrays;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder.Callback {
+    public static final double scale = 4;
+
     public static final double OOSQRT2 = 0.70710678118654752440084436210484903928483593768847;
+    public static final double SQRT2 = 1.41421356237309504880168;
+    public static final Paint scalingPaint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
     private Choreographer choreographer;
 
     private final SurfaceView surfaceView;
-    private Canvas bitmapCanvas;
     private Bitmap bitmap;
 
+    private Rect scaledSize;
+    private Rect bitmapSize;
+
+
     private double[] zBuffer;
+    private int[] pixelBuffer;
 
     private static final double thetaSpacing = 0.07;
     private static final double phiSpacing = 0.02;
@@ -32,12 +43,13 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
     private double A = 0, B = 0;
     private boolean isSurfaceReady = false;
 
+
     public DonutRenderer(SurfaceView surfaceView) {
         this.surfaceView = surfaceView;
         surfaceView.getHolder().addCallback(this);
         if (surfaceView.getHolder().getSurface().isValid()) {
             isSurfaceReady = true;
-            initResources(surfaceView.getWidth(), surfaceView.getHeight());
+            initResources((int) (surfaceView.getWidth() / scale), (int) (surfaceView.getHeight() / scale));
         }
     }
 
@@ -50,10 +62,13 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         }
 
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitmapCanvas = new Canvas(bitmap);
-        bitmapCanvas.drawColor(0xff000000);
         K1 = (width * K2 * 3 / (8f * (R1 + R2)));
+
+        scaledSize = new Rect(0, 0, surfaceView.getWidth(), surfaceView.getHeight());
+        bitmapSize = new Rect(0, 0, width, height);
+
         zBuffer = new double[width * height];
+        pixelBuffer = new int[width * height];
     }
 
     @Override
@@ -61,8 +76,8 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         if (choreographer == null) return;
 
         if (isSurfaceReady) {
-            int width = surfaceView.getWidth();
-            int height = surfaceView.getHeight();
+            int width = (int) (surfaceView.getWidth() / scale);
+            int height = (int) (surfaceView.getHeight() / scale);
             if (width > 0 && height > 0) {
                 initResources(width, height);
 
@@ -70,7 +85,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
                     drawDonut();
                     Canvas surfaceCanvas = surfaceView.getHolder().lockCanvas();
                     if (surfaceCanvas != null) {
-                        surfaceCanvas.drawBitmap(bitmap, 0, 0, null);
+                        surfaceCanvas.drawBitmap(bitmap, bitmapSize, scaledSize, scalingPaint);
                         surfaceView.getHolder().unlockCanvasAndPost(surfaceCanvas);
                     }
                 }
@@ -78,30 +93,31 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         }
 
         choreographer.postFrameCallback(this);
-        A += 0.01;
-        B += 0.04;
+        A += 0.04;
+        B += 0.02;
     }
 
     private void drawDonut() {
-        if (bitmapCanvas == null || bitmap == null) return;
-
-        bitmapCanvas.drawColor(0xff000000);
-        Arrays.fill(zBuffer, 0.0);
-
-        double cosA = Math.cos(A), sinA = Math.sin(A);
-        double cosB = Math.cos(B), sinB = Math.sin(B);
+        if (bitmap == null || zBuffer == null || pixelBuffer == null) return;
 
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        for (double theta = 0; theta < 2 * Math.PI; theta += thetaSpacing) {
+        Arrays.fill(zBuffer, 0.0);
+        Arrays.fill(pixelBuffer, 0xff000000);
+
+        double cosA = Math.cos(A), sinA = Math.sin(A);
+        double cosB = Math.cos(B), sinB = Math.sin(B);
+
+        DoubleStream stream = IntStream.range(0, (int) (2*Math.PI/thetaSpacing)).mapToDouble(i -> i * thetaSpacing);
+
+        stream.forEach(theta -> {
             double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
+            double circleX = R2 + R1 * cosTheta;
+            double circleY = R1 * sinTheta;
 
             for (double phi = 0; phi < 2 * Math.PI; phi += phiSpacing) {
                 double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
-
-                double circleX = R2 + R1 * cosTheta;
-                double circleY = R1 * sinTheta;
 
                 double x = circleX * (cosB * cosPhi + sinA * sinB * sinPhi) - circleY * cosA * sinB;
                 double y = circleX * (sinB * cosPhi - sinA * cosB * sinPhi) + circleY * cosA * cosB;
@@ -114,19 +130,21 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
                 if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
                     double L = cosPhi * cosTheta * sinB - cosA * cosTheta * sinPhi -
                             sinA * sinTheta + cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi);
+                    L += SQRT2;
 
-                    if (L > 0) {
-                        int index = screenX + screenY * width;
-                        if (ooz > zBuffer[index]) {
-                            zBuffer[index] = ooz;
-                            int intensity = (int) (255 * L * OOSQRT2);
-                            int color = Color.argb(255, intensity, intensity, intensity);
-                            bitmap.setPixel(screenX, screenY, color);
+                    int index = screenX + screenY * width;
+                    if (ooz > zBuffer[index]) {
+                        zBuffer[index] = ooz;
+                        int intensity = (int) (128 * L * OOSQRT2);
+                        if (intensity > 255) intensity = 255;
+                        int color = 0xff000000 | (intensity << 16) | (intensity << 8) | intensity;
+                        pixelBuffer[index] = color;
                         }
-                    }
                 }
             }
-        }
+        });
+
+        bitmap.setPixels(pixelBuffer, 0, width, 0, 0, width, height);
     }
 
     public void startRender() {
@@ -143,8 +161,9 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
         if (bitmap != null) {
             bitmap.recycle();
             bitmap = null;
-            bitmapCanvas = null;
         }
+        pixelBuffer = null;
+        zBuffer = null;
     }
 
     @Override
@@ -154,7 +173,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        initResources(width, height);
+        initResources((int) (width / scale), (int) (height / scale));
     }
 
     @Override

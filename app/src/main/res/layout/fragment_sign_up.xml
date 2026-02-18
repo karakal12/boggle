@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    tools:context=".ui.main_menu.SignUpFragment">
+    tools:context=".ui.mainmenu.SignUpFragment">
 
     <ImageView
         android:id="@+id/IVProfileImage"

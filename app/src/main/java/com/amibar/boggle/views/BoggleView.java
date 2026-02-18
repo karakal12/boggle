@@ -4,15 +4,15 @@ import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -81,7 +81,7 @@ public class BoggleView extends LinearLayout {
         LinearProgressIndicator timerIndicator = findViewById(R.id.progressBar);
 
         new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
-                ()-> game.endGame()).start();
+                () -> game.endGame()).start();
     }
 
     public BoggleGame getGame() {
@@ -90,7 +90,7 @@ public class BoggleView extends LinearLayout {
 
     private void onClickSubmit(View v) {
         if (game.isEnded()) return;
-        int unselectedColor = getColor(R.color.unselected);
+        int unselectedColor = resolveAttribute(R.attr.colorUnselected);
         for (TextView cell : cells) {
             cell.setBackgroundColor(unselectedColor);
         }
@@ -113,17 +113,20 @@ public class BoggleView extends LinearLayout {
                 return;
             if (game.selectDie(cellId)){
                 if (lastSelected != null) {
-                    lastSelected.setBackgroundColor(getColor(R.color.selected));
+                    lastSelected.setBackgroundColor(resolveAttribute(R.attr.colorSelected));
                 }
                 updateWord();
-                view.setBackgroundColor(getColor(R.color.lastSelected));
+                view.setBackgroundColor(resolveAttribute(R.attr.colorLastSelected));
                 lastSelected = (TextView) view;
             }
         };
     }
 
-    private @ColorInt int getColor(@ColorRes int colorRes){
-        return getContext().getColor(colorRes);
+    private int resolveAttribute(int colorRes){
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getContext().getTheme();
+        theme.resolveAttribute(colorRes, typedValue, true);
+        return typedValue.data;
     }
 
     private void updateWord(){

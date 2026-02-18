@@ -1,6 +1,15 @@
 package com.amibar.boggle.engine;
 
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.ALREADY_FOUND;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.INVALID;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.NULL_WORD;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.TOO_SHORT;
+import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
+
 import android.util.Log;
+
+import com.amibar.boggle.R;
+import com.amibar.boggle.data.Dictionary;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -8,11 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.*;
-
-import com.amibar.boggle.R;
-import com.amibar.boggle.data.Dictionary;
 
 public class BoggleGame {
     public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
@@ -23,12 +27,17 @@ public class BoggleGame {
     private int score;
     private boolean gameEnded;
     private final List<OnGameEndListener> onGameEndListeners = new CopyOnWriteArrayList<>();
+    private final List<OnWordFoundListener> onWordFoundListeners = new CopyOnWriteArrayList<>();
 
     private final Set<String> solutions;
 
-    public interface OnGameEndListener {
+    public interface OnGameEndListener{
         void onGameEnd();
     }
+    public interface OnWordFoundListener{
+        void onWordFound(String word);
+    }
+
 
     public BoggleGame(){
         dice = Die.generateDice();
@@ -48,6 +57,11 @@ public class BoggleGame {
     public void addOnGameEndListener(OnGameEndListener listener) {
         this.onGameEndListeners.add(listener);
     }
+
+    public void addOnWordFoundListener(OnWordFoundListener listener) {
+        this.onWordFoundListeners.add(listener);
+    }
+
 
     public int getScore() {
         return score;
@@ -109,6 +123,10 @@ public class BoggleGame {
         if (Dictionary.getInstance().contains(formedWord)){
             score += wordScore(formedWord);
             foundWords.add(formedWord);
+            for (OnWordFoundListener listener : onWordFoundListeners) {
+                listener.onWordFound(formedWord);
+            }
+            Log.d("BoggleGame", "Found word: " + formedWord);
             return VALID;
         }
         return INVALID;
