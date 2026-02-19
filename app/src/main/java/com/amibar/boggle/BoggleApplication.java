@@ -1,6 +1,7 @@
 package com.amibar.boggle;
 
 import android.app.Application;
+
 import com.amibar.boggle.data.Dictionary;
 
 /**

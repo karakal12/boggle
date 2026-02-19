@@ -8,7 +8,6 @@ import static android.view.MotionEvent.ACTION_UP;
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
@@ -17,7 +16,6 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MotionEventCompat;
 
 import com.amibar.boggle.engine.DonutRenderer;
 

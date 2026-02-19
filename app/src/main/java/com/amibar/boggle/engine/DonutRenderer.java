@@ -17,7 +17,6 @@ import com.amibar.boggle.utils.Quad;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 /**
@@ -31,13 +30,11 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
     /** Default rotation rate for angle B */
     public static final double B_RATE = 0.007;
 
-    private final static Random rng = new Random();
-
     /** Paint used for scaling operations (filtering disabled for performance/look) */
     public static final Paint scalingPaint = new Paint();
     /** Paint used for drawing the donut segments */
     public static final Paint shapePaint = new Paint();
-    
+
     private Choreographer choreographer;
     private final SurfaceView surfaceView;
     private Bitmap bitmap;
@@ -46,6 +43,8 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
 
     /** The vector representing the light source direction in 3D space */
     private static final double[] lightVector = normalize(new double[]{0, 1, -1});
+    /** Minimum light level for lighting calculations */
+    public static final float MIN_LIGHT = 0.2f;
 
     /**
      * Normalizes a 3D vector to have a magnitude of 1.
@@ -188,6 +187,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
                 // --- Lighting Logic ---
                 // 1. Define the surface normal in local coordinates
                 double nx = cosTheta * cosPhi;
+                @SuppressWarnings("UnnecessaryLocalVariable")
                 double ny = sinTheta;
                 
                 // 2. Rotate the normal to match the current orientation of the torus (A and B angles)
@@ -210,7 +210,7 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
 
                 // --- Styling ---
                 // Calculate final brightness, hue (based on phi), and saturation (based on theta)
-                float luminosity = getLuminosityWithMinLight(L, 0.2f);
+                float luminosity = getLuminosityWithMinLight(L);
                 float hue = (phiIndex * 360f / phiSteps) % 360;
                 float saturation = Math.abs(thetaIndex - thetaSteps * 0.5f) / (thetaSteps * 0.5f);
                 int color = Color.HSVToColor(new float[]{hue, saturation, luminosity});
@@ -239,12 +239,12 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
 
     /**
      * Maps luminosity value to a specific range.
+     *
      * @param L Calculated dot product luminosity.
-     * @param min Minimum light level.
      * @return Clamped luminosity value.
      */
-    private static float getLuminosityWithMinLight(float L, float min) {
-        return Math.clamp((L * (1 - min)) + min, 0, 1);
+    private static float getLuminosityWithMinLight(float L) {
+        return Math.clamp((L * (1 - MIN_LIGHT)) + MIN_LIGHT, 0, 1);
     }
 
     /**
