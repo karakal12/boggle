@@ -3,11 +3,17 @@ package com.amibar.boggle;
 import android.app.Application;
 import com.amibar.boggle.data.Dictionary;
 
+/**
+ * Custom Application class for the Boggle app.
+ * Used for global initialization tasks that should run once per application lifecycle.
+ */
 public class BoggleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Initialize the dictionary when the application process starts
+        // Global Initialization
+        // Load the dictionary from raw resources into memory (Trie structure)
+        // This ensures the word list is ready before any game activities are launched.
         Dictionary.getInstance().init(getResources().openRawResource(R.raw.word_list));
     }
 }

@@ -21,37 +21,57 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Activity that hosts the single-player Boggle game session.
+ * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
+ * and handles the end-of-game result reporting and summary display.
+ */
 public class SinglePlayerActivity extends AppCompatActivity {
 
+    /** Key for passing the final score in an Intent result. */
     public static final String EXTRA_SCORE = "extra_score";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Enable Edge-to-Edge display support for modern Android navigation
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_single_player);
+        
+        // Adjust padding to account for system bars (status bar, navigation bar)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // Initialize the BoggleView and set up a listener for when the game timer runs out
         BoggleView boggleView = findViewById(R.id.boggle_view);
         BoggleGame game = boggleView.getGame();
         game.addOnGameEndListener(() -> {
+            // Prepare result data to be returned to the calling activity
             Intent data = new Intent();
             data.putExtra(EXTRA_SCORE, game.getScore());
             setResult(RESULT_OK, data);
 
+            // Show the game summary dialog
             showGameEndDialog(game);
         });
     }
 
+    /**
+     * Builds and displays a dialog summary showing all possible solutions.
+     * Highlights words found by the player in green.
+     * 
+     * @param game The finished BoggleGame instance.
+     */
     private void showGameEndDialog(BoggleGame game) {
+        // Create an alphabetically sorted list of all valid words on the board
         List<String> sortedSolutions = new ArrayList<>(game.getSolutions());
         Collections.sort(sortedSolutions);
         List<String> foundByPlayer = game.getFoundWords();
 
+        // Use SpannableStringBuilder to format the word list with colors
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
 
@@ -59,14 +79,19 @@ public class SinglePlayerActivity extends AppCompatActivity {
             String s = sortedSolutions.get(i);
             int start = ssb.length();
             ssb.append(s);
+            
+            // If the player found this word, highlight it in green
             if (foundByPlayer.contains(s)) {
                 ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
+            
+            // Add a newline between words
             if (i < sortedSolutions.size() - 1) {
                 ssb.append('\n');
             }
         }
 
+        // Show the summary dialog fragment
         SinglePlayerGameEndDialogFragment.newInstance(ssb, getString(R.string.score, game.getScore())).show(
                 getSupportFragmentManager(),
                 SinglePlayerGameEndDialogFragment.TAG);
