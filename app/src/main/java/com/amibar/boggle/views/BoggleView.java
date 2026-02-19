@@ -18,8 +18,10 @@ import androidx.annotation.Nullable;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.engine.BoggleGame;
-import com.amibar.boggle.ui.Timer;
+import com.amibar.boggle.utils.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import java.util.Locale;
 
 /**
  * A custom view representing the Boggle game board and its associated UI elements.
@@ -102,8 +104,31 @@ public class BoggleView extends LinearLayout {
         TextView timerText = findViewById(R.id.tvTime);
         LinearProgressIndicator timerIndicator = findViewById(R.id.progressBar);
 
-        new Timer(timerText, timerIndicator, BoggleGame.GAME_TIME_MILLIS,
-                () -> game.endGame()).start();
+        new Timer(BoggleGame.GAME_TIME_MILLIS,
+                (elapsedTime) -> {
+                    // Update indicator
+                    float progress = (float) elapsedTime / BoggleGame.GAME_TIME_MILLIS;
+                    timerIndicator.setProgress((int) (progress * timerIndicator.getMax()));
+                    
+                    // Update text
+                    timerText.setText(formatTime(elapsedTime));
+                },
+                () -> {
+                    timerText.setText("00:00");
+                    game.endGame();
+                }).start();
+    }
+
+    /**
+     * Formats the remaining time into a MM:SS string.
+     * @param elapsedTime Time elapsed since start in ms.
+     * @return Formatted string.
+     */
+    private String formatTime(long elapsedTime) {
+        long remainingTime = Math.max(0, BoggleGame.GAME_TIME_MILLIS - elapsedTime);
+        long minutes = remainingTime / 60000;
+        long seconds = (remainingTime % 60000) / 1000;
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
     }
 
     /**

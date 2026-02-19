@@ -212,7 +212,7 @@ public class BoggleGame {
      * @param word The word to score.
      * @return The points awarded for the word.
      */
-    private int wordScore(String word) {
+    public int wordScore(String word) {
         int wordLength = word.length();
         return switch (wordLength) {
             case 3, 4 -> 1;
@@ -221,6 +221,18 @@ public class BoggleGame {
             case 7 -> 5;
             default -> wordLength >= 8 ? 11 : 0;
         };
+    }
+
+    /**
+     * Calculates the maximum possible score for this board.
+     * @return The sum of scores for all possible solutions.
+     */
+    public int getMaxScore() {
+        int maxScore = 0;
+        for (String s : solutions) {
+            maxScore += wordScore(s);
+        }
+        return maxScore;
     }
 
     /**

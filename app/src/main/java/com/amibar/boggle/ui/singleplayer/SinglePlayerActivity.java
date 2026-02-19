@@ -14,12 +14,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.amibar.boggle.R;
+import com.amibar.boggle.data.FirebaseHandler;
+import com.amibar.boggle.data.GameResult;
 import com.amibar.boggle.engine.BoggleGame;
 import com.amibar.boggle.views.BoggleView;
+import com.google.firebase.database.DatabaseReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity that hosts the single-player Boggle game session.
@@ -54,9 +60,36 @@ public class SinglePlayerActivity extends AppCompatActivity {
             data.putExtra(EXTRA_SCORE, game.getScore());
             setResult(RESULT_OK, data);
 
+            // Upload game results to Firebase
+            uploadGameResults(game);
+
             // Show the game summary dialog
             showGameEndDialog(game);
         });
+    }
+
+    /**
+     * Uploads the game results to Firebase Realtime Database.
+     * Uses the current date and time as the node key.
+     * @param game The finished BoggleGame instance.
+     */
+    private void uploadGameResults(BoggleGame game) {
+        FirebaseHandler handler = FirebaseHandler.getInstance();
+        DatabaseReference userRef = handler.getUserRef();
+        if (userRef != null) {
+            GameResult result = new GameResult(
+                    game.getScore(),
+                    game.getFoundWords().size(),
+                    game.getSolutions().size(),
+                    game.getMaxScore()
+            );
+            
+            // Generate a timestamp for the node key
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String timestamp = sdf.format(new Date());
+            
+            userRef.child("games").child(timestamp).setValue(result);
+        }
     }
 
     /**
