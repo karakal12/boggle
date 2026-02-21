@@ -22,6 +22,7 @@ import androidx.fragment.app.DialogFragment;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.User;
+import com.amibar.boggle.databinding.FragmentSignUpBinding;
 import com.amibar.boggle.utils.ImageUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseNetworkException;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class SignUpFragment extends DialogFragment {
+    FragmentSignUpBinding binding;
 
     private static final String TAG = "SignUpFragment";
 
@@ -68,24 +70,25 @@ public class SignUpFragment extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_sign_up, container, false);
+        binding = FragmentSignUpBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        init(view);
+        init();
     }
 
-    private void init(View view) {
-        IVProfileImage = view.findViewById(R.id.IVProfileImage);
-        Button btnSelectImage = view.findViewById(R.id.btnSelectImage);
-        ETDisplayName = view.findViewById(R.id.ETDisplayName);
-        ETEmail = view.findViewById(R.id.ETEmail);
-        ETPassword = view.findViewById(R.id.ETPassword);
-        Button signup_button = view.findViewById(R.id.signup_button);
+    private void init() {
+        IVProfileImage = binding.IVProfileImage;
+        Button btnSelectImage = binding.btnSelectImage;
+        ETDisplayName = binding.ETDisplayName;
+        ETEmail = binding.ETEmail;
+        ETPassword = binding.ETPassword;
+        Button signup_button = binding.signupButton;
 
         btnSelectImage.setOnClickListener(v -> pickMedia.launch(new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
@@ -176,5 +179,8 @@ public class SignUpFragment extends DialogFragment {
                         Toast.makeText(requireContext(), "Failed to save user data", Toast.LENGTH_SHORT).show();
                     }
                 });
+        if (getContext() instanceof MainActivity mainActivity){
+            mainActivity.updateUI();
+        }
     }
 }

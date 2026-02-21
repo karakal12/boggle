@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,8 +25,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.User;
+import com.amibar.boggle.databinding.ActivityMainBinding;
+import com.amibar.boggle.databinding.NavHeaderBinding;
 import com.amibar.boggle.ui.DonutActivity;
-import com.amibar.boggle.ui.singleplayer.SinglePlayerActivity;
+import com.amibar.boggle.ui.singleplayer.SingleplayerActivity;
 import com.amibar.boggle.utils.ImageUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +36,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding binding;
+
     private Button singlePlayerButton;
     private Button multiPlayerButton;
     private Button friendsButton;
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    int score = result.getData().getIntExtra(SinglePlayerActivity.EXTRA_SCORE, 0);
+                    int score = result.getData().getIntExtra(SingleplayerActivity.EXTRA_SCORE, 0);
                     Toast.makeText(this, "Game finished! Your score: " + score, Toast.LENGTH_LONG).show();
                 }
             }
@@ -59,14 +62,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainContent, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -77,19 +81,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
-        singlePlayerButton = findViewById(R.id.singlePlayerButton);
-        multiPlayerButton = findViewById(R.id.multiPlayerButton);
-        friendsButton = findViewById(R.id.friendsListButton);
-        leaderboardsButton = findViewById(R.id.leaderboardsButton);
-        donutButton = findViewById(R.id.donutButton);
-        drawerLayout = findViewById(R.id.main);
-        toolbar = findViewById(R.id.toolbar);
-        navigationView = findViewById(R.id.nav_view);
+        singlePlayerButton = binding.singlePlayerButton;
+        multiPlayerButton = binding.multiPlayerButton;
+        friendsButton = binding.friendsListButton;
+        leaderboardsButton = binding.leaderboardsButton;
+        donutButton = binding.donutButton;
+        drawerLayout = binding.main;
+        toolbar = binding.toolbar;
+        navigationView = binding.navView;
 
         setSupportActionBar(toolbar);
 
         singlePlayerButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SinglePlayerActivity.class);
+            Intent intent = new Intent(this, SingleplayerActivity.class);
             singlePlayerLauncher.launch(intent);
         });
 
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI() {
+    void updateUI() {
         boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
         FirebaseUser user = FirebaseHandler.getInstance().getCurrentUser();
 
@@ -141,30 +145,31 @@ public class MainActivity extends AppCompatActivity {
             if (logoutItem != null) logoutItem.setVisible(isLoggedIn);
 
             LinearLayout header = (LinearLayout) navigationView.getHeaderView(0);
-            if (header != null) {
-                ((TextView) header.findViewById(R.id.nav_header_textView_name)).setText
-                        (user != null ? user.getDisplayName() : "Not Logged In");
-                ((TextView) header.findViewById(R.id.nav_header_textView_email)).setText
-                        (user != null ? user.getEmail() : "");
-                // set profile image from firebase user
-                ImageView imageView = header.findViewById(R.id.nav_header_imageView);
-                if (user != null) {
-                    FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            User userData = task.getResult().getValue(User.class);
-                            if (userData != null && userData.getProfileImageBase64() != null) {
-                                Bitmap imageBitMap = ImageUtils.base64ToBitmap(userData.getProfileImageBase64());
-                                imageView.setImageBitmap(imageBitMap);
-                            } else {
-                                imageView.setImageResource(R.drawable.ic_person);
-                            }
+            NavHeaderBinding headerBinding = NavHeaderBinding.bind(header);
+
+            headerBinding.navHeaderTextViewName
+                    .setText(user != null ? user.getDisplayName() : "Not Logged In");
+            headerBinding.navHeaderTextViewEmail
+                    .setText(user != null ? user.getEmail() : "");
+
+            // set profile image from firebase user
+            ImageView imageView = headerBinding.navHeaderImageView;
+            if (user != null) {
+                FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        User userData = task.getResult().getValue(User.class);
+                        if (userData != null && userData.getProfileImageBase64() != null) {
+                            Bitmap imageBitMap = ImageUtils.base64ToBitmap(userData.getProfileImageBase64());
+                            imageView.setImageBitmap(imageBitMap);
                         } else {
                             imageView.setImageResource(R.drawable.ic_person);
                         }
-                    });
-                } else {
-                    imageView.setImageResource(R.drawable.ic_person);
-                }
+                    } else {
+                        imageView.setImageResource(R.drawable.ic_person);
+                    }
+                });
+            } else {
+                imageView.setImageResource(R.drawable.ic_person);
             }
         }
     }

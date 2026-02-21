@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.amibar.boggle.R;
+import com.amibar.boggle.databinding.ViewBoggleBinding;
 import com.amibar.boggle.engine.BoggleGame;
 import com.amibar.boggle.utils.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -29,6 +30,8 @@ import java.util.Locale;
  * and manages the game timer.
  */
 public class BoggleView extends LinearLayout {
+    ViewBoggleBinding binding;
+
 
     /** The underlying Boggle game engine. */
     private BoggleGame game;
@@ -46,18 +49,15 @@ public class BoggleView extends LinearLayout {
 
 
     public BoggleView(@NonNull Context context) {
-        super(context);
-        initView();
+        this(context, null);
     }
 
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        initView();
+        this(context, attrs, 0);
     }
 
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initView();
+        this(context, attrs, defStyleAttr, 0);
     }
 
     @SuppressWarnings("unused")
@@ -72,13 +72,12 @@ public class BoggleView extends LinearLayout {
      */
     @SuppressLint("SetTextI18n")
     private void initView(){
-        inflate(getContext(), R.layout.view_boggle, this);
-
+        binding = ViewBoggleBinding.inflate(LayoutInflater.from(getContext()), this, true);
         game = new BoggleGame();
 
         // Set up the 4x4 grid of dice cells
         cells = new TextView[16];
-        GridLayout gl = findViewById(R.id.glGameLayout);
+        GridLayout gl = binding.glGameLayout;
         for (int i = 0; i < gl.getChildCount(); i++) {
             cells[i] = (TextView) gl.getChildAt(i);
             cells[i].setOnClickListener(cellOnClickListener(i));
@@ -88,21 +87,20 @@ public class BoggleView extends LinearLayout {
         }
 
         // Set up the submit button
-        Button submit = findViewById(R.id.bSubmit);
-        submit.setOnClickListener(this::onClickSubmit);
+        binding.bSubmit.setOnClickListener(this::onClickSubmit);
 
         // Bind score and current word displays
-        score = findViewById(R.id.tvScore);
+        score = binding.tvScore;
         updateScore();
 
-        word = findViewById(R.id.tvWord);
+        word = binding.tvWord;
         updateWord();
 
-        msg = findViewById(R.id.tvErrors);
+        msg = binding.tvErrors;
 
         // Initialize and start the game timer
-        TextView timerText = findViewById(R.id.tvTime);
-        LinearProgressIndicator timerIndicator = findViewById(R.id.progressBar);
+        TextView timerText = binding.tvTime;
+        LinearProgressIndicator timerIndicator = binding.progressBar;
 
         new Timer(BoggleGame.GAME_TIME_MILLIS,
                 (elapsedTime) -> {

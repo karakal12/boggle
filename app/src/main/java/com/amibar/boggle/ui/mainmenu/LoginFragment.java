@@ -1,6 +1,5 @@
 package com.amibar.boggle.ui.mainmenu;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,14 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
+import com.amibar.boggle.databinding.FragmentLoginBinding;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginFragment extends DialogFragment {
+    FragmentLoginBinding binding;
+
+    private static final String TAG = "LoginFragment";
+
     private EditText ETEmail;
     private EditText ETPassword;
 
@@ -43,34 +46,25 @@ public class LoginFragment extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        init(view);
+        init();
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-        return dialog;
-    }
+    private void init(){
+        Button loginButton = binding.loginButton;
+        ETPassword = binding.ETPassword;
+        ETEmail = binding.ETEmail;
 
-    private void init(View view){
-        Button login_button = view.findViewById(R.id.login_button);
-        ETPassword = view.findViewById(R.id.ETPassword);
-        ETEmail = view.findViewById(R.id.ETEmail);
-
-        login_button.setOnClickListener(this::loginUser);
+        loginButton.setOnClickListener(this::loginUser);
     }
 
 

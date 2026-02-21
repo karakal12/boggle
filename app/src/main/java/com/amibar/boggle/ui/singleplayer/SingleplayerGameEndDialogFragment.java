@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,13 +11,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import com.amibar.boggle.R;
+import com.amibar.boggle.databinding.FragmentSingleplayerGameEndDialogBinding;
 
 /**
  * A DialogFragment that appears when a single-player game ends.
  * Displays the final score and a list of all possible words.
  */
-public class SinglePlayerGameEndDialogFragment extends DialogFragment {
+public class SingleplayerGameEndDialogFragment extends DialogFragment {
+
+
     /** Tag used for identifying this fragment in the FragmentManager. */
     public static final String TAG = "SinglePlayerGameEndDialogFragment";
 
@@ -32,8 +33,8 @@ public class SinglePlayerGameEndDialogFragment extends DialogFragment {
      * @param score The final score string to display.
      * @return A configured SinglePlayerGameEndDialogFragment.
      */
-    public static SinglePlayerGameEndDialogFragment newInstance(CharSequence text, CharSequence score) {
-        SinglePlayerGameEndDialogFragment fragment = new SinglePlayerGameEndDialogFragment();
+    public static SingleplayerGameEndDialogFragment newInstance(CharSequence text, CharSequence score) {
+        SingleplayerGameEndDialogFragment fragment = new SingleplayerGameEndDialogFragment();
         Bundle args = new Bundle();
         args.putCharSequence(ARG_SPANNABLE_TEXT, text);
         args.putCharSequence(ARG_SCORE, score);
@@ -50,22 +51,24 @@ public class SinglePlayerGameEndDialogFragment extends DialogFragment {
         CharSequence score = getArguments().getCharSequence(ARG_SCORE);
 
         // Inflate the custom layout for the dialog content
-        View view = getLayoutInflater().inflate(R.layout.fragment_game_end_dialog, null);
+        FragmentSingleplayerGameEndDialogBinding binding =
+                FragmentSingleplayerGameEndDialogBinding.inflate(getLayoutInflater());
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 
         builder.setTitle("Game Over");
 
         // Bind UI components and set data
-        TextView tvScore = view.findViewById(R.id.tvScore);
+        TextView tvScore = binding.tvScore;
         tvScore.setText(score);
 
-        TextView tvGameWords = view.findViewById(R.id.tvGameWords);
+        TextView tvGameWords = binding.tvGameWords;
         tvGameWords.setText(text);
         // Enable scrolling for the word list since it can be very long
         tvGameWords.setMovementMethod(ScrollingMovementMethod.getInstance());
 
-        builder.setView(view);
+        builder.setView(binding.getRoot());
 
         // Finish the activity when OK is pressed (returning to main menu)
         builder.setPositiveButton("OK", (dialog, which) -> {

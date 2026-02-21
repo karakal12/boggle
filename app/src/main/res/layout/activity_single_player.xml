@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.singleplayer.SinglePlayerActivity">
+    tools:context=".ui.singleplayer.SingleplayerActivity">
 
     <com.amibar.boggle.views.BoggleView
         android:id="@+id/boggle_view"

@@ -16,8 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.GameResult;
+import com.amibar.boggle.databinding.ActivitySinglePlayerBinding;
 import com.amibar.boggle.engine.BoggleGame;
-import com.amibar.boggle.views.BoggleView;
 import com.google.firebase.database.DatabaseReference;
 
 import java.text.SimpleDateFormat;
@@ -32,7 +32,9 @@ import java.util.Locale;
  * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
  * and handles the end-of-game result reporting and summary display.
  */
-public class SinglePlayerActivity extends AppCompatActivity {
+public class SingleplayerActivity extends AppCompatActivity {
+    ActivitySinglePlayerBinding binding;
+
 
     /** Key for passing the final score in an Intent result. */
     public static final String EXTRA_SCORE = "extra_score";
@@ -40,31 +42,31 @@ public class SinglePlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivitySinglePlayerBinding.inflate(getLayoutInflater());
         // Enable Edge-to-Edge display support for modern Android navigation
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_single_player);
+        setContentView(binding.getRoot());
         
         // Adjust padding to account for system bars (status bar, navigation bar)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
         // Initialize the BoggleView and set up a listener for when the game timer runs out
-        BoggleView boggleView = findViewById(R.id.boggle_view);
-        BoggleGame game = boggleView.getGame();
+        BoggleGame game = binding.boggleView.getGame();
         game.addOnGameEndListener(() -> {
             // Prepare result data to be returned to the calling activity
             Intent data = new Intent();
             data.putExtra(EXTRA_SCORE, game.getScore());
             setResult(RESULT_OK, data);
 
-            // Upload game results to Firebase
-            uploadGameResults(game);
-
             // Show the game summary dialog
             showGameEndDialog(game);
+
+            // Upload game results to Firebase
+            uploadGameResults(game);
         });
     }
 
@@ -125,8 +127,8 @@ public class SinglePlayerActivity extends AppCompatActivity {
         }
 
         // Show the summary dialog fragment
-        SinglePlayerGameEndDialogFragment.newInstance(ssb, getString(R.string.score, game.getScore())).show(
+        SingleplayerGameEndDialogFragment.newInstance(ssb, getString(R.string.score, game.getScore())).show(
                 getSupportFragmentManager(),
-                SinglePlayerGameEndDialogFragment.TAG);
+                SingleplayerGameEndDialogFragment.TAG);
     }
 }

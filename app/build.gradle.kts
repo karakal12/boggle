@@ -7,6 +7,10 @@ android {
     namespace = "com.amibar.boggle"
     compileSdk = 36
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.amibar.boggle"
         minSdk = 34

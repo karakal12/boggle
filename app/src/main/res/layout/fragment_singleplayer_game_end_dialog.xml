@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.singleplayer.SinglePlayerGameEndDialogFragment"
+    tools:context=".ui.singleplayer.SingleplayerGameEndDialogFragment"
     android:orientation="vertical">
 
     <TextView
