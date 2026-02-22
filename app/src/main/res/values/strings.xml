@@ -22,4 +22,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="open_nav">open hamburger menu</string>
     <string name="close_nav">close hamburger menu</string>
+    <string name="join_room">Join Room</string>
+    <string name="enter_room_code">Enter Room Code</string>
+    <string name="profile_picture">Profile Picture</string>
 </resources>

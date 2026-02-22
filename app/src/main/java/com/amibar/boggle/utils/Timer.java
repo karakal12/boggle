@@ -2,6 +2,7 @@ package com.amibar.boggle.utils;
 
 
 import android.os.Handler;
+import android.os.Looper;
 
 /**
  * A utility class to manage a countdown timer.
@@ -13,10 +14,10 @@ public class Timer implements Runnable {
     /** The system time when the timer was started. */
     private final long millisTimeBegan;
     /** Handler to schedule the next update. */
-    @SuppressWarnings("deprecation")
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private final OnTimerEndListener onTimerEnd;
     private final OnTickListener onTick;
+    private boolean isStopped = false;
 
     /**
      * Interface to receive a notification when the timer expires.
@@ -50,6 +51,8 @@ public class Timer implements Runnable {
      */
     @Override
     public void run() {
+        if (isStopped) return;
+
         long elapsedTime = System.currentTimeMillis() - millisTimeBegan;
 
         // Notify listener of progress
@@ -69,7 +72,16 @@ public class Timer implements Runnable {
      * Starts the timer execution.
      */
     public void start(){
+        isStopped = false;
         handler.post(this);
+    }
+
+    /**
+     * Stops the timer and cancels any pending updates.
+     */
+    public void stop() {
+        isStopped = true;
+        handler.removeCallbacks(this);
     }
 
 }

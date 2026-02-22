@@ -6,6 +6,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.ImageView;
+
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.databinding.BindingAdapter;
+
+import com.amibar.boggle.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +21,18 @@ import java.io.InputStream;
 
 public class ImageUtils {
     private final static String TAG = "ImageUtils";
+
+    @BindingAdapter("imageBitmap")
+    static public void setImageBitmap(ImageView imageView, Bitmap bitmap) {
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        } else {
+            imageView.setImageDrawable(AppCompatResources.getDrawable(imageView.getContext(),
+                    R.drawable.ic_person));
+        }
+    }
+
+
 
     static public String uriToBase64(Uri uri, Context context) throws IOException {
         try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {

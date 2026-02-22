@@ -5,6 +5,7 @@ import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.amibar.boggle.R;
+import com.amibar.boggle.data.GameMode;
 import com.amibar.boggle.databinding.ViewBoggleBinding;
 import com.amibar.boggle.engine.BoggleGame;
 import com.amibar.boggle.utils.Timer;
@@ -46,6 +48,8 @@ public class BoggleView extends LinearLayout {
     private TextView msg;
     /** TextView displaying the current score. */
     private TextView score;
+    private final GameMode gameMode;
+    private Timer gameTimer;
 
 
     public BoggleView(@NonNull Context context) {
@@ -63,6 +67,15 @@ public class BoggleView extends LinearLayout {
     @SuppressWarnings("unused")
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        // TODO : custom attribute for mode (singleplayer or multiplayer)
+        //  and whether or not the create a new BoggleGame or wait for one from the bd
+        @SuppressLint("Recycle") TypedArray array = context.obtainStyledAttributes(
+                attrs,
+                R.styleable.BoggleView,
+                defStyleAttr, defStyleRes);
+        try (array) {
+            gameMode = GameMode.values()[array.getInt(R.styleable.BoggleView_gameMode, 0)];
+        }
         initView();
     }
 
@@ -70,13 +83,31 @@ public class BoggleView extends LinearLayout {
      * Initializes the view by inflating the layout, setting up the game engine,
      * binding UI components, and starting the game timer.
      */
-    @SuppressLint("SetTextI18n")
     private void initView(){
         binding = ViewBoggleBinding.inflate(LayoutInflater.from(getContext()), this, true);
-        game = new BoggleGame();
+        if (gameMode == GameMode.singleplayer)
+            game = new BoggleGame();
 
         // Set up the 4x4 grid of dice cells
         cells = new TextView[16];
+
+        // Set up the submit button
+        binding.bSubmit.setOnClickListener(this::onClickSubmit);
+
+        // Bind score and current word displays
+        score = binding.tvScore;
+
+        word = binding.tvWord;
+
+        msg = binding.tvErrors;
+
+        if (gameMode == GameMode.singleplayer) {
+            setupUI();
+        }
+
+    }
+
+    private void setupUI() {
         GridLayout gl = binding.glGameLayout;
         for (int i = 0; i < gl.getChildCount(); i++) {
             cells[i] = (TextView) gl.getChildAt(i);
@@ -86,35 +117,37 @@ public class BoggleView extends LinearLayout {
             cells[i].setText(letter == 'Q' ? "Qu" : String.valueOf(letter));
         }
 
-        // Set up the submit button
-        binding.bSubmit.setOnClickListener(this::onClickSubmit);
-
-        // Bind score and current word displays
-        score = binding.tvScore;
         updateScore();
-
-        word = binding.tvWord;
         updateWord();
-
-        msg = binding.tvErrors;
 
         // Initialize and start the game timer
         TextView timerText = binding.tvTime;
         LinearProgressIndicator timerIndicator = binding.progressBar;
 
-        new Timer(BoggleGame.GAME_TIME_MILLIS,
+        gameTimer = new Timer(BoggleGame.GAME_TIME_MILLIS,
+                // onTick
                 (elapsedTime) -> {
                     // Update indicator
                     float progress = (float) elapsedTime / BoggleGame.GAME_TIME_MILLIS;
                     timerIndicator.setProgress((int) (progress * timerIndicator.getMax()));
-                    
+
                     // Update text
                     timerText.setText(formatTime(elapsedTime));
                 },
+                // onTimerEnd
                 () -> {
                     timerText.setText("00:00");
                     game.endGame();
-                }).start();
+                });
+        gameTimer.start();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
     }
 
     /**

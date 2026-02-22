@@ -5,4 +5,12 @@
         <attr name="colorSelected" format="color"/>
         <attr name="colorLastSelected" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="BoggleView">
+        <attr name="gameMode" format="enum">
+            <enum name="singleplayer" value="0"/>
+            <enum name="multiplayer" value="1"/>
+        </attr>
+    </declare-styleable>
+
 </resources>

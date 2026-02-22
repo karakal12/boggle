@@ -52,10 +52,14 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
     }
 
     private void createRoom(View view){
+        binding.roomCodeTIL.setVisibility(View.VISIBLE);
+        binding.joinRoom.setVisibility(View.GONE);
         // TODO: Create Room
     }
 
     private void joinRoom(View view){
+        binding.roomCodeTIL.setVisibility(View.VISIBLE);
+        binding.createRoom.setVisibility(View.GONE);
         // TODO: Join Room
     }
 

@@ -8,6 +8,8 @@ import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
 
@@ -28,8 +30,8 @@ public class BoggleGame {
      */
     public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
 
-    private final ArrayList<Die> dice;
-    private final ArrayDeque<Die> word;
+    private final char[] board;
+    private final ArrayDeque<Integer> selectedIndices;
     private final ArrayList<String> foundWords;
     private int score;
     private boolean gameEnded;
@@ -66,20 +68,32 @@ public class BoggleGame {
      * Also calculates all possible solutions for the generated board.
      */
     public BoggleGame(){
-        // Initialize dice
-        dice = Die.generateDice();
-        Collections.shuffle(dice);
-        for (Die die : dice){
-            die.roll();
-        }
+        this(generateBoard());
+    }
+
+
+    public BoggleGame(char[] board){
+        this.board = board;
+
         foundWords = new ArrayList<>();
-        word = new ArrayDeque<>();
+        selectedIndices = new ArrayDeque<>();
         gameEnded = false;
 
         // Solve the board using the GameSolver and the dictionary singleton
         solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
         Log.d("BoggleGame", "Solution: " + solutions);
+    }
+    private static char[] generateBoard() {
+        ArrayList<Die> diceList = Die.generateDice();
+        Collections.shuffle(diceList);
+        char[] board = new char[16];
+        for (int i = 0; i < 16; i++){
+            Die die = diceList.get(i);
+            die.roll();
+            board[i] = die.getLetter();
+        }
+        return board;
     }
 
     /**
@@ -122,14 +136,14 @@ public class BoggleGame {
      * @return A 2D char array representing the board.
      */
     public char[][] getDice(){
-        char[][] dice = new char[4][4];
+        char[][] diceGrid = new char[4][4];
         for (int i = 0; i < 4; i++){
             for (int j = 0; j < 4; j++){
                 // Convert index to grid coordinates and get lowercase letter
-                dice[i][j] = (char) (this.dice.get(i * 4 + j).getLetter() - 'A' + 'a');
+                diceGrid[i][j] = Character.toLowerCase(board[i * 4 + j]);
             }
         }
-        return dice;
+        return diceGrid;
     }
 
     /**
@@ -139,8 +153,8 @@ public class BoggleGame {
      */
     public String getWord() {
         StringBuilder sb = new StringBuilder();
-        for (Die d : word) {
-            char c = d.getLetter();
+        for (int index : selectedIndices) {
+            char c = board[index];
             sb.append(c);
             if (c == 'Q') sb.append('U');
         }
@@ -242,8 +256,9 @@ public class BoggleGame {
      */
     public String formWord(){
         StringBuilder sb = new StringBuilder();
-        while (!word.isEmpty()){
-            char c = word.removeFirst().getLetter();
+        while (!selectedIndices.isEmpty()){
+            int index = selectedIndices.removeFirst();
+            char c = board[index];
             sb.append(c);
             if (c == 'Q') sb.append('U');
         }
@@ -258,17 +273,15 @@ public class BoggleGame {
      * @return True if the die was successfully added to the selection.
      */
     public boolean selectDie(int index){
-        Die die = dice.get(index);
         // First letter in a word
-        if (word.isEmpty()){
-            word.add(die);
+        if (selectedIndices.isEmpty()){
+            selectedIndices.add(index);
             return true;
         }
         // Subsequent letters must be adjacent and not reused
-        Die lastDie = word.getLast();
-        int lastIndex = dice.indexOf(lastDie);
-        if (isAdjacent(lastIndex, index) && !word.contains(die)){
-            word.add(die);
+        int lastIndex = selectedIndices.getLast();
+        if (isAdjacent(lastIndex, index) && !selectedIndices.contains(index)){
+            selectedIndices.add(index);
             return true;
         }
         return false;
@@ -296,7 +309,7 @@ public class BoggleGame {
      * @return The character on the die.
      */
     public char getDie(int index){
-        return dice.get(index).getLetter();
+        return board[index];
     }
 
     /**
