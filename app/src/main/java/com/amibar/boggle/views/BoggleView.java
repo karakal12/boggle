@@ -103,8 +103,19 @@ public class BoggleView extends LinearLayout {
 
         if (gameMode == GameMode.singleplayer) {
             setupUI();
+            gameTimer.start();
         }
 
+    }
+    public BoggleGame newGame(){
+        game = new BoggleGame();
+        setupUI();
+        return game;
+    }
+
+    public void setGame(char[] board){
+        game = new BoggleGame(board);
+        setupUI();
     }
 
     private void setupUI() {
@@ -139,7 +150,6 @@ public class BoggleView extends LinearLayout {
                     timerText.setText("00:00");
                     game.endGame();
                 });
-        gameTimer.start();
     }
 
     @Override

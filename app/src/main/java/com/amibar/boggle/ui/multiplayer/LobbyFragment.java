@@ -1,5 +1,6 @@
 package com.amibar.boggle.ui.multiplayer;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +90,7 @@ public class LobbyFragment extends Fragment {
 
     private void listenForPlayers() {
         playerListener = new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 playerList.clear();

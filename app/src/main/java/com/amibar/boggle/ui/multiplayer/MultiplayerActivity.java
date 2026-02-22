@@ -58,7 +58,7 @@ public class MultiplayerActivity extends AppCompatActivity {
     public void startGame(){
         if (roomCode != null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(binding.main.getId(), MultiplayerGameFragment.newInstance(roomCode), MultiplayerGameFragment.TAG)
+                    .replace(binding.main.getId(), MultiplayerGameFragment.newInstance(playerRole, roomCode), MultiplayerGameFragment.TAG)
                     .commit();
         }
     }

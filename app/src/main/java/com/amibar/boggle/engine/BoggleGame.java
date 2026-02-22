@@ -8,8 +8,6 @@ import static com.amibar.boggle.engine.BoggleGame.WordCheckResult.VALID;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
 
@@ -159,6 +157,10 @@ public class BoggleGame {
             if (c == 'Q') sb.append('U');
         }
         return sb.toString();
+    }
+
+    public char[] getBoard() {
+        return board;
     }
 
     /**
