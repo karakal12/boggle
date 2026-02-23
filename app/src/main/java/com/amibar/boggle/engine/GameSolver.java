@@ -7,8 +7,10 @@ import com.amibar.boggle.data.Dictionary;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.RecursiveAction;
 
@@ -18,7 +20,7 @@ import java.util.concurrent.RecursiveAction;
  */
 public class GameSolver {
     /** A synchronized set to store all unique words found on the board. */
-    private Set<String> solutions;
+    private Map<String, String> solutions;
 
     /**
      * Represents a recursive task for searching words starting from a specific die on the board.
@@ -30,6 +32,7 @@ public class GameSolver {
         private final int i, j;
         /** A 16-bit bitmap tracking visited dice in the current path. */
         private short visited; // bitmap
+        private String path;
         private final String string;
 
         /**
@@ -41,13 +44,14 @@ public class GameSolver {
          * @param visited Bitmap of visited cells.
          * @param string The string formed so far in this path.
          */
-        public GameSolverTask(Dictionary.DictNode root, char[][] board, int i, int j, short visited, String string) {
+        public GameSolverTask(Dictionary.DictNode root, char[][] board, int i, int j, short visited, String path, String string) {
             this.root = root;
             this.board = board;
             assert (board.length == board[0].length && board.length == 4) : "board must be 4x4";
             this.i = i;
             this.j = j;
             this.visited = visited;
+            this.path = path;
             this.string = string;
         }
 
@@ -55,12 +59,14 @@ public class GameSolver {
         protected void compute() {
             // If the Trie node is a leaf, we've reached the end of a potential word path
             if (root.isLeaf()) {
-                if (string.length() > 2) solutions.add(string);
+                if (string.length() > 2 &&
+                    solutions.get(string) == null) solutions.put(string, path);
                 return;
             }
             // If the current node marks the end of a word in the dictionary, add it to solutions
             if (root.isEndOfWord()) {
-                if (string.length() > 2) solutions.add(string);
+                if (string.length() > 2 &&
+                    solutions.get(string) == null) solutions.put(string, path);
             }
 
             // Mark the current cell as visited in the bitmap
@@ -84,6 +90,7 @@ public class GameSolver {
                                 char c = board[nextI][nextJ];
                                 Dictionary.DictNode nextNode = root.get(c);
                                 if (nextNode != null) {
+                                    String nextPath = path + (char) (i * board.length + j);
                                     String nextString = string + c;
                                     // Boggle special case: 'q' is always followed by 'u'
                                     if (c == 'q') {
@@ -92,7 +99,7 @@ public class GameSolver {
                                         nextString = string + "qu";
                                     }
                                     // Spawn a new task to continue searching from this neighbor
-                                    tasks.add(new GameSolverTask(nextNode, board, nextI, nextJ, visited, nextString));
+                                    tasks.add(new GameSolverTask(nextNode, board, nextI, nextJ, visited, nextPath, nextString));
                                 }
                             }
                         }
@@ -121,8 +128,8 @@ public class GameSolver {
      * @param dictionary The dictionary to use for word validation.
      * @return A set of all unique valid words found on the board.
      */
-    public Set<String> solve(char[][] board, Dictionary dictionary) {
-        solutions = Collections.synchronizedSet(new HashSet<>());
+    public Map<String, String> solve(char[][] board, Dictionary dictionary) {
+        solutions = Collections.synchronizedMap(new HashMap<>());
         List<GameSolverTask> tasks = new ArrayList<>();
         // Start a search from every cell on the board
         for (int i = 0; i < board.length; i++) {
@@ -131,13 +138,14 @@ public class GameSolver {
                 Dictionary.DictNode node = dictionary.getRoot().get(c);
                 if (node != null) {
                     String s = String.valueOf(c);
+                    String path = String.valueOf(i * board.length + j);
                     // Handle special 'q' -> 'qu' case
                     if (c == 'q') {
                         node = node.get('u');
                         if (node == null) continue;
                         s = "qu";
                     }
-                    tasks.add(new GameSolverTask(node, board, i, j, (short) 0, s));
+                    tasks.add(new GameSolverTask(node, board, i, j, (short) 0, path, s));
                 }
             }
         }

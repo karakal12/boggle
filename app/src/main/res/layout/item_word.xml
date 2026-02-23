@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="word"
+            type="String" />
+    </data>
+
+    <TextView
+        android:id="@+id/word_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@{word}"
+        android:padding="4dp"
+        tools:text="Word"/>
+</layout>

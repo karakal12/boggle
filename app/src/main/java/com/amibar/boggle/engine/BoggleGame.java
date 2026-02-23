@@ -10,11 +10,13 @@ import android.util.Log;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.utils.Timer;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -35,8 +37,10 @@ public class BoggleGame {
     private boolean gameEnded;
     private final List<OnGameEndListener> onGameEndListeners = new CopyOnWriteArrayList<>();
     private final List<OnWordFoundListener> onWordFoundListeners = new CopyOnWriteArrayList<>();
+    private final List<OnTickListener> onTickListeners = new CopyOnWriteArrayList<>();
 
-    private final Set<String> solutions;
+    private final Map<String, String> solutions;
+    private final Timer gameTimer;
 
     /**
      * Listener interface for game end events.
@@ -57,6 +61,17 @@ public class BoggleGame {
          * @param word The word that was found.
          */
         void onWordFound(String word);
+    }
+
+    /**
+     * Listener interface for timer tick events.
+     */
+    public interface OnTickListener {
+        /**
+         * Called on every timer tick.
+         * @param elapsedTime Time elapsed since start in ms.
+         */
+        void onTick(long elapsedTime);
     }
 
 
@@ -81,6 +96,14 @@ public class BoggleGame {
         solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
         Log.d("BoggleGame", "Solution: " + solutions);
+
+        gameTimer = new Timer(GAME_TIME_MILLIS,
+                (elapsedTime) -> {
+                    for (OnTickListener listener : onTickListeners) {
+                        listener.onTick(elapsedTime);
+                    }
+                },
+                this::endGame);
     }
     private static char[] generateBoard() {
         ArrayList<Die> diceList = Die.generateDice();
@@ -108,6 +131,14 @@ public class BoggleGame {
      */
     public void addOnWordFoundListener(OnWordFoundListener listener) {
         this.onWordFoundListeners.add(listener);
+    }
+
+    /**
+     * Adds a listener to be notified on every timer tick.
+     * @param listener The listener to add.
+     */
+    public void addOnTickListener(OnTickListener listener) {
+        this.onTickListeners.add(listener);
     }
 
 
@@ -167,7 +198,7 @@ public class BoggleGame {
      * Returns all possible valid words that can be found on this board.
      * @return A set of solution words.
      */
-    public Set<String> getSolutions() {
+    public Map<String, String> getSolutions() {
         return solutions;
     }
 
@@ -180,11 +211,26 @@ public class BoggleGame {
     }
 
     /**
+     * Starts the game timer.
+     */
+    public void startTimer() {
+        gameTimer.start();
+    }
+
+    /**
+     * Stops the game timer.
+     */
+    public void stopTimer() {
+        gameTimer.stop();
+    }
+
+    /**
      * Signals the end of the game and notifies all registered listeners.
      */
     public void endGame(){
         if (gameEnded) return;
         gameEnded = true;
+        gameTimer.stop();
         Log.d("BoggleGame", "Game ended. Final score: " + score + ", Words found: " + foundWords);
         for (OnGameEndListener listener : onGameEndListeners) {
             listener.onGameEnd();
@@ -245,7 +291,7 @@ public class BoggleGame {
      */
     public int getMaxScore() {
         int maxScore = 0;
-        for (String s : solutions) {
+        for (String s : solutions.keySet()) {
             maxScore += wordScore(s);
         }
         return maxScore;

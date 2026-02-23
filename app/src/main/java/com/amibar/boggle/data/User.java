@@ -1,12 +1,14 @@
 package com.amibar.boggle.data;
 
+import java.io.Serializable;
+
 /**
  * Represents a user of the Boggle app.
  * This is a simple data class (POJO) used for storing user information, especially when
  * interacting with Firebase Realtime Database.
  */
 @SuppressWarnings("unused")
-public class User {
+public class User implements Serializable {
     /** The user's chosen display name. */
     private String displayName;
     /** The user's email address, used for authentication and identification. */

@@ -1,14 +1,11 @@
 package com.amibar.boggle.ui.singleplayer;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -22,10 +19,7 @@ import com.amibar.boggle.engine.BoggleGame;
 import com.google.firebase.database.DatabaseReference;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -33,7 +27,7 @@ import java.util.Locale;
  * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
  * and handles the end-of-game result reporting and summary display.
  */
-public class SingleplayerActivity extends AppCompatActivity {
+public class SingleplayerActivity extends AppCompatActivity implements SingleplayerGameEndDialogFragment.OnWordClickListener {
 
     /** Tag used for logging and debugging purposes. */
     private static final String TAG = "SingleplayerActivity";
@@ -44,6 +38,9 @@ public class SingleplayerActivity extends AppCompatActivity {
 
     /** Key for passing the final score in an Intent result. */
     public static final String EXTRA_SCORE = "extra_score";
+
+    private BoggleGame game;
+    private boolean isGameEnded = false;
 
     /**
      * Called when the activity is first created.
@@ -73,7 +70,7 @@ public class SingleplayerActivity extends AppCompatActivity {
         });
 
         // Reference the underlying game engine from the custom BoggleView
-        BoggleGame game = binding.boggleView.getGame();
+        game = binding.boggleView.getGame();
 
         // Set up a listener for when the game timer runs out or the game ends
         game.addOnGameEndListener(() ->
@@ -82,6 +79,7 @@ public class SingleplayerActivity extends AppCompatActivity {
                     if (isDestroyed()) {
                         return;
                     }
+                    isGameEnded = true;
 
                     // Prepare result data to be returned to the calling activity (e.g., MainActivity)
                     Intent data = new Intent();
@@ -89,11 +87,23 @@ public class SingleplayerActivity extends AppCompatActivity {
                     setResult(RESULT_OK, data);
 
                     // Show the game summary dialog with found/missed words
-                    showGameEndDialog(game);
+                    showGameEndDialog();
 
                     // Synchronize the game results with the cloud database
                     uploadGameResults(game);
                 }));
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (isGameEnded) {
+                    showGameEndDialog();
+                } else {
+                    setEnabled(false);
+                    onBackPressed();
+                }
+            }
+        });
     }
 
     /**
@@ -130,46 +140,21 @@ public class SingleplayerActivity extends AppCompatActivity {
      * Builds and displays a dialog summary showing all possible solutions.
      * Iterates through all possible words on the board and highlights words
      * successfully found by the player in green.
-     *
-     * @param game The finished {@link BoggleGame} instance.
      */
-    private void showGameEndDialog(BoggleGame game) {
+    private void showGameEndDialog() {
         if (isDestroyed()) {
             return;
-        }
-
-        // Prepare alphabetical list of all valid words that were hidden in the grid
-        List<String> sortedSolutions = new ArrayList<>(game.getSolutions());
-        Collections.sort(sortedSolutions);
-        List<String> foundByPlayer = game.getFoundWords();
-
-        // Use SpannableStringBuilder to apply rich text formatting (colors) to the list
-        SpannableStringBuilder ssb = new SpannableStringBuilder();
-        ssb.append("Possible words (").append(String.valueOf(sortedSolutions.size())).append("):\n\n");
-
-        for (int i = 0; i < sortedSolutions.size(); i++) {
-            String s = sortedSolutions.get(i);
-            int start = ssb.length();
-            ssb.append(s);
-
-            // If the player successfully identified this word, highlight it in green
-            if (foundByPlayer.contains(s)) {
-                ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-
-            // Add a newline between words for readability, except after the last word
-            if (i < sortedSolutions.size() - 1) {
-                ssb.append('\n');
-            }
         }
 
         // Initialize and display the custom dialog fragment
         try {
             // Create fragment instance with the formatted word list and final score string
             SingleplayerGameEndDialogFragment fragment = SingleplayerGameEndDialogFragment.newInstance(
-                    ssb,
+                    game.getSolutions(),
+                    game.getFoundWords(),
                     getString(R.string.score, game.getScore())
             );
+            fragment.setOnWordClickListener(this);
 
             // Use commitAllowingStateLoss to prevent crashes if the activity state was already saved
             getSupportFragmentManager().beginTransaction()
@@ -179,5 +164,10 @@ public class SingleplayerActivity extends AppCompatActivity {
             // Fallback to prevent app crash if fragment transaction fails
             Log.e(TAG, "Failed to show game end dialog", e);
         }
+    }
+
+    @Override
+    public void onWordClick(String word, String path) {
+        binding.boggleView.showSolution(path);
     }
 }

@@ -1,5 +1,7 @@
 package com.amibar.boggle.ui.multiplayer;
 
+import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.*;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,23 +28,22 @@ import java.util.List;
 public class LobbyFragment extends Fragment {
     public static final String TAG = "LobbyFragment";
 
-    private static final String ARG_ROOM_CODE = "room_code";
-    private static final String ARG_PLAYER_ROLE = "player_role";
-
     private FragmentLobbyBinding binding;
     private PlayerAdapter playerAdapter;
     private final List<User> playerList = new ArrayList<>();
 
     private String roomCode;
     private PlayerRole playerRole;
+    private User player;
     private DatabaseReference roomRef;
     private ValueEventListener playerListener;
 
-    public static LobbyFragment newInstance(String roomCode, PlayerRole playerRole) {
+    public static LobbyFragment newInstance(String roomCode, PlayerRole playerRole, User player) {
         LobbyFragment fragment = new LobbyFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ROOM_CODE, roomCode);
         args.putString(ARG_PLAYER_ROLE, playerRole.name());
+        args.putSerializable(ARG_PLAYER, player);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,6 +73,7 @@ public class LobbyFragment extends Fragment {
             if (roleStr != null) {
                 playerRole = PlayerRole.valueOf(roleStr);
             }
+            player = args.getSerializable(ARG_PLAYER, User.class);
         }
 
         if (playerRole == PlayerRole.HOST) {
@@ -86,6 +88,7 @@ public class LobbyFragment extends Fragment {
             roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
             listenForPlayers();
         }
+        roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId());
     }
 
     private void listenForPlayers() {
@@ -103,7 +106,7 @@ public class LobbyFragment extends Fragment {
                 }
                 playerAdapter.notifyDataSetChanged();
                 
-                // Optional: Check if the game has started
+                // Check if the game has started
                 Boolean gameStarted = snapshot.child("gameStarted").getValue(Boolean.class);
                 if (Boolean.TRUE.equals(gameStarted)) {
                     ((MultiplayerActivity) requireContext()).startGame();

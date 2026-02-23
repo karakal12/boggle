@@ -21,7 +21,6 @@ import com.amibar.boggle.R;
 import com.amibar.boggle.data.GameMode;
 import com.amibar.boggle.databinding.ViewBoggleBinding;
 import com.amibar.boggle.engine.BoggleGame;
-import com.amibar.boggle.utils.Timer;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.Locale;
@@ -49,7 +48,6 @@ public class BoggleView extends LinearLayout {
     /** TextView displaying the current score. */
     private TextView score;
     private final GameMode gameMode;
-    private Timer gameTimer;
 
 
     public BoggleView(@NonNull Context context) {
@@ -103,7 +101,7 @@ public class BoggleView extends LinearLayout {
 
         if (gameMode == GameMode.singleplayer) {
             setupUI();
-            gameTimer.start();
+            game.startTimer();
         }
 
     }
@@ -113,10 +111,16 @@ public class BoggleView extends LinearLayout {
         return game;
     }
 
-    public void setGame(char[] board){
+    public BoggleGame setGame(char[] board){
         game = new BoggleGame(board);
         setupUI();
+        return game;
     }
+
+    public void startGame(){
+        game.startTimer();
+    }
+
 
     private void setupUI() {
         GridLayout gl = binding.glGameLayout;
@@ -135,28 +139,23 @@ public class BoggleView extends LinearLayout {
         TextView timerText = binding.tvTime;
         LinearProgressIndicator timerIndicator = binding.progressBar;
 
-        gameTimer = new Timer(BoggleGame.GAME_TIME_MILLIS,
-                // onTick
-                (elapsedTime) -> {
-                    // Update indicator
-                    float progress = (float) elapsedTime / BoggleGame.GAME_TIME_MILLIS;
-                    timerIndicator.setProgress((int) (progress * timerIndicator.getMax()));
+        game.addOnTickListener(elapsedTime -> {
+            // Update indicator
+            float progress = (float) elapsedTime / BoggleGame.GAME_TIME_MILLIS;
+            timerIndicator.setProgress((int) (progress * timerIndicator.getMax()));
 
-                    // Update text
-                    timerText.setText(formatTime(elapsedTime));
-                },
-                // onTimerEnd
-                () -> {
-                    timerText.setText("00:00");
-                    game.endGame();
-                });
+            // Update text
+            timerText.setText(formatTime(elapsedTime));
+        });
+
+        game.addOnGameEndListener(() -> timerText.setText("00:00"));
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (gameTimer != null) {
-            gameTimer.stop();
+        if (game != null && gameMode == GameMode.singleplayer) {
+            game.stopTimer();
         }
     }
 
@@ -188,11 +187,7 @@ public class BoggleView extends LinearLayout {
     private void onClickSubmit(View v) {
         if (game.isEnded()) return;
 
-        // Reset visual state of all cells
-        int unselectedColor = resolveAttribute(R.attr.colorUnselected);
-        for (TextView cell : cells) {
-            cell.setBackgroundColor(unselectedColor);
-        }
+        clearSolution();
 
         String lastWord = game.getWord();
         BoggleGame.WordCheckResult result = game.submitWord();
@@ -225,7 +220,7 @@ public class BoggleView extends LinearLayout {
                 return;
             
             // Attempt to select the die in the game logic
-            if (game.selectDie(cellId)){
+            if (game.selectDie(cellId)) {
                 // Provide visual feedback for selection sequence
                 if (lastSelected != null) {
                     lastSelected.setBackgroundColor(resolveAttribute(R.attr.colorSelected));
@@ -255,5 +250,28 @@ public class BoggleView extends LinearLayout {
      */
     private void updateWord(){
         this.word.setText(getContext().getString(R.string.word, game.getWord()));
+    }
+
+    public void showSolution(String path) {
+        clearSolution();
+        char[] indices = path.toCharArray();
+        int selectedColor = resolveAttribute(R.attr.colorSelected);
+        for (int i = 0; i < indices.length; i++) {
+            int index = indices[i];
+            if (i == indices.length - 1) {
+                lastSelected = cells[index];
+                cells[index].setBackgroundColor(resolveAttribute(R.attr.colorLastSelected));
+            } else {
+                cells[index].setBackgroundColor(selectedColor);
+            }
+        }
+    }
+
+    public void clearSolution() {
+        int unselectedColor = resolveAttribute(R.attr.colorUnselected);
+        for (TextView cell : cells) {
+            cell.setBackgroundColor(unselectedColor);
+        }
+        lastSelected = null;
     }
 }
