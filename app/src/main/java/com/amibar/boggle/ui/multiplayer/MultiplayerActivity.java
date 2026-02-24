@@ -16,6 +16,7 @@ import com.amibar.boggle.databinding.ActivityMultiplayerBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MultiplayerActivity extends AppCompatActivity {
     public static final String TAG = "MultiplayerActivity";
@@ -26,7 +27,6 @@ public class MultiplayerActivity extends AppCompatActivity {
     
     private String roomCode;
     private PlayerRole playerRole;
-    private User player;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,9 +47,6 @@ public class MultiplayerActivity extends AppCompatActivity {
             playerRole = getIntent().getSerializableExtra(ARG_PLAYER_ROLE, PlayerRole.class);
             roomCode = getIntent().getStringExtra(ARG_ROOM_CODE);
         }
-        
-        // Get player data from FirebaseHandler instead of Intent to avoid DeadObjectException (Binder limit)
-        player = FirebaseHandler.getInstance().getUserData();
 
         // Load the LobbyFragment with arguments if this is the first time the activity is created
         if (savedInstanceState == null && roomCode != null && playerRole != null) {
@@ -68,8 +65,8 @@ public class MultiplayerActivity extends AppCompatActivity {
         }
     }
 
-    public void showGameResults(HashMap<User, ArrayList<String>> playersWords) {
-        MultiplayerOnGameEndFragment fragment = MultiplayerOnGameEndFragment.newInstance(playersWords);
+    public void showGameResults(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords) {
+        MultiplayerOnGameEndFragment fragment = MultiplayerOnGameEndFragment.newInstance(solutions, playersWords);
         fragment.show(getSupportFragmentManager(), MultiplayerOnGameEndFragment.TAG);
     }
 

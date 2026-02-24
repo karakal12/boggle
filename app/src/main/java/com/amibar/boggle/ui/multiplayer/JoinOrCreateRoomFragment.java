@@ -14,8 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.PlayerRole;
 import com.amibar.boggle.databinding.FragmentJoinOrCreateRoomBinding;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class JoinOrCreateRoomFragment extends DialogFragment {
     public static final String TAG = "JoinOrCreateRoomFragment";
@@ -74,12 +77,28 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
     }
 
     private void joinRoom(View view) {
-        Intent intent = makeIntent(PlayerRole.GUEST);
-        if (intent != null) {
-            startActivity(intent);
-        }
-        dismiss();
+        Editable roomCodeTVText = binding.roomCodeTV.getText();
+        if (roomCodeTVText == null || roomCodeTVText.toString().isEmpty()) return;
+
+        String roomCode = roomCodeTVText.toString();
+        DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomCode);
+
+        roomRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult().exists()) {
+                // Room exists, proceed to join
+                Intent intent = makeIntent(PlayerRole.GUEST);
+                if (intent != null) {
+                    startActivity(intent);
+                    dismiss();
+                }
+            } else {
+                // Room doesn't exist, show error to user
+                binding.roomCodeTIL.setError("Room not found");
+            }
+        });
     }
+
+
 
     private Intent makeIntent(PlayerRole role) {
         Editable roomCodeTVText = binding.roomCodeTV.getText();
@@ -87,10 +106,6 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
             Intent intent = new Intent(requireContext(), MultiplayerActivity.class);
             intent.putExtra(ARG_ROOM_CODE, roomCodeTVText.toString());
             intent.putExtra(ARG_PLAYER_ROLE, role);
-            // We removed the User object (ARG_PLAYER) from the Intent to avoid DeadObjectException.
-            // The User class contains a Base64 encoded profile image which can exceed the 1MB 
-            // Binder transaction limit. MultiplayerActivity now retrieves the User data 
-            // directly from the FirebaseHandler singleton.
             return intent;
         }
         return null;

@@ -1,6 +1,7 @@
 package com.amibar.boggle.ui.multiplayer;
 
-import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.*;
+import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_PLAYER_ROLE;
+import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_ROOM_CODE;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -86,7 +87,7 @@ public class LobbyFragment extends Fragment {
 
         // Initialize Firebase reference and start listening for players
         if (roomCode != null) {
-            roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
+            roomRef = FirebaseHandler.getInstance().getRootRef().child("rooms").child(roomCode);
             listenForPlayers();
             
             if (player != null) {

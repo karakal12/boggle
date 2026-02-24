@@ -8,10 +8,8 @@ import com.amibar.boggle.data.Dictionary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.RecursiveAction;
 
 /**
@@ -32,7 +30,7 @@ public class GameSolver {
         private final int i, j;
         /** A 16-bit bitmap tracking visited dice in the current path. */
         private short visited; // bitmap
-        private String path;
+        private final String path;
         private final String string;
 
         /**

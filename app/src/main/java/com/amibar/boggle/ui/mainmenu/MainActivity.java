@@ -25,7 +25,6 @@ import com.amibar.boggle.databinding.ActivityMainBinding;
 import com.amibar.boggle.databinding.NavHeaderBinding;
 import com.amibar.boggle.ui.DonutActivity;
 import com.amibar.boggle.ui.multiplayer.JoinOrCreateRoomFragment;
-import com.amibar.boggle.ui.multiplayer.MultiplayerActivity;
 import com.amibar.boggle.ui.singleplayer.SingleplayerActivity;
 import com.amibar.boggle.utils.ImageUtils;
 import com.google.firebase.auth.FirebaseAuth;

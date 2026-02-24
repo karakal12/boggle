@@ -1,6 +1,5 @@
 package com.amibar.boggle.ui.singleplayer;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import com.amibar.boggle.R;
 import com.amibar.boggle.databinding.FragmentSingleplayerGameEndDialogBinding;
 
 import java.util.ArrayList;

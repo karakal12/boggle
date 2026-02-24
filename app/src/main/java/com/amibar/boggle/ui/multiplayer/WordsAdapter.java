@@ -3,20 +3,28 @@ package com.amibar.boggle.ui.multiplayer;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.amibar.boggle.R;
+
 import com.amibar.boggle.databinding.ItemWordBinding;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> {
 
-    private final List<String> words;
+    private final Map<String, String> solutions;
+    private final List<String> playerWords;
     private final Set<String> commonWords;
 
-    public WordsAdapter(List<String> words, Set<String> commonWords) {
-        this.words = words;
+    public WordsAdapter(HashMap<String, String> solutions, List<String> playerWords, Set<String> commonWords) {
+        this.solutions = solutions;
+        this.playerWords = playerWords;
         this.commonWords = commonWords;
     }
 
@@ -29,10 +37,14 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        List<String> words = new ArrayList<>(solutions.keySet());
+        Collections.sort(words);
         String word = words.get(position);
         holder.binding.setWord(word);
         if (commonWords.contains(word)) {
             holder.binding.wordText.setTextColor(Color.RED);
+        } else if (playerWords.contains(word)){
+            holder.binding.wordText.setTextColor(Color.GREEN);
         } else {
             holder.binding.wordText.setTextColor(Color.BLACK);
         }
@@ -41,10 +53,10 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return words.size();
+        return solutions.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         final ItemWordBinding binding;
         ViewHolder(ItemWordBinding binding) {
             super(binding.getRoot());

@@ -15,9 +15,9 @@ import com.amibar.boggle.utils.Timer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -39,7 +39,7 @@ public class BoggleGame {
     private final List<OnWordFoundListener> onWordFoundListeners = new CopyOnWriteArrayList<>();
     private final List<OnTickListener> onTickListeners = new CopyOnWriteArrayList<>();
 
-    private final Map<String, String> solutions;
+    private final HashMap<String, String> solutions; // HashMap for serializability
     private final Timer gameTimer;
 
     /**
@@ -93,7 +93,8 @@ public class BoggleGame {
         gameEnded = false;
 
         // Solve the board using the GameSolver and the dictionary singleton
-        solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
+        Map<String, String> solutionsMap = new GameSolver().solve(getDice(), Dictionary.getInstance());
+        solutions = new HashMap<>(solutionsMap);
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
         Log.d("BoggleGame", "Solution: " + solutions);
 
@@ -198,7 +199,7 @@ public class BoggleGame {
      * Returns all possible valid words that can be found on this board.
      * @return A set of solution words.
      */
-    public Map<String, String> getSolutions() {
+    public HashMap<String, String> getSolutions() {
         return solutions;
     }
 

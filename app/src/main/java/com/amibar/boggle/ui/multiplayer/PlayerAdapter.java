@@ -2,15 +2,18 @@ package com.amibar.boggle.ui.multiplayer;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerBinding;
+
 import java.util.List;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
 
-    private List<User> playerList;
+    private final List<User> playerList;
 
     public PlayerAdapter(List<User> playerList) {
         this.playerList = playerList;
@@ -37,7 +40,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         return playerList != null ? playerList.size() : 0;
     }
 
-    static class PlayerViewHolder extends RecyclerView.ViewHolder {
+    public static class PlayerViewHolder extends RecyclerView.ViewHolder {
         // Store the binding instead of individual views
         final ItemPlayerBinding binding;
 

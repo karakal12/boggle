@@ -61,11 +61,35 @@ public class FirebaseHandler {
     public User getUserData() {
         return user;
     }
-    public void updateUserData(){
-        if (mAuth.getCurrentUser() != null)
-            getUserRef().get().addOnCompleteListener(snapshot -> {
-                user = snapshot.getResult().getValue(User.class);
+
+    /**
+     * Checks if the user is still valid in Firebase Auth and exists in the database.
+     * If not, signs them out.
+     */
+    public void updateUserData() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // First, reload the user to check if they are still valid in Firebase Auth
+            currentUser.reload().addOnCompleteListener(reloadTask -> {
+                if (reloadTask.isSuccessful()) {
+                    // User is still valid in Auth, now check the database
+                    DatabaseReference userRef = getUserRef();
+                    if (userRef != null) {
+                        userRef.get().addOnCompleteListener(dbTask -> {
+                            if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
+                                user = dbTask.getResult().getValue(User.class);
+                            } else {
+                                // User does not exist in the database or read failed
+                                signOut();
+                            }
+                        });
+                    }
+                } else {
+                    // Reload failed - user might have been deleted or disabled
+                    signOut();
+                }
             });
+        }
     }
 
     /**
@@ -100,6 +124,7 @@ public class FirebaseHandler {
      */
     public void signOut() {
         mAuth.signOut();
+        user = null;
     }
 
 }

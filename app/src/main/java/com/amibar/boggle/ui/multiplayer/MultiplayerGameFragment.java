@@ -189,7 +189,8 @@ public class MultiplayerGameFragment extends Fragment {
                 }
                 
                 if (isAdded()) {
-                    ((MultiplayerActivity) requireActivity()).showGameResults(playersWordsMap);
+                    BoggleGame game = binding.boggleView.getGame();
+                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutions(), playersWordsMap);
                 }
             }
 

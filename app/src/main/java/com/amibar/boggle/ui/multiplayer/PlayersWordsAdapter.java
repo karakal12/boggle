@@ -3,11 +3,14 @@ package com.amibar.boggle.ui.multiplayer;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerScoreBinding;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
 
     private final List<User> players;
     private final HashMap<User, ArrayList<String>> playersWords;
+    private final HashMap<String, String> solutions;
     private final Set<String> commonWords;
     private final LayoutInflater inflater;
 
@@ -44,8 +48,9 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     };
 
 
-    public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords) {
+    public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords, HashMap<String, String> solutions) {
         this.playersWords = playersWords;
+        this.solutions = solutions;
         this.players = new ArrayList<>(playersWords.keySet());
         this.inflater = LayoutInflater.from(context);
         this.commonWords = findCommonWords(playersWords);
@@ -75,9 +80,9 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User player = players.get(position);
         holder.binding.setPlayerName(player.getDisplayName());
-        ArrayList<String> words = playersWords.get(player);
+        ArrayList<String> playerWords = playersWords.get(player);
         holder.binding.wordsList.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
-        holder.binding.wordsList.setAdapter(new WordsAdapter(words, commonWords));
+        holder.binding.wordsList.setAdapter(new WordsAdapter(solutions, playerWords, commonWords));
         holder.binding.executePendingBindings();
 
         RecyclerView innerRv = holder.binding.wordsList;
@@ -92,7 +97,7 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
         return players.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         final ItemPlayerScoreBinding binding;
         ViewHolder(ItemPlayerScoreBinding binding) {
             super(binding.getRoot());
