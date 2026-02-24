@@ -28,7 +28,7 @@ import java.util.Locale;
  * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
  * and handles the end-of-game result reporting and summary display.
  */
-public class SingleplayerActivity extends AppCompatActivity implements SingleplayerGameEndDialogFragment.OnWordClickListener {
+public class SingleplayerActivity extends AppCompatActivity implements SingleplayerOnGameEndFragment.OnWordClickListener {
 
     /** Tag used for logging and debugging purposes. */
     private static final String TAG = "SingleplayerActivity";
@@ -166,7 +166,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
         // Initialize and display the custom dialog fragment
         try {
             // Create fragment instance with the formatted word list and final score string
-            SingleplayerGameEndDialogFragment fragment = SingleplayerGameEndDialogFragment.newInstance(
+            SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
                     game.getSolutions(),
                     game.getFoundWords(),
                     getString(R.string.score, game.getScore())
@@ -175,7 +175,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
 
             // Use commitAllowingStateLoss to prevent crashes if the activity state was already saved
             getSupportFragmentManager().beginTransaction()
-                    .add(fragment, SingleplayerGameEndDialogFragment.TAG)
+                    .add(fragment, SingleplayerOnGameEndFragment.TAG)
                     .commitAllowingStateLoss();
         } catch (Exception e) {
             // Fallback to prevent app crash if fragment transaction fails

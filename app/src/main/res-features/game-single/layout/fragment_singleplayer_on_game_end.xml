@@ -3,7 +3,11 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+<<<<<<<< HEAD:app/src/main/res-features/game-single/layout/fragment_singleplayer_game_end_dialog.xml
     tools:context=".ui.game.singleplayer.SingleplayerGameEndDialogFragment"
+========
+    tools:context=".ui.game.singleplayer.SingleplayerOnGameEndFragment"
+>>>>>>>> ceca510 (Refactor package structure and implement feature-based resource organization):app/src/main/res-features/game-single/layout/fragment_singleplayer_on_game_end.xml
     android:orientation="vertical">
 
     <TextView

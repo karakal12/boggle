@@ -18,7 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import com.amibar.boggle.databinding.FragmentSingleplayerGameEndDialogBinding;
+import com.amibar.boggle.databinding.FragmentSingleplayerOnGameEndBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,7 @@ import java.util.Map;
  * Words found by the player are highlighted in green.
  * Clicking on a word triggers a callback to show its path on the board.
  */
-public class SingleplayerGameEndDialogFragment extends DialogFragment {
+public class SingleplayerOnGameEndFragment extends DialogFragment {
 
     /** Tag used for identifying this fragment in the FragmentManager. */
     public static final String TAG = "SinglePlayerGameEndDialogFragment";
@@ -75,10 +75,10 @@ public class SingleplayerGameEndDialogFragment extends DialogFragment {
      * @param solutions  Map of all possible words to their paths.
      * @param foundWords List of words found by the player.
      * @param score      The final score string to display.
-     * @return A configured SingleplayerGameEndDialogFragment.
+     * @return A configured SingleplayerOnGameEndFragment.
      */
-    public static SingleplayerGameEndDialogFragment newInstance(Map<String, String> solutions, List<String> foundWords, String score) {
-        SingleplayerGameEndDialogFragment fragment = new SingleplayerGameEndDialogFragment();
+    public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, String score) {
+        SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
         Bundle args = new Bundle();
         // Storing data in the arguments bundle to survive configuration changes.
         args.putSerializable(ARG_SOLUTIONS, new HashMap<>(solutions));
@@ -105,8 +105,8 @@ public class SingleplayerGameEndDialogFragment extends DialogFragment {
         String score = getArguments().getString(ARG_SCORE);
 
         // Inflate the custom layout for the dialog content using ViewBinding.
-        FragmentSingleplayerGameEndDialogBinding binding =
-                FragmentSingleplayerGameEndDialogBinding.inflate(getLayoutInflater());
+        FragmentSingleplayerOnGameEndBinding binding =
+                FragmentSingleplayerOnGameEndBinding.inflate(getLayoutInflater());
 
         // Create an AlertDialog builder to construct the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
