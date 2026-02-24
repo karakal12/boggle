@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.FragmentMultiplayerOnGameEndBinding;
@@ -42,10 +41,9 @@ public class MultiplayerOnGameEndFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.playersWordsList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-
         if (getArguments() != null) {
-            HashMap<User, ArrayList<String>> playersWords = (HashMap<User, ArrayList<String>>) getArguments().getSerializable("playersWords");
+            @SuppressWarnings("unchecked") HashMap<User, ArrayList<String>> playersWords = getArguments().getSerializable("playersWords", HashMap.class);
+            assert playersWords != null;
             playersWordsAdapter = new PlayersWordsAdapter(requireContext(), playersWords);
             binding.playersWordsList.setAdapter(playersWordsAdapter);
         }
@@ -57,5 +55,16 @@ public class MultiplayerOnGameEndFragment extends DialogFragment {
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getDialog() != null && getDialog().getWindow() != null) {{
+            getDialog().getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }}
     }
 }

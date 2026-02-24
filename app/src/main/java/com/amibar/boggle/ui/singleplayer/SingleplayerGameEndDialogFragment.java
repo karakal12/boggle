@@ -10,6 +10,8 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -154,7 +156,13 @@ public class SingleplayerGameEndDialogFragment extends DialogFragment {
 
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         // Add a header showing the total count of possible words.
-        ssb.append("Possible words (").append(String.valueOf(sortedKeys.size())).append("):\n\n");
+        ssb.append("Possible words (").append(String.valueOf(sortedKeys.size())).append("):\n");
+        int hintStart = ssb.length();
+        ssb.append("hint: click on the words to see solution");
+        ssb.setSpan(new ForegroundColorSpan(Color.GRAY), hintStart, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new RelativeSizeSpan(0.5f), hintStart, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ssb.append("\n\n");
 
         for (int i = 0; i < sortedKeys.size(); i++) {
             String word = sortedKeys.get(i);
@@ -180,9 +188,6 @@ public class SingleplayerGameEndDialogFragment extends DialogFragment {
 
                 @Override
                 public void updateDrawState(@NonNull TextPaint ds) {
-                    super.updateDrawState(ds);
-                    // Disable the default underline for clickable spans.
-                    ds.setUnderlineText(false);
                 }
             }, start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 

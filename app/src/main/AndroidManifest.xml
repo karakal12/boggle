@@ -14,6 +14,8 @@
         <activity
             android:name=".ui.singleplayer.SingleplayerActivity"
             android:exported="false" />
+        <activity android:name=".ui.multiplayer.MultiplayerActivity"
+            android:exported="false"/>
         <activity
             android:name=".ui.mainmenu.MainActivity"
             android:exported="true">

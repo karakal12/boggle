@@ -38,12 +38,11 @@ public class LobbyFragment extends Fragment {
     private DatabaseReference roomRef;
     private ValueEventListener playerListener;
 
-    public static LobbyFragment newInstance(String roomCode, PlayerRole playerRole, User player) {
+    public static LobbyFragment newInstance(String roomCode, PlayerRole playerRole) {
         LobbyFragment fragment = new LobbyFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ROOM_CODE, roomCode);
         args.putString(ARG_PLAYER_ROLE, playerRole.name());
-        args.putSerializable(ARG_PLAYER, player);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,8 +72,10 @@ public class LobbyFragment extends Fragment {
             if (roleStr != null) {
                 playerRole = PlayerRole.valueOf(roleStr);
             }
-            player = args.getSerializable(ARG_PLAYER, User.class);
         }
+        
+        // Get player data from FirebaseHandler to avoid large Binder transactions
+        player = FirebaseHandler.getInstance().getUserData();
 
         if (playerRole == PlayerRole.HOST) {
             binding.startButton.setVisibility(View.VISIBLE);
@@ -87,8 +88,11 @@ public class LobbyFragment extends Fragment {
         if (roomCode != null) {
             roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
             listenForPlayers();
+            
+            if (player != null) {
+                roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId()).setValue(player);
+            }
         }
-        roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId());
     }
 
     private void listenForPlayers() {
@@ -109,7 +113,9 @@ public class LobbyFragment extends Fragment {
                 // Check if the game has started
                 Boolean gameStarted = snapshot.child("gameStarted").getValue(Boolean.class);
                 if (Boolean.TRUE.equals(gameStarted)) {
-                    ((MultiplayerActivity) requireContext()).startGame();
+                    if (isAdded()) {
+                        ((MultiplayerActivity) requireActivity()).startGame();
+                    }
                 }
             }
 

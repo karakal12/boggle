@@ -90,7 +90,7 @@ public class GameSolver {
                                 char c = board[nextI][nextJ];
                                 Dictionary.DictNode nextNode = root.get(c);
                                 if (nextNode != null) {
-                                    String nextPath = path + (char) (i * board.length + j);
+                                    String nextPath = path + Integer.toHexString(nextI * board.length + nextJ);
                                     String nextString = string + c;
                                     // Boggle special case: 'q' is always followed by 'u'
                                     if (c == 'q') {
@@ -138,7 +138,7 @@ public class GameSolver {
                 Dictionary.DictNode node = dictionary.getRoot().get(c);
                 if (node != null) {
                     String s = String.valueOf(c);
-                    String path = String.valueOf(i * board.length + j);
+                    String path = Integer.toHexString(i * board.length + j);
                     // Handle special 'q' -> 'qu' case
                     if (c == 'q') {
                         node = node.get('u');

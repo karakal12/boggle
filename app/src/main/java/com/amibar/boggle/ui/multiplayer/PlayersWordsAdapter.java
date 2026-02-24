@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerScoreBinding;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapter.ViewHolder> {
 
@@ -21,6 +22,27 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     private final HashMap<User, ArrayList<String>> playersWords;
     private final Set<String> commonWords;
     private final LayoutInflater inflater;
+
+    private final Set<RecyclerView> childRecyclerViews = Collections.newSetFromMap(new WeakHashMap<>());
+    private int currentScrollX = 0;
+    private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            currentScrollX += dx;
+
+            // only scroll if this view was scrolled by user and not another view
+            if (recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE){
+                for (RecyclerView rv : childRecyclerViews) {
+                    if (rv != recyclerView) {
+                        rv.scrollBy(dx, 0);
+                    }
+                }
+            }
+        }
+    };
+
 
     public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords) {
         this.playersWords = playersWords;
@@ -53,11 +75,16 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User player = players.get(position);
         holder.binding.setPlayerName(player.getDisplayName());
-        
         ArrayList<String> words = playersWords.get(player);
         holder.binding.wordsList.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.binding.wordsList.setAdapter(new WordsAdapter(words, commonWords));
         holder.binding.executePendingBindings();
+
+        RecyclerView innerRv = holder.binding.wordsList;
+        childRecyclerViews.add(innerRv);
+        innerRv.clearOnScrollListeners();
+        innerRv.addOnScrollListener(syncScrollHandler);
+        innerRv.scrollTo(currentScrollX, 0);
     }
 
     @Override

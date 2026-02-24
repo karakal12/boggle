@@ -17,6 +17,8 @@ public class FirebaseHandler {
     /** Instance of Firebase Realtime Database. */
     private final FirebaseDatabase mDatabase;
 
+    private User user;
+
     /**
      * Initializes the Firebase instances.
      */
@@ -56,6 +58,16 @@ public class FirebaseHandler {
         return mAuth.getCurrentUser();
     }
 
+    public User getUserData() {
+        return user;
+    }
+    public void updateUserData(){
+        if (mAuth.getCurrentUser() != null)
+            getUserRef().get().addOnCompleteListener(snapshot -> {
+                user = snapshot.getResult().getValue(User.class);
+            });
+    }
+
     /**
      * @return The Unique ID (UID) of the current user, or null if not signed in.
      */
@@ -89,4 +101,5 @@ public class FirebaseHandler {
     public void signOut() {
         mAuth.signOut();
     }
+
 }

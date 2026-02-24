@@ -9,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.PlayerRole;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ActivityMultiplayerBinding;
@@ -20,7 +21,6 @@ public class MultiplayerActivity extends AppCompatActivity {
     public static final String TAG = "MultiplayerActivity";
     public static final String ARG_ROOM_CODE = "room_code";
     public static final String ARG_PLAYER_ROLE = "player_role";
-    public static final String ARG_PLAYER = "player";
     
     private ActivityMultiplayerBinding binding;
     
@@ -33,7 +33,6 @@ public class MultiplayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         
-        // Correct ViewBinding initialization
         binding = ActivityMultiplayerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -45,19 +44,18 @@ public class MultiplayerActivity extends AppCompatActivity {
         
         // Retrieve data from the Intent
         if (getIntent() != null) {
-            String roleStr = getIntent().getStringExtra(ARG_PLAYER_ROLE);
-            if (roleStr != null) {
-                playerRole = PlayerRole.valueOf(roleStr);
-            }
+            playerRole = getIntent().getSerializableExtra(ARG_PLAYER_ROLE, PlayerRole.class);
             roomCode = getIntent().getStringExtra(ARG_ROOM_CODE);
-            player = getIntent().getSerializableExtra(ARG_PLAYER, User.class);
         }
+        
+        // Get player data from FirebaseHandler instead of Intent to avoid DeadObjectException (Binder limit)
+        player = FirebaseHandler.getInstance().getUserData();
 
         // Load the LobbyFragment with arguments if this is the first time the activity is created
         if (savedInstanceState == null && roomCode != null && playerRole != null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(binding.main.getId(), LobbyFragment.newInstance(roomCode, playerRole, player), LobbyFragment.TAG)
+                    .add(binding.main.getId(), LobbyFragment.newInstance(roomCode, playerRole), LobbyFragment.TAG)
                     .commit();
         }
     }
@@ -65,7 +63,7 @@ public class MultiplayerActivity extends AppCompatActivity {
     public void startGame(){
         if (roomCode != null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(binding.main.getId(), MultiplayerGameFragment.newInstance(playerRole, roomCode, player), MultiplayerGameFragment.TAG)
+                    .replace(binding.main.getId(), MultiplayerGameFragment.newInstance(playerRole, roomCode), MultiplayerGameFragment.TAG)
                     .commit();
         }
     }
@@ -73,5 +71,11 @@ public class MultiplayerActivity extends AppCompatActivity {
     public void showGameResults(HashMap<User, ArrayList<String>> playersWords) {
         MultiplayerOnGameEndFragment fragment = MultiplayerOnGameEndFragment.newInstance(playersWords);
         fragment.show(getSupportFragmentManager(), MultiplayerOnGameEndFragment.TAG);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseHandler.getDatabase().getReference("rooms").child(roomCode).removeValue();
     }
 }

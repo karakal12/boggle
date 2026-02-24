@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,6 +17,7 @@ import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.GameResult;
 import com.amibar.boggle.databinding.ActivitySingleplayerBinding;
 import com.amibar.boggle.engine.BoggleGame;
+import com.amibar.boggle.ui.DonutActivity;
 import com.google.firebase.database.DatabaseReference;
 
 import java.text.SimpleDateFormat;
@@ -93,6 +95,14 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
                     uploadGameResults(game);
                 }));
 
+        game.addOnWordFoundListener(word -> {
+            if (word.equalsIgnoreCase("donut")){
+                game.stopTimer();
+                Intent intent = new Intent(this, DonutActivity.class);
+                startActivity(intent);
+            }
+        });
+
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -104,6 +114,14 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (game != null && !isGameEnded) {
+            game.startTimer();
+        }
     }
 
     /**

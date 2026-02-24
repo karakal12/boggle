@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Join Room"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@+id/create_room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -20,6 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Room"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/room_code_TIL"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -40,7 +42,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/room_code_TV"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:hint="Enter room code"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"

@@ -1,6 +1,5 @@
 package com.amibar.boggle.ui.multiplayer;
 
-import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_PLAYER;
 import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_PLAYER_ROLE;
 import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_ROOM_CODE;
 
@@ -9,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +19,7 @@ import com.amibar.boggle.data.PlayerRole;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.FragmentMultiplayerGameBinding;
 import com.amibar.boggle.engine.BoggleGame;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,18 +34,17 @@ public class MultiplayerGameFragment extends Fragment {
     private FragmentMultiplayerGameBinding binding;
     private String roomCode;
     private PlayerRole playerRole;
-    private User player;
 
     private DatabaseReference roomRef;
     private ValueEventListener boardListener;
     private ValueEventListener gameEndListener;
+    private ChildEventListener gameDestroyedListener;
 
-    public static MultiplayerGameFragment newInstance(PlayerRole playerRole, String roomCode, User player) {
+    public static MultiplayerGameFragment newInstance(PlayerRole playerRole, String roomCode) {
         MultiplayerGameFragment fragment = new MultiplayerGameFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ROOM_CODE, roomCode);
         args.putString(ARG_PLAYER_ROLE, playerRole.name());
-        args.putSerializable(ARG_PLAYER, player);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,7 +55,6 @@ public class MultiplayerGameFragment extends Fragment {
         if (getArguments() != null) {
             roomCode = getArguments().getString(ARG_ROOM_CODE);
             playerRole = PlayerRole.valueOf(getArguments().getString(ARG_PLAYER_ROLE));
-            player = getArguments().getSerializable(ARG_PLAYER, User.class);
         }
 
         if (roomCode != null){
@@ -75,6 +74,7 @@ public class MultiplayerGameFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listenForGameEnd();
+        listenForGameDestroyed();
 
         if (playerRole == PlayerRole.HOST) {
             // Host creates the game and uploads the board
@@ -120,6 +120,43 @@ public class MultiplayerGameFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {}
         };
         roomRef.child("gameEnded").addValueEventListener(gameEndListener);
+    }
+
+    private void listenForGameDestroyed() {
+        gameDestroyedListener = new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                String deletedNodeKey = snapshot.getKey();
+                if (deletedNodeKey != null && deletedNodeKey.equals(roomCode)) {
+                    requireActivity().finish();
+                    Toast.makeText(requireContext(), "Game was destroyed by HOST", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        assert roomRef.getParent() != null;
+        roomRef.getParent().addChildEventListener(gameDestroyedListener);
     }
 
     private void collectResultsAndFinish() {
@@ -184,6 +221,9 @@ public class MultiplayerGameFragment extends Fragment {
         }
         if (gameEndListener != null && roomRef != null) {
             roomRef.child("gameEnded").removeEventListener(gameEndListener);
+        }
+        if (gameDestroyedListener != null && roomRef != null && roomRef.getParent() != null) {
+            roomRef.getParent().removeEventListener(gameDestroyedListener);
         }
         binding = null;
     }

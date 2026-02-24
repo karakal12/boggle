@@ -257,7 +257,7 @@ public class BoggleView extends LinearLayout {
         char[] indices = path.toCharArray();
         int selectedColor = resolveAttribute(R.attr.colorSelected);
         for (int i = 0; i < indices.length; i++) {
-            int index = indices[i];
+            int index = Character.getNumericValue(indices[i]);
             if (i == indices.length - 1) {
                 lastSelected = cells[index];
                 cells[index].setBackgroundColor(resolveAttribute(R.attr.colorLastSelected));

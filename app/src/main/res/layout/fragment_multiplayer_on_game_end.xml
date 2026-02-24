@@ -24,13 +24,16 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/players_words_list"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constrainedHeight="true"
             android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/game_over_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:listitem="@layout/item_player_score" />
+            tools:listitem="@layout/item_player_score"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

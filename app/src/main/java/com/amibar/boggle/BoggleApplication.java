@@ -3,6 +3,7 @@ package com.amibar.boggle;
 import android.app.Application;
 
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.data.FirebaseHandler;
 
 /**
  * Custom Application class for the Boggle app.
@@ -16,5 +17,6 @@ public class BoggleApplication extends Application {
         // Load the dictionary from raw resources into memory (Trie structure)
         // This ensures the word list is ready before any game activities are launched.
         Dictionary.getInstance().init(getResources().openRawResource(R.raw.word_list));
+        FirebaseHandler.getInstance().updateUserData();
     }
 }
