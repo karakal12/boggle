@@ -25,4 +25,5 @@
     <string name="join_room">Join Room</string>
     <string name="enter_room_code">Enter Room Code</string>
     <string name="profile_picture">Profile Picture</string>
+    <string name="hint_click_on_the_words_for_solution"><small><small>hint: click on the words for solution</small></small></string>
 </resources>

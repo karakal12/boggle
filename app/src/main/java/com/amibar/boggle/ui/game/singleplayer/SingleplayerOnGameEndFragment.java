@@ -1,27 +1,21 @@
 package com.amibar.boggle.ui.game.singleplayer;
 
 import android.app.Dialog;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.amibar.boggle.databinding.FragmentSingleplayerOnGameEndBinding;
+import com.amibar.boggle.ui.game.shared.WordsAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +54,8 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     /** Listener for word click events. */
     private OnWordClickListener listener;
 
+    private FragmentSingleplayerOnGameEndBinding binding;
+
     /**
      * Sets the listener for word click events.
      *
@@ -77,23 +73,17 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
      * @param score      The final score string to display.
      * @return A configured SingleplayerOnGameEndFragment.
      */
-    public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, String score) {
+    public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
         SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
         Bundle args = new Bundle();
         // Storing data in the arguments bundle to survive configuration changes.
         args.putSerializable(ARG_SOLUTIONS, new HashMap<>(solutions));
         args.putStringArrayList(ARG_FOUND_WORDS, new ArrayList<>(foundWords));
-        args.putString(ARG_SCORE, score);
+        args.putInt(ARG_SCORE, score);
         fragment.setArguments(args);
         return fragment;
     }
 
-    /**
-     * Called to create the dialog displayed by this fragment.
-     *
-     * @param savedInstanceState The last saved instance state of the Fragment, or null if this is a new instance.
-     * @return A new {@link Dialog} instance to be displayed by the Fragment.
-     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -102,26 +92,26 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
         @SuppressWarnings("unchecked")
         Map<String, String> solutions = (Map<String, String>) getArguments().getSerializable(ARG_SOLUTIONS);
         List<String> foundWords = getArguments().getStringArrayList(ARG_FOUND_WORDS);
-        String score = getArguments().getString(ARG_SCORE);
+        int score = getArguments().getInt(ARG_SCORE);
 
         // Inflate the custom layout for the dialog content using ViewBinding.
-        FragmentSingleplayerOnGameEndBinding binding =
-                FragmentSingleplayerOnGameEndBinding.inflate(getLayoutInflater());
+        binding = FragmentSingleplayerOnGameEndBinding.inflate(getLayoutInflater());
 
         // Create an AlertDialog builder to construct the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Game Over");
 
         // Bind UI components and set data.
-        TextView tvScore = binding.tvScore;
-        tvScore.setText(score);
+        binding.setScore(score);
 
-        TextView tvGameWords = binding.tvGameWords;
-        assert solutions != null;
-        // Build and set the spannable string containing all possible words.
-        tvGameWords.setText(buildSpannableWords(solutions, foundWords));
-        // Enable clicking and scrolling within the TextView.
-        tvGameWords.setMovementMethod(LinkMovementMethod.getInstance());
+        if (solutions != null && foundWords != null) {
+            binding.wordsList.setAdapter(new WordsAdapter(solutions, foundWords, (word, path) -> {
+                if (listener != null) {
+                    listener.onWordClick(word, path);
+                }
+                dismiss();
+            }));
+        }
 
         // Set the custom view for the dialog.
         builder.setView(binding.getRoot());
@@ -139,60 +129,11 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
         return dialog;
     }
 
-    /**
-     * Builds a {@link CharSequence} containing all possible words, formatted with colors and click listeners.
-     *
-     * @param solutions  Map of all possible words to their paths.
-     * @param foundWords List of words found by the player.
-     * @return A {@link SpannableStringBuilder} containing the formatted text.
-     */
-    private CharSequence buildSpannableWords(Map<String, String> solutions, List<String> foundWords) {
-        // Sort the possible words alphabetically.
-        List<String> sortedKeys = new ArrayList<>(solutions.keySet());
-        Collections.sort(sortedKeys);
-
-        SpannableStringBuilder ssb = new SpannableStringBuilder();
-        // Add a header showing the total count of possible words.
-        ssb.append("Possible words (").append(String.valueOf(sortedKeys.size())).append("):\n");
-        int hintStart = ssb.length();
-        ssb.append("hint: click on the words to see solution");
-        ssb.setSpan(new ForegroundColorSpan(Color.GRAY), hintStart, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ssb.setSpan(new RelativeSizeSpan(0.5f), hintStart, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        ssb.append("\n\n");
-
-        for (int i = 0; i < sortedKeys.size(); i++) {
-            String word = sortedKeys.get(i);
-            String path = solutions.get(word);
-            int start = ssb.length();
-            ssb.append(word);
-
-            // Highlight words found by the player in green.
-            if (foundWords.contains(word)) {
-                ssb.setSpan(new ForegroundColorSpan(Color.GREEN), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-
-            // Add a click listener to each word to show its path on the board.
-            ssb.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    if (listener != null) {
-                        listener.onWordClick(word, path);
-                    }
-                    // Dismiss the dialog after a word is clicked to show the path on the game screen.
-                    dismiss();
-                }
-
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                }
-            }, start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            // Add a newline after each word except the last one.
-            if (i < sortedKeys.size() - 1) {
-                ssb.append("\n");
-            }
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-        return ssb;
     }
 }

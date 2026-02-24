@@ -18,19 +18,27 @@ import java.util.Set;
 
 public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> {
 
+    public interface OnWordClickListener {
+        void onWordClick(String word, String path);
+    }
+
     private final Map<String, String> solutions;
     private final List<String> playerWords;
     private final Set<String> commonWords;
+    private final OnWordClickListener listener;
 
-    public WordsAdapter(HashMap<String, String> solutions, List<String> playerWords, Set<String> commonWords) {
+    public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener) {
         this.solutions = solutions;
         this.playerWords = playerWords;
         this.commonWords = commonWords;
+        this.listener = listener;
     }
-    public WordsAdapter(HashMap<String, String> solutions, List<String> playerWords) {
+
+    public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener) {
         this.solutions = solutions;
         this.playerWords = playerWords;
         this.commonWords = null;
+        this.listener = listener;
     }
 
     @NonNull
@@ -53,6 +61,13 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         } else {
             holder.binding.wordText.setTextColor(Color.BLACK);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onWordClick(word, solutions.get(word));
+            }
+        });
+
         holder.binding.executePendingBindings();
     }
 

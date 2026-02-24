@@ -27,6 +27,7 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     private final HashMap<String, String> solutions;
     private final Set<String> commonWords;
     private final LayoutInflater inflater;
+    private final WordsAdapter.OnWordClickListener onWordClickListener;
 
     private final Set<RecyclerView> childRecyclerViews = Collections.newSetFromMap(new WeakHashMap<>());
     private int currentScrollX = 0;
@@ -50,11 +51,16 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
 
 
     public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords, HashMap<String, String> solutions) {
+        this(context, playersWords, solutions, null);
+    }
+
+    public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords, HashMap<String, String> solutions, WordsAdapter.OnWordClickListener onWordClickListener) {
         this.playersWords = playersWords;
         this.solutions = solutions;
         this.players = new ArrayList<>(playersWords.keySet());
         this.inflater = LayoutInflater.from(context);
         this.commonWords = findCommonWords(playersWords);
+        this.onWordClickListener = onWordClickListener;
     }
 
     private Set<String> findCommonWords(HashMap<User, ArrayList<String>> playersWords) {
@@ -83,7 +89,7 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
         holder.binding.setPlayerName(player.getDisplayName());
         ArrayList<String> playerWords = playersWords.get(player);
         holder.binding.wordsList.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
-        holder.binding.wordsList.setAdapter(new WordsAdapter(solutions, playerWords, commonWords));
+        holder.binding.wordsList.setAdapter(new WordsAdapter(solutions, playerWords, commonWords, onWordClickListener));
         holder.binding.executePendingBindings();
 
         RecyclerView innerRv = holder.binding.wordsList;

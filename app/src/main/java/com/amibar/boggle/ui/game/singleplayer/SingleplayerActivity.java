@@ -169,7 +169,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
             SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
                     game.getSolutions(),
                     game.getFoundWords(),
-                    getString(R.string.score, game.getScore())
+                    game.getScore()
             );
             fragment.setOnWordClickListener(this);
 
