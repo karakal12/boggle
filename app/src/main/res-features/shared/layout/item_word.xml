@@ -10,9 +10,11 @@
 
     <TextView
         android:id="@+id/word_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@{word}"
         android:padding="4dp"
-        tools:text="Word"/>
+        tools:text="Word"
+        android:gravity="center"
+        android:maxLines="1"/>
 </layout>
