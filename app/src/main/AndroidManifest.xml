@@ -12,9 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Boggle">
         <activity
-            android:name=".ui.singleplayer.SingleplayerActivity"
+            android:name=".ui.game.singleplayer.SingleplayerActivity"
             android:exported="false" />
-        <activity android:name=".ui.multiplayer.MultiplayerActivity"
+        <activity android:name=".ui.game.multiplayer.MultiplayerActivity"
             android:exported="false"/>
         <activity
             android:name=".ui.mainmenu.MainActivity"

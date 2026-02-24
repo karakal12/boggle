@@ -1,7 +1,7 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.multiplayer;
 
-import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_PLAYER_ROLE;
-import static com.amibar.boggle.ui.multiplayer.MultiplayerActivity.ARG_ROOM_CODE;
+import static com.amibar.boggle.ui.game.multiplayer.MultiplayerActivity.ARG_PLAYER_ROLE;
+import static com.amibar.boggle.ui.game.multiplayer.MultiplayerActivity.ARG_ROOM_CODE;
 
 import android.os.Bundle;
 import android.util.Log;

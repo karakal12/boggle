@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.multiplayer;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.singleplayer;
+package com.amibar.boggle.ui.game.singleplayer;
 
 import android.app.Dialog;
 import android.graphics.Color;

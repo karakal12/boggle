@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.multiplayer;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,7 +22,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     @NonNull
     @Override
     public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Use View Binding to inflate the layout
         ItemPlayerBinding binding = ItemPlayerBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
         return new PlayerViewHolder(binding);

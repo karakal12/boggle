@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.shared;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -27,6 +27,11 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         this.playerWords = playerWords;
         this.commonWords = commonWords;
     }
+    public WordsAdapter(HashMap<String, String> solutions, List<String> playerWords) {
+        this.solutions = solutions;
+        this.playerWords = playerWords;
+        this.commonWords = null;
+    }
 
     @NonNull
     @Override
@@ -41,7 +46,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         Collections.sort(words);
         String word = words.get(position);
         holder.binding.setWord(word);
-        if (commonWords.contains(word)) {
+        if (commonWords != null && commonWords.contains(word)) {
             holder.binding.wordText.setTextColor(Color.RED);
         } else if (playerWords.contains(word)){
             holder.binding.wordText.setTextColor(Color.GREEN);

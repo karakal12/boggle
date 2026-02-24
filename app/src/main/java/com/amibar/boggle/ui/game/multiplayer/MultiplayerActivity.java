@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.multiplayer;
 
 import android.os.Bundle;
 
@@ -16,7 +16,6 @@ import com.amibar.boggle.databinding.ActivityMultiplayerBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MultiplayerActivity extends AppCompatActivity {
     public static final String TAG = "MultiplayerActivity";

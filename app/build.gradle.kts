@@ -31,6 +31,20 @@ android {
             )
         }
     }
+
+    sourceSets {
+        getByName("main") {
+            res.srcDirs(
+                "src/main/res",
+                "src/main/res-features/auth",
+                "src/main/res-features/mainmenu",
+                "src/main/res-features/game-single",
+                "src/main/res-features/game-multi",
+                "src/main/res-features/shared"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21

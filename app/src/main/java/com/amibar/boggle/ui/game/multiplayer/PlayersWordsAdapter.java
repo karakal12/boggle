@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.multiplayer;
+package com.amibar.boggle.ui.game.multiplayer;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerScoreBinding;
+import com.amibar.boggle.ui.game.shared.WordsAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
