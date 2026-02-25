@@ -1,5 +1,7 @@
 package com.amibar.boggle.data;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -10,6 +12,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * This simplifies Firebase access across various fragments and activities in the app.
  */
 public class FirebaseHandler {
+    private static final String TAG = "FirebaseHandler";
     /** Singleton instance. */
     private static FirebaseHandler instance;
     /** Instance of Firebase Authentication. */
@@ -63,8 +66,7 @@ public class FirebaseHandler {
     }
 
     /**
-     * Checks if the user is still valid in Firebase Auth and exists in the database.
-     * If not, signs them out.
+     * Checks if the user is still valid in Firebase Auth and updates local user data.
      */
     public void updateUserData() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -78,17 +80,15 @@ public class FirebaseHandler {
                         userRef.get().addOnCompleteListener(dbTask -> {
                             if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
                                 user = dbTask.getResult().getValue(User.class);
-                            } else {
-                                // User does not exist in the database or read failed
-                                signOut();
                             }
                         });
                     }
                 } else {
-                    // Reload failed - user might have been deleted or disabled
-                    signOut();
+                    Log.e(TAG, "User reload failed", reloadTask.getException());
                 }
             });
+        } else {
+            user = null;
         }
     }
 

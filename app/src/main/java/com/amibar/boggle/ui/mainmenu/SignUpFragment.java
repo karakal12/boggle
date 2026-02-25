@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -169,7 +170,8 @@ public class SignUpFragment extends DialogFragment {
         pd.setMessage("Saving User Data...");
         User newUser = new User(displayName, user.getEmail(), base64Image);
 
-        FirebaseHandler.getInstance().getUserRef().setValue(newUser)
+        DatabaseReference userRef = FirebaseHandler.getInstance().getRootRef().child("users").child(user.getUid());
+        userRef.setValue(newUser)
                 .addOnCompleteListener(task -> {
                     pd.dismiss();
                     if (task.isSuccessful()) {
@@ -179,7 +181,7 @@ public class SignUpFragment extends DialogFragment {
                         Toast.makeText(requireContext(), "Failed to save user data", Toast.LENGTH_SHORT).show();
                     }
                 });
-        if (getContext() instanceof MainActivity mainActivity){
+        if (getActivity() instanceof MainActivity mainActivity){
             mainActivity.updateUI();
         }
     }

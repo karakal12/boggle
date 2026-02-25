@@ -28,7 +28,7 @@ public class BoggleGame {
     /**
      * The total duration of a game in milliseconds.
      */
-    public static final long GAME_TIME_MILLIS = 18000; // 180000 millis = 3 minutes
+    public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
 
     private final char[] board;
     private final ArrayDeque<Integer> selectedIndices;
