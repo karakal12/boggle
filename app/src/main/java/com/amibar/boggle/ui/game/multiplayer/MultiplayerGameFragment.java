@@ -29,8 +29,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Fragment responsible for the multiplayer game logic.
+ * This fragment manages the Boggle game state, synchronizes the game board via Firebase,
+ * listens for game completion, and handles real-time updates for found words.
+ */
 public class MultiplayerGameFragment extends Fragment {
     public static final String TAG = "MultiplayerGameFragment";
+    
     private FragmentMultiplayerGameBinding binding;
     private String roomCode;
     private PlayerRole playerRole;
@@ -40,6 +46,13 @@ public class MultiplayerGameFragment extends Fragment {
     private ValueEventListener gameEndListener;
     private ChildEventListener gameDestroyedListener;
 
+    /**
+     * Creates a new instance of MultiplayerGameFragment with the specified role and room code.
+     *
+     * @param playerRole The role of the player (HOST or GUEST).
+     * @param roomCode   The unique code for the multiplayer room.
+     * @return A new instance of MultiplayerGameFragment.
+     */
     public static MultiplayerGameFragment newInstance(PlayerRole playerRole, String roomCode) {
         MultiplayerGameFragment fragment = new MultiplayerGameFragment();
         Bundle args = new Bundle();
@@ -52,11 +65,13 @@ public class MultiplayerGameFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Retrieve arguments passed via newInstance
         if (getArguments() != null) {
             roomCode = getArguments().getString(ARG_ROOM_CODE);
             playerRole = PlayerRole.valueOf(getArguments().getString(ARG_PLAYER_ROLE));
         }
 
+        // Initialize the Firebase reference for the specific room
         if (roomCode != null){
             roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
         }
@@ -65,6 +80,7 @@ public class MultiplayerGameFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate the layout using View Binding
         binding = FragmentMultiplayerGameBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -73,25 +89,28 @@ public class MultiplayerGameFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Start listening for game-wide events
         listenForGameEnd();
         listenForGameDestroyed();
 
         if (playerRole == PlayerRole.HOST) {
-            // Host creates the game and uploads the board
+            // The Host is responsible for generating the game board and sharing it
             BoggleGame game = binding.boggleView.newGame();
             roomRef.child("board").setValue(new String(game.getBoard()))
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to upload board", e));
             setupGame(game);
         } else {
-            // Guest downloads the board and creates the local game
+            // Guests wait for the Host to upload the board before starting
             boardListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String boardStr = snapshot.getValue(String.class);
                     if (boardStr != null && !boardStr.isEmpty()) {
+                        // Once the board is available, initialize the local game with it
                         BoggleGame game = binding.boggleView.setGame(boardStr.toCharArray());
                         setupGame(game);
-                        // Once the board is received, we can stop listening
+                        
+                        // Stop listening for board changes once it's successfully received
                         roomRef.child("board").removeEventListener(this);
                         boardListener = null;
                     }
@@ -106,6 +125,10 @@ public class MultiplayerGameFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets up a listener for the 'gameEnded' flag in Firebase.
+     * When the flag is set to true, it triggers the results collection process.
+     */
     private void listenForGameEnd() {
         gameEndListener = new ValueEventListener() {
             @Override
@@ -122,43 +145,47 @@ public class MultiplayerGameFragment extends Fragment {
         roomRef.child("gameEnded").addValueEventListener(gameEndListener);
     }
 
+    /**
+     * Listens for the deletion of the room in Firebase.
+     * If the room node is removed (e.g., host cancels), the game session is terminated.
+     */
     private void listenForGameDestroyed() {
         gameDestroyedListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
 
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 String deletedNodeKey = snapshot.getKey();
+                // Check if the removed node is the current room
                 if (deletedNodeKey != null && deletedNodeKey.equals(roomCode)) {
-                    requireActivity().finish();
-                    Toast.makeText(requireContext(), "Game was destroyed by HOST", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {
+                        requireActivity().finish();
+                        Toast.makeText(requireContext(), "Game was destroyed by HOST", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         };
 
-        assert roomRef.getParent() != null;
-        roomRef.getParent().addChildEventListener(gameDestroyedListener);
+        // Listen for changes in the parent 'rooms' node
+        if (roomRef.getParent() != null) {
+            roomRef.getParent().addChildEventListener(gameDestroyedListener);
+        }
     }
 
+    /**
+     * Collects all players' found words and the game results from Firebase.
+     * After data collection, it notifies the activity to show the final results screen.
+     */
     private void collectResultsAndFinish() {
         roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -168,6 +195,7 @@ public class MultiplayerGameFragment extends Fragment {
                 DataSnapshot playersSnapshot = snapshot.child("players");
                 DataSnapshot wordsSnapshot = snapshot.child("playerWords");
                 
+                // Map user IDs to User objects for easier lookups
                 Map<String, User> userIdToUser = new HashMap<>();
                 for (DataSnapshot playerSnap : playersSnapshot.getChildren()) {
                     User u = playerSnap.getValue(User.class);
@@ -176,6 +204,7 @@ public class MultiplayerGameFragment extends Fragment {
                     }
                 }
                 
+                // Aggregate words found by each player
                 for (DataSnapshot userWordsSnap : wordsSnapshot.getChildren()) {
                     String userId = userWordsSnap.getKey();
                     User u = userIdToUser.get(userId);
@@ -190,33 +219,47 @@ public class MultiplayerGameFragment extends Fragment {
                 
                 if (isAdded()) {
                     BoggleGame game = binding.boggleView.getGame();
-                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutions(), playersWordsMap);
+                    // Transition to the results view in the parent activity
+                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutionsMap(), playersWordsMap);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Failed to collect final results: " + error.getMessage());
+            }
         });
     }
 
+    /**
+     * Initializes the Boggle game logic and attaches listeners for local game events.
+     *
+     * @param game The BoggleGame instance to configure.
+     */
     private void setupGame(BoggleGame game) {
         String userId = FirebaseHandler.getInstance().getCurrentUserId();
+        
+        // Listen for words found locally and sync them to Firebase
         game.addOnWordFoundListener(word ->
             roomRef.child("playerWords").child(userId).child(word).setValue(true)
         );
         
+        // Listen for game end (timer expire)
         game.addOnGameEndListener(() -> {
             if (playerRole == PlayerRole.HOST) {
+                // Host marks the game as ended globally in Firebase
                 roomRef.child("gameEnded").setValue(true);
             }
         });
 
+        // Start the visual countdown/timer
         binding.boggleView.startGame();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Clean up Firebase listeners to prevent memory leaks and unexpected behavior
         if (boardListener != null && roomRef != null) {
             roomRef.child("board").removeEventListener(boardListener);
         }

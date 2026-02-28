@@ -4,12 +4,10 @@ package com.amibar.boggle.engine;
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.data.Trie;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.RecursiveAction;
 
 /**
@@ -18,14 +16,14 @@ import java.util.concurrent.RecursiveAction;
  */
 public class GameSolver {
     /** A synchronized set to store all unique words found on the board. */
-    private Map<String, String> solutions;
+    private Trie solutions;
 
     /**
      * Represents a recursive task for searching words starting from a specific die on the board.
      */
     class GameSolverTask extends RecursiveAction {
 
-        private final Dictionary.DictNode root;
+        private final Trie root;
         private final char[][] board;
         private final int i, j;
         /** A 16-bit bitmap tracking visited dice in the current path. */
@@ -42,7 +40,7 @@ public class GameSolver {
          * @param visited Bitmap of visited cells.
          * @param string The string formed so far in this path.
          */
-        public GameSolverTask(Dictionary.DictNode root, char[][] board, int i, int j, short visited, String path, String string) {
+        public GameSolverTask(Trie root, char[][] board, int i, int j, short visited, String path, String string) {
             this.root = root;
             this.board = board;
             assert (board.length == board[0].length && board.length == 4) : "board must be 4x4";
@@ -86,7 +84,7 @@ public class GameSolver {
                             // Check if neighbor is within bounds, not visited, and matches the dictionary path
                             if (isSafe(nextI, nextJ, visited) && board[nextI][nextJ] == ch) {
                                 char c = board[nextI][nextJ];
-                                Dictionary.DictNode nextNode = root.get(c);
+                                Trie nextNode = root.get(c);
                                 if (nextNode != null) {
                                     String nextPath = path + Integer.toHexString(nextI * board.length + nextJ);
                                     String nextString = string + c;
@@ -126,14 +124,14 @@ public class GameSolver {
      * @param dictionary The dictionary to use for word validation.
      * @return A set of all unique valid words found on the board.
      */
-    public Map<String, String> solve(char[][] board, Dictionary dictionary) {
-        solutions = Collections.synchronizedMap(new HashMap<>());
+    public Trie solve(char[][] board, Dictionary dictionary) {
+        solutions = new Trie();
         List<GameSolverTask> tasks = new ArrayList<>();
         // Start a search from every cell on the board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 char c = board[i][j];
-                Dictionary.DictNode node = dictionary.getRoot().get(c);
+                Trie node = dictionary.getRoot().get(c);
                 if (node != null) {
                     String s = String.valueOf(c);
                     String path = Integer.toHexString(i * board.length + j);

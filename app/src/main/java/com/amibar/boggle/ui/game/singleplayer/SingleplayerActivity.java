@@ -11,7 +11,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.GameResult;
 import com.amibar.boggle.databinding.ActivitySingleplayerBinding;
@@ -109,7 +108,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
                     showGameEndDialog();
                 } else {
                     setEnabled(false);
-                    onBackPressed();
+                    getOnBackPressedDispatcher().onBackPressed();
                 }
             }
         });
@@ -167,7 +166,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
         try {
             // Create fragment instance with the formatted word list and final score string
             SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
-                    game.getSolutions(),
+                    game.getSolutionsMap(),
                     game.getFoundWords(),
                     game.getScore()
             );

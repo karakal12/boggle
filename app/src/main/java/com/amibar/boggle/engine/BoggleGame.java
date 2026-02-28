@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.data.Trie;
 import com.amibar.boggle.utils.Timer;
 
 import java.util.ArrayDeque;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -30,22 +30,31 @@ public class BoggleGame {
      */
     public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
 
+    /** The 1D array representation of the 4x4 board letters. */
     private final char[] board;
+    /** Tracks the indices of dice currently selected by the player to form a word. */
     private final ArrayDeque<Integer> selectedIndices;
+    /** Stores words successfully found and submitted by the player. */
     private final ArrayList<String> foundWords;
+    /** The player's current cumulative score. */
     private int score;
+    /** Flag indicating if the game has concluded. */
     private boolean gameEnded;
+
+    // Listeners for game events, using CopyOnWriteArrayList for thread safety during iteration
     private final List<OnGameEndListener> onGameEndListeners = new CopyOnWriteArrayList<>();
     private final List<OnWordFoundListener> onWordFoundListeners = new CopyOnWriteArrayList<>();
     private final List<OnTickListener> onTickListeners = new CopyOnWriteArrayList<>();
 
-    private final HashMap<String, String> solutions; // HashMap for serializability
+    /** Trie containing all valid words that can be formed on the current board. */
+    private final Trie solutions;
+    /** Timer managing the game countdown. */
     private final Timer gameTimer;
 
     /**
      * Listener interface for game end events.
      */
-    public interface OnGameEndListener{
+    public interface OnGameEndListener {
         /**
          * Called when the game timer expires or the game is manually ended.
          */
@@ -55,7 +64,7 @@ public class BoggleGame {
     /**
      * Listener interface for word found events.
      */
-    public interface OnWordFoundListener{
+    public interface OnWordFoundListener {
         /**
          * Called when a valid word is found.
          * @param word The word that was found.
@@ -76,28 +85,34 @@ public class BoggleGame {
 
 
     /**
-     * Initializes a new Boggle game.
+     * Initializes a new Boggle game with a randomly generated board.
      * Generates the dice, shuffles their positions, and rolls each one to determine the face.
      * Also calculates all possible solutions for the generated board.
      */
-    public BoggleGame(){
+    public BoggleGame() {
         this(generateBoard());
     }
 
 
-    public BoggleGame(char[] board){
+    /**
+     * Initializes a new Boggle game with a specific board configuration.
+     *
+     * @param board A char array of size 16 representing the 4x4 grid.
+     */
+    public BoggleGame(char[] board) {
         this.board = board;
 
-        foundWords = new ArrayList<>();
-        selectedIndices = new ArrayDeque<>();
-        gameEnded = false;
+        this.foundWords = new ArrayList<>();
+        this.selectedIndices = new ArrayDeque<>();
+        this.gameEnded = false;
 
-        // Solve the board using the GameSolver and the dictionary singleton
-        Map<String, String> solutionsMap = new GameSolver().solve(getDice(), Dictionary.getInstance());
-        solutions = new HashMap<>(solutionsMap);
+        // Solve the board using the GameSolver and the dictionary singleton.
+        // This is done upfront to provide immediate feedback on word validity during the game.
+        solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
         Log.d("BoggleGame", "Solution: " + solutions);
 
+        // Initialize the game timer with total duration and callbacks for ticks and completion.
         gameTimer = new Timer(GAME_TIME_MILLIS,
                 (elapsedTime) -> {
                     for (OnTickListener listener : onTickListeners) {
@@ -106,11 +121,17 @@ public class BoggleGame {
                 },
                 this::endGame);
     }
+
+    /**
+     * Generates a randomized 16-character board based on standard Boggle dice.
+     *
+     * @return A char array representing the board.
+     */
     private static char[] generateBoard() {
         ArrayList<Die> diceList = Die.generateDice();
         Collections.shuffle(diceList);
         char[] board = new char[16];
-        for (int i = 0; i < 16; i++){
+        for (int i = 0; i < 16; i++) {
             Die die = diceList.get(i);
             die.roll();
             board[i] = die.getLetter();
@@ -161,14 +182,14 @@ public class BoggleGame {
     }
 
     /**
-     * Converts the internal list of dice into a 4x4 character array.
+     * Converts the internal 1D board into a 4x4 character array for solvers or UI.
      * Letters are converted to lowercase.
      * @return A 2D char array representing the board.
      */
-    public char[][] getDice(){
+    public char[][] getDice() {
         char[][] diceGrid = new char[4][4];
-        for (int i = 0; i < 4; i++){
-            for (int j = 0; j < 4; j++){
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
                 // Convert index to grid coordinates and get lowercase letter
                 diceGrid[i][j] = Character.toLowerCase(board[i * 4 + j]);
             }
@@ -177,7 +198,7 @@ public class BoggleGame {
     }
 
     /**
-     * Returns the string representation of the currently selected letters.
+     * Returns the string representation of the currently selected letters without clearing them.
      * Note: Special handling for 'Q' which is treated as 'QU' in Boggle.
      * @return The current word selection.
      */
@@ -191,16 +212,32 @@ public class BoggleGame {
         return sb.toString();
     }
 
+    /**
+     * Gets the raw 1D character array representing the board.
+     * @return The board array.
+     */
     public char[] getBoard() {
         return board;
     }
 
     /**
-     * Returns all possible valid words that can be found on this board.
-     * @return A set of solution words.
+     * Returns all possible valid words that can be found on this board as a Trie.
+     * @return A Trie of solution words.
      */
-    public HashMap<String, String> getSolutions() {
+    public Trie getSolutions() {
         return solutions;
+    }
+
+    /**
+     * Returns a map of all valid solution words and their corresponding paths on the board.
+     * @return A map where keys are words and values are string representations of dice paths.
+     */
+    public HashMap<String, String> getSolutionsMap() {
+        HashMap<String, String> map = new HashMap<>();
+        for (String s : solutions.getWords()) {
+            map.put(s, solutions.get(s).getPath());
+        }
+        return map;
     }
 
     /**
@@ -228,7 +265,7 @@ public class BoggleGame {
     /**
      * Signals the end of the game and notifies all registered listeners.
      */
-    public void endGame(){
+    public void endGame() {
         if (gameEnded) return;
         gameEnded = true;
         gameTimer.stop();
@@ -242,23 +279,24 @@ public class BoggleGame {
      * Submits the current word selection for scoring.
      * Checks for validity, minimum length, and whether it was already found.
      * If valid, updates score and notifies listeners.
-     * @return The result of the word check.
+     *
+     * @return The result of the word check (VALID, INVALID, TOO_SHORT, etc.).
      */
-    public WordCheckResult submitWord(){
-        String formedWord = formWord();
-        if (formedWord.isBlank()){
+    public WordCheckResult submitWord() {
+        String formedWord = formWord(); // Note: this clears the selection indices
+        if (formedWord.isBlank()) {
             return NULL_WORD;
         }
         // Boggle words must be at least 3 letters long
-        if (formedWord.length() < 3){
+        if (formedWord.length() < 3) {
             return TOO_SHORT;
         }
         // Cannot submit the same word twice
         if (foundWords.contains(formedWord)) {
             return ALREADY_FOUND;
         }
-        // Check if word exists in the dictionary
-        if (Dictionary.getInstance().contains(formedWord)){
+        // Check if word exists in the dictionary. Using solutions trie would also work and be faster.
+        if (Dictionary.getInstance().contains(formedWord)) {
             score += wordScore(formedWord);
             foundWords.add(formedWord);
             for (OnWordFoundListener listener : onWordFoundListeners) {
@@ -272,6 +310,8 @@ public class BoggleGame {
 
     /**
      * Calculates the score of a word based on standard Boggle scoring rules.
+     * 3-4 letters: 1 pt, 5 letters: 2 pts, 6 letters: 3 pts, 7 letters: 5 pts, 8+ letters: 11 pts.
+     *
      * @param word The word to score.
      * @return The points awarded for the word.
      */
@@ -292,7 +332,7 @@ public class BoggleGame {
      */
     public int getMaxScore() {
         int maxScore = 0;
-        for (String s : solutions.keySet()) {
+        for (String s : solutions.getWords()) {
             maxScore += wordScore(s);
         }
         return maxScore;
@@ -300,12 +340,12 @@ public class BoggleGame {
 
     /**
      * Extracts the word from the current selection queue and clears the selection.
-     * Handles 'Q' -> 'QU' conversion.
+     * Handles 'Q' -> 'QU' conversion and converts the result to lowercase.
      * @return The lowercase string representation of the selected dice.
      */
-    public String formWord(){
+    public String formWord() {
         StringBuilder sb = new StringBuilder();
-        while (!selectedIndices.isEmpty()){
+        while (!selectedIndices.isEmpty()) {
             int index = selectedIndices.removeFirst();
             char c = board[index];
             sb.append(c);
@@ -321,15 +361,15 @@ public class BoggleGame {
      * @param index The index of the die in the 1D list (0-15).
      * @return True if the die was successfully added to the selection.
      */
-    public boolean selectDie(int index){
+    public boolean selectDie(int index) {
         // First letter in a word
-        if (selectedIndices.isEmpty()){
+        if (selectedIndices.isEmpty()) {
             selectedIndices.add(index);
             return true;
         }
         // Subsequent letters must be adjacent and not reused
         int lastIndex = selectedIndices.getLast();
-        if (isAdjacent(lastIndex, index) && !selectedIndices.contains(index)){
+        if (isAdjacent(lastIndex, index) && !selectedIndices.contains(index)) {
             selectedIndices.add(index);
             return true;
         }
@@ -357,7 +397,7 @@ public class BoggleGame {
      * @param index The index of the die.
      * @return The character on the die.
      */
-    public char getDie(int index){
+    public char getDie(int index) {
         return board[index];
     }
 
@@ -369,48 +409,54 @@ public class BoggleGame {
          * The letter configurations for the 16 standard Boggle dice.
          */
         static final char[][] DICE_CONFIGS = new char[][]{
-                {'A','A','E','E','G','N'},
-                {'E','L','R','T','T','Y'},
-                {'A','O','O','T','T','W'},
-                {'A','B','B','J','O','O'},
-                {'E','H','R','T','V','W'},
-                {'C','I','M','O','T','U'},
-                {'D','I','S','T','T','Y'},
-                {'E','I','O','S','S','T'},
-                {'D','E','L','R','V','Y'},
-                {'A','C','H','O','P','S'},
-                {'H','I','M','N','Q','U'},
-                {'E','E','I','N','S','U'},
-                {'E','E','G','H','N','W'},
-                {'A','F','F','K','P','S'},
-                {'H','L','N','N','R','Z'},
-                {'D','E','I','L','R','X'}
+                {'A', 'A', 'E', 'E', 'G', 'N'},
+                {'E', 'L', 'R', 'T', 'T', 'Y'},
+                {'A', 'O', 'O', 'T', 'T', 'W'},
+                {'A', 'B', 'B', 'J', 'O', 'O'},
+                {'E', 'H', 'R', 'T', 'V', 'W'},
+                {'C', 'I', 'M', 'O', 'T', 'U'},
+                {'D', 'I', 'S', 'T', 'T', 'Y'},
+                {'E', 'I', 'O', 'S', 'S', 'T'},
+                {'D', 'E', 'L', 'R', 'V', 'Y'},
+                {'A', 'C', 'H', 'O', 'P', 'S'},
+                {'H', 'I', 'M', 'N', 'Q', 'U'},
+                {'E', 'E', 'I', 'N', 'S', 'U'},
+                {'E', 'E', 'G', 'H', 'N', 'W'},
+                {'A', 'F', 'F', 'K', 'P', 'S'},
+                {'H', 'L', 'N', 'N', 'R', 'Z'},
+                {'D', 'E', 'I', 'L', 'R', 'X'}
         };
 
+        /** The six letters on this specific die. */
         private final char[] letters;
+        /** The index of the letter currently facing up. */
         private int selectedLetter;
 
         @SuppressWarnings("unused")
-        private Die(){
+        private Die() {
             throw new UnsupportedOperationException("Use Die.generateDice()");
         }
 
-        private Die(char[] letters){
+        /**
+         * Creates a die with the specified faces.
+         * @param letters Array of 6 characters.
+         */
+        private Die(char[] letters) {
             this.letters = letters;
         }
 
         /**
          * Randomly selects one of the 6 letters on the die.
          */
-        public void roll(){
-            selectedLetter = (int)(Math.random() * 6);
+        public void roll() {
+            selectedLetter = (int) (Math.random() * 6);
         }
 
         /**
          * Gets the letter currently showing on the top face.
          * @return The character.
          */
-        public char getLetter(){
+        public char getLetter() {
             return letters[selectedLetter];
         }
 
@@ -418,9 +464,9 @@ public class BoggleGame {
          * Factory method to create the set of 16 dice based on standard configurations.
          * @return A list of 16 Die objects.
          */
-        static ArrayList<Die> generateDice(){
+        static ArrayList<Die> generateDice() {
             ArrayList<Die> dice = new ArrayList<>(16);
-            for (char[] config : DICE_CONFIGS){
+            for (char[] config : DICE_CONFIGS) {
                 dice.add(new Die(config));
             }
             return dice;
@@ -442,6 +488,7 @@ public class BoggleGame {
         /** The word is empty or null. */
         NULL_WORD(R.string.word_null);
 
+        /** The string resource ID for the message to be displayed for this result. */
         private final int messageId;
 
         /**
@@ -451,6 +498,10 @@ public class BoggleGame {
             return messageId;
         }
 
+        /**
+         * Constructor for WordCheckResult.
+         * @param messageId The R.string ID.
+         */
         WordCheckResult(int messageId) {
             this.messageId = messageId;
         }
