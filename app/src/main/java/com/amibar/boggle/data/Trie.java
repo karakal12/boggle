@@ -2,6 +2,9 @@ package com.amibar.boggle.data;
 
 import android.util.ArraySet;
 
+import androidx.annotation.NonNull;
+
+import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -198,5 +201,20 @@ public class Trie {
                 child.getWordsRec(word + (char)(i + 'a'), set);
             }
         }
+    }
+
+
+    public HashMap<String, String> toMap() {
+        HashMap<String, String> map = new HashMap<>();
+        for (String s : getWords()) {
+            map.put(s, get(s).getPath());
+        }
+        return map;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return toMap().keySet().toString();
     }
 }

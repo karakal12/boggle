@@ -166,7 +166,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
         try {
             // Create fragment instance with the formatted word list and final score string
             SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
-                    game.getSolutionsMap(),
+                    game.getSolutions().toMap(),
                     game.getFoundWords(),
                     game.getScore()
             );

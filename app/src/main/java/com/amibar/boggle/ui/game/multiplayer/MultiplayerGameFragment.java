@@ -220,7 +220,7 @@ public class MultiplayerGameFragment extends Fragment {
                 if (isAdded()) {
                     BoggleGame game = binding.boggleView.getGame();
                     // Transition to the results view in the parent activity
-                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutionsMap(), playersWordsMap);
+                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutions().toMap(), playersWordsMap);
                 }
             }
 

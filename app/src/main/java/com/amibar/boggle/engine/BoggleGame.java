@@ -16,7 +16,6 @@ import com.amibar.boggle.utils.Timer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -37,7 +36,9 @@ public class BoggleGame {
     /** Stores words successfully found and submitted by the player. */
     private final ArrayList<String> foundWords;
     /** The player's current cumulative score. */
-    private int score;
+    private int score = 0;
+    /** Number of hints available to the player. */
+    private int hints = 999;
     /** Flag indicating if the game has concluded. */
     private boolean gameEnded;
 
@@ -48,6 +49,8 @@ public class BoggleGame {
 
     /** Trie containing all valid words that can be formed on the current board. */
     private final Trie solutions;
+    /** List of all possible valid paths on the board. */
+    private final List<String> allPaths;
     /** Timer managing the game countdown. */
     private final Timer gameTimer;
 
@@ -108,9 +111,10 @@ public class BoggleGame {
 
         // Solve the board using the GameSolver and the dictionary singleton.
         // This is done upfront to provide immediate feedback on word validity during the game.
-        solutions = new GameSolver().solve(getDice(), Dictionary.getInstance());
-        Log.d("BoggleGame", "Found " + solutions.size() + " solutions");
-        Log.d("BoggleGame", "Solution: " + solutions);
+        GameSolver.SolverResult result = new GameSolver().solve(getDice(), Dictionary.getInstance());
+        solutions = result.solutions();
+        allPaths = result.allPaths();
+        Log.d("BoggleGame", "Found " + solutions.size() + " solutions and " + allPaths.size() + " total paths");
 
         // Initialize the game timer with total duration and callbacks for ticks and completion.
         gameTimer = new Timer(GAME_TIME_MILLIS,
@@ -173,6 +177,27 @@ public class BoggleGame {
     }
 
     /**
+     * Gets the number of hints available to the player.
+     * @return The number of hints.
+     */
+    public int getHints() {
+        return hints;
+    }
+    /**
+     * Sets the number of hints available to the player.
+     * @param hints The number of hints.
+     */
+    public void setHints(int hints) {
+        this.hints = hints;
+    }
+    /**
+     * Subtracts 1 from the number of hints available to the player.
+     */
+    public void subHint(){
+        hints--;
+    }
+
+    /**
      * Returns the list of words correctly found by the player.
      * @return A list of found words.
      */
@@ -180,6 +205,11 @@ public class BoggleGame {
     public ArrayList<String> getFoundWords() {
         return foundWords;
     }
+
+    public int[] getSelectedIndices() {
+        return selectedIndices.stream().mapToInt(i -> i).toArray();
+    }
+
 
     /**
      * Converts the internal 1D board into a 4x4 character array for solvers or UI.
@@ -229,15 +259,27 @@ public class BoggleGame {
     }
 
     /**
-     * Returns a map of all valid solution words and their corresponding paths on the board.
-     * @return A map where keys are words and values are string representations of dice paths.
+     * Returns a list of all possible word paths on the board.
+     * @return A list of path strings.
      */
-    public HashMap<String, String> getSolutionsMap() {
-        HashMap<String, String> map = new HashMap<>();
-        for (String s : solutions.getWords()) {
-            map.put(s, solutions.get(s).getPath());
+    public List<String> getAllPaths() {
+        return allPaths;
+    }
+
+    /**
+     * Reconstructs the word formed by a given path of indices.
+     * @param path A string of hexadecimal digits representing board indices.
+     * @return The word string.
+     */
+    public String getWordFromPath(String path) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < path.length(); i++) {
+            int index = Character.getNumericValue(path.charAt(i));
+            char c = board[index];
+            sb.append(c);
+            if (c == 'Q') sb.append('U');
         }
-        return map;
+        return sb.toString().toLowerCase();
     }
 
     /**
@@ -343,7 +385,7 @@ public class BoggleGame {
      * Handles 'Q' -> 'QU' conversion and converts the result to lowercase.
      * @return The lowercase string representation of the selected dice.
      */
-    public String formWord() {
+    private String formWord() {
         StringBuilder sb = new StringBuilder();
         while (!selectedIndices.isEmpty()) {
             int index = selectedIndices.removeFirst();
@@ -374,6 +416,24 @@ public class BoggleGame {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Selects a sequence of dice indices as the current word selection.
+     * @param path A string where each character is a hexadecimal digit (0-f) representing a die index.
+     */
+    public void selectPath(String path) {
+        selectedIndices.clear();
+        for (char c : path.toCharArray()) {
+            selectedIndices.add(Character.getNumericValue(c));
+        }
+    }
+
+    /**
+     * Clears the current word selection.
+     */
+    public void deselectPath() {
+        selectedIndices.clear();
     }
 
     /**

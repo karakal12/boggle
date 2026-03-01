@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,52 +22,72 @@ import com.amibar.boggle.R;
 import com.amibar.boggle.data.GameMode;
 import com.amibar.boggle.databinding.ViewBoggleBinding;
 import com.amibar.boggle.engine.BoggleGame;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * A custom view representing the Boggle game board and its associated UI elements.
  * This class handles user interactions with the game grid, updates the UI based on game state,
- * and manages the game timer.
+ * manages word selection, and handles the game timer/progress display.
  */
 public class BoggleView extends LinearLayout {
-    ViewBoggleBinding binding;
+    /** View binding for the boggle layout. */
+    private ViewBoggleBinding binding;
 
-
-    /** The underlying Boggle game engine. */
+    /** The underlying Boggle game engine that manages logic and state. */
     private BoggleGame game;
     /** Array of TextViews representing the 16 dice in the 4x4 grid. */
     private TextView[] cells;
     /** Reference to the last selected cell to manage visual feedback. */
     private TextView lastSelected;
+    /** Badge drawable for the hint button. */
+    private BadgeDrawable hintBadge;
 
-    /** TextView displaying the word currently being formed. */
-    private TextView word;
-    /** TextView displaying feedback messages (e.g., word validity). */
-    private TextView msg;
-    /** TextView displaying the current score. */
-    private TextView score;
+    /** The mode of the game, determined by XML attributes. */
     private final GameMode gameMode;
 
-
+    /**
+     * Basic constructor for programmatic instantiation.
+     * @param context The Context the view is running in.
+     */
     public BoggleView(@NonNull Context context) {
         this(context, null);
     }
 
+    /**
+     * Constructor used when inflating from XML.
+     * @param context The Context the view is running in.
+     * @param attrs The attributes of the XML tag that is inflating the view.
+     */
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    /**
+     * Constructor that allows specifying a default style.
+     * @param context The Context the view is running in.
+     * @param attrs The attributes of the XML tag.
+     * @param defStyleAttr An attribute in the current theme that contains a reference to a style resource.
+     */
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
+    /**
+     * Full constructor for BoggleView.
+     * Resolves custom XML attributes such as 'gameMode'.
+     */
     @SuppressWarnings("unused")
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        // TODO : custom attribute for mode (singleplayer or multiplayer)
-        //  and whether or not the create a new BoggleGame or wait for one from the bd
+
+        // Resolve custom attributes from XML
         @SuppressLint("Recycle") TypedArray array = context.obtainStyledAttributes(
                 attrs,
                 R.styleable.BoggleView,
@@ -78,65 +99,91 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * Initializes the view by inflating the layout, setting up the game engine,
-     * binding UI components, and starting the game timer.
+     * Initializes the view by inflating the layout, initializing the game engine (if in singleplayer),
+     * and setting up UI component bindings.
      */
     private void initView(){
         binding = ViewBoggleBinding.inflate(LayoutInflater.from(getContext()), this, true);
+        
+        // Auto-initialize game if in singleplayer mode
         if (gameMode == GameMode.singleplayer)
             game = new BoggleGame();
 
-        // Set up the 4x4 grid of dice cells
+        // Initialize the array for the 4x4 grid cells and attach click listeners
         cells = new TextView[16];
+        GridLayout gl = binding.glGameLayout;
+        for (int i = 0; i < cells.length; i++) {
+            cells[i] = (TextView) gl.getChildAt(i);
+            cells[i].setOnClickListener(cellOnClickListener(i));
+        }
 
-        // Set up the submit button
+        // Attach click listener to the submit button
         binding.bSubmit.setOnClickListener(this::onClickSubmit);
 
-        // Bind score and current word displays
-        score = binding.tvScore;
+        // Attach click listener to the hint button
+        binding.ivHint.setOnClickListener(v -> showHint());
 
-        word = binding.tvWord;
+        // Initialize the badge
+        hintBadge = BadgeDrawable.create(getContext());
+        hintBadge.setNumber(game.getHints());
 
-        msg = binding.tvErrors;
+        // Attach it to the icon (must be done after view is laid out)
+        binding.ivHint.post(() -> BadgeUtils.attachBadgeDrawable(hintBadge, binding.ivHint, null));
 
+        // For singleplayer, immediately setup UI and start the countdown
         if (gameMode == GameMode.singleplayer) {
             setupUI();
             game.startTimer();
         }
-
     }
+
+    /**
+     * Starts a fresh game instance and refreshes the UI.
+     * @return The newly created {@link BoggleGame} instance.
+     */
     public BoggleGame newGame(){
         game = new BoggleGame();
         setupUI();
         return game;
     }
 
+    /**
+     * Sets the game board with a specific configuration and refreshes the UI.
+     * Useful for multiplayer or loading saved states.
+     * @param board A 16-character array representing the dice letters.
+     * @return The updated {@link BoggleGame} instance.
+     */
     public BoggleGame setGame(char[] board){
         game = new BoggleGame(board);
         setupUI();
         return game;
     }
 
+    /**
+     * Manually triggers the game timer to start.
+     */
     public void startGame(){
-        game.startTimer();
+        if (game != null) {
+            game.startTimer();
+        }
     }
 
-
+    /**
+     * Configures the grid UI, attaches listeners to cells, and sets up
+     * the game-state observation (timer and scoring).
+     */
     private void setupUI() {
-        GridLayout gl = binding.glGameLayout;
-        for (int i = 0; i < gl.getChildCount(); i++) {
-            cells[i] = (TextView) gl.getChildAt(i);
-            cells[i].setOnClickListener(cellOnClickListener(i));
+        for (int i = 0; i < cells.length; i++) {
             char letter = game.getDie(i);
             // Handle special 'Qu' case for Boggle
             cells[i].setText(letter == 'Q' ? "Qu" : String.valueOf(letter));
         }
 
+        // Initial UI state sync
         updateScore();
         updateWord();
 
         // Initialize and start the game timer
-        TextView timerText = binding.tvTime;
         LinearProgressIndicator timerIndicator = binding.progressBar;
 
         game.addOnTickListener(elapsedTime -> {
@@ -145,12 +192,17 @@ public class BoggleView extends LinearLayout {
             timerIndicator.setProgress((int) (progress * timerIndicator.getMax()));
 
             // Update text
-            timerText.setText(formatTime(elapsedTime));
+            binding.setTime(formatTime(elapsedTime));
         });
 
-        game.addOnGameEndListener(() -> timerText.setText("00:00"));
+        // Ensure timer displays zero exactly when game ends
+        game.addOnGameEndListener(() -> binding.setTime("00:00"));
     }
 
+    /**
+     * Ensures the game timer is stopped when the view is removed from the window
+     * to prevent leaks.
+     */
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -161,8 +213,8 @@ public class BoggleView extends LinearLayout {
 
     /**
      * Formats the remaining time into a MM:SS string.
-     * @param elapsedTime Time elapsed since start in ms.
-     * @return Formatted string.
+     * @param elapsedTime Time elapsed since start in milliseconds.
+     * @return Formatted time string (e.g., "01:30").
      */
     private String formatTime(long elapsedTime) {
         long remainingTime = Math.max(0, BoggleGame.GAME_TIME_MILLIS - elapsedTime);
@@ -172,60 +224,66 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * @return The BoggleGame instance associated with this view.
+     * @return The current {@link BoggleGame} logic instance.
      */
     public BoggleGame getGame() {
         return game;
     }
 
     /**
-     * Handles the click event for the submit button.
-     * Checks the validity of the current word, updates score/messages, and resets the board state.
+     * Logic for the word submission button.
+     * Evaluates the current word, updates score/feedback, and resets board highlights.
      * 
-     * @param v The clicked view.
+     * @param v The button view.
      */
     private void onClickSubmit(View v) {
         if (game.isEnded()) return;
 
-        clearSolution();
-
+        // Capture the word and result BEFORE clearing the selection/UI
         String lastWord = game.getWord();
         BoggleGame.WordCheckResult result = game.submitWord();
 
+        // Now safe to clear visual highlights and selection state
+        clearSolution();
+
+        // Update score display if the word was valid
         if (result == VALID)
             updateScore();
 
         // Display feedback message based on the result of the word submission
-        msg.setText(getContext().getString(result.getMessageId(), lastWord));
-        updateWord();
+        binding.setError(getContext().getString(result.getMessageId(), lastWord));
         lastSelected = null;
     }
 
     /**
-     * Updates the score display with the current score from the game engine.
+     * Synchronizes the UI score display with the current game engine score.
      */
     private void updateScore() {
-        this.score.setText(getContext().getString(R.string.score, game.getScore()));
+        binding.setScore(game.getScore());
     }
 
     /**
-     * Creates an OnClickListener for a specific cell in the grid.
+     * Factory for cell click listeners. Handles the selection logic and visual feedback.
      * 
-     * @param cellId The index of the cell in the dice array.
-     * @return An OnClickListener that handles cell selection.
+     * @param cellId The index of the die in the 0-15 grid.
+     * @return An OnClickListener for the die cell.
      */
     private OnClickListener cellOnClickListener(int cellId) {
         return (view) -> {
             if (game.isEnded())
                 return;
             
-            // Attempt to select the die in the game logic
+            // Attempt to select the die. This validates adjacency and re-selection rules.
             if (game.selectDie(cellId)) {
-                // Provide visual feedback for selection sequence
+                // If there was a previous selection, change its color to the generic 'selected' state
                 if (lastSelected != null) {
                     lastSelected.setBackgroundColor(resolveAttribute(R.attr.colorSelected));
                 }
+                
+                // Update the current word display
                 updateWord();
+                
+                // Highlight the most recently selected cell with a distinct color
                 view.setBackgroundColor(resolveAttribute(R.attr.colorLastSelected));
                 lastSelected = (TextView) view;
             }
@@ -233,10 +291,9 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * Resolves a theme attribute (like a color) to its actual value.
-     * 
-     * @param attrRes The attribute resource ID to resolve.
-     * @return The resolved data value (e.g., color integer).
+     * Utility to resolve theme-dependent attributes (like colors) at runtime.
+     * @param attrRes The theme attribute resource ID.
+     * @return The resolved integer value (usually a color).
      */
     private int resolveAttribute(int attrRes){
         TypedValue typedValue = new TypedValue();
@@ -246,18 +303,28 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * Updates the text display of the word currently being formed.
+     * Synchronizes the UI word preview with the word currently being built in the game engine.
      */
     private void updateWord(){
-        this.word.setText(getContext().getString(R.string.word, game.getWord()));
+        binding.setWord(game.getWord());
     }
 
+    /**
+     * Highlights a specific word path on the board.
+     * This is used for showing hints or historical word paths.
+     * @param path A string of digits (0-9, a-f) representing cell indices.
+     */
     public void showSolution(String path) {
         clearSolution();
+        game.selectPath(path);
+
         char[] indices = path.toCharArray();
         int selectedColor = resolveAttribute(R.attr.colorSelected);
+
         for (int i = 0; i < indices.length; i++) {
             int index = Character.getNumericValue(indices[i]);
+
+            // Highlight cells along the path, with special color for the last one
             if (i == indices.length - 1) {
                 lastSelected = cells[index];
                 cells[index].setBackgroundColor(resolveAttribute(R.attr.colorLastSelected));
@@ -265,13 +332,80 @@ public class BoggleView extends LinearLayout {
                 cells[index].setBackgroundColor(selectedColor);
             }
         }
+        updateWord();
     }
 
+    /**
+     * Resets all cell backgrounds to the default state and clears word-related UI.
+     */
     public void clearSolution() {
+        game.deselectPath();
         int unselectedColor = resolveAttribute(R.attr.colorUnselected);
         for (TextView cell : cells) {
             cell.setBackgroundColor(unselectedColor);
         }
         lastSelected = null;
+        updateWord();
+    }
+
+    /**
+     * Logic for providing a hint to the user.
+     * Finds a valid word that continues from the current board path and reveals part of it.
+     */
+    public void showHint(){
+        if (game.getHints() <= 0) return;
+
+        // Get current path as hex string
+        StringBuilder currentPathSB = new StringBuilder();
+        for (int index : game.getSelectedIndices()) {
+            currentPathSB.append(Integer.toHexString(index));
+        }
+        String currentPath = currentPathSB.toString();
+
+        List<String> candidatePaths = new ArrayList<>();
+        // Search for completions of the current path that form words not yet found
+        for (String path : game.getAllPaths()) {
+            if (path.startsWith(currentPath) && path.length() > currentPath.length()) {
+                String word = game.getWordFromPath(path);
+                if (!game.getFoundWords().contains(word)) {
+                    candidatePaths.add(path);
+                }
+            }
+        }
+
+        // If no completions for current path, try to find ANY word not yet found
+        if (candidatePaths.isEmpty()) {
+            Log.d("BoggleView", "No completions for current path, trying any word");
+            for (String path : game.getAllPaths()) {
+                String word = game.getWordFromPath(path);
+                if (!game.getFoundWords().contains(word)) {
+                    candidatePaths.add(path);
+                }
+            }
+        }
+
+        if (candidatePaths.isEmpty()) return;
+
+        Log.d("BoggleView", "Found " + candidatePaths.size() + " candidate paths");
+        Log.v("BoggleView", "Candidate paths: " + candidatePaths);
+
+        // Shuffle so hints are random among valid completions
+        Collections.shuffle(candidatePaths);
+        String fullPath = candidatePaths.getFirst();
+
+        int currentPathLength = currentPath.length();
+        int remainingLength = fullPath.length() - currentPathLength;
+        int revealCount = currentPathLength + (int) Math.floor(remainingLength / 2.0);
+
+
+        if (revealCount >= fullPath.length())
+            return;
+
+        Log.d("BoggleView", "found solution " + game.getWordFromPath(fullPath) + " with path " + fullPath + " revealing " + revealCount + " characters");
+        showSolution(fullPath.substring(0, revealCount + 1));
+
+        game.subHint();
+        hintBadge.setNumber(game.getHints());
+        if (game.getHints() == 0) hintBadge.setVisible(false);
     }
 }
