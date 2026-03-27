@@ -2,18 +2,15 @@ package com.amibar.boggle.ui.game.singleplayer;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.amibar.boggle.databinding.FragmentSingleplayerOnGameEndBinding;
-import com.amibar.boggle.ui.game.shared.WordsAdapter;
+import com.amibar.boggle.ui.shared.WordsAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerScoreBinding;
-import com.amibar.boggle.ui.game.shared.WordsAdapter;
+import com.amibar.boggle.ui.shared.WordsAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;

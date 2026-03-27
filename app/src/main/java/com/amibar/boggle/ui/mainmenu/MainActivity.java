@@ -85,6 +85,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.friendsListButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, FriendListActivity.class);
+            startActivity(intent);
+        });
+
         binding.donutButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, DonutActivity.class);
             startActivity(intent);

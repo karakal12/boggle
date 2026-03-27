@@ -1,4 +1,4 @@
-package com.amibar.boggle.ui.game.shared;
+package com.amibar.boggle.ui.shared;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import com.amibar.boggle.databinding.ItemWordBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
