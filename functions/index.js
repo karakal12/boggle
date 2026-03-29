@@ -24,39 +24,55 @@ const logger = require("firebase-functions/logger");
 setGlobalOptions({maxInstances: 10});
 
 const functions = require("firebase-functions");
+const { onValueCreated } = require("firebase-functions/v2/database");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
 // eslint-disable-next-line max-len
-exports.sendInvitationNotification = functions.database.ref("/invitations/{targetUserId}/{invitationId}")
-    .onCreate(async (snapshot, context) => {
-      const targetUserId = context.params.targetUserId;
-      const invitationData = snapshot.val();
+exports.sendInvitationNotification = onValueCreated(
+    {
+        ref: "/invitations/{targetUserId}/{invitationId}",
+        region: "europe-west1",
+        instance: "idk-a-school-project-or-smth-default-rtdb"
+    },
+    async (event) => {
+        // 3. We now get everything from the single 'event' object
+        const targetUserId = event.params.targetUserId;
+        const invitationData = event.data.val();
 
-      try {
-        // eslint-disable-next-line max-len
-        const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
-        const fcmToken = tokenSnapshot.val();
-
-        if (!fcmToken) {
-          console.log("No FCM token found for user: ", targetUserId);
-          return null;
-        }
-
-        const payload = {
-          notification: {
-            title: `New Invite from ${invitationData.senderName}`,
+        try {
             // eslint-disable-next-line max-len
-            body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
-          },
-          roomCode: String(invitationData.roomCode),
-          token: fcmToken,
-        };
+            const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
+            const fcmToken = tokenSnapshot.val();
 
-        const response = await admin.messaging().send(payload);
-        console.log("Successfully sent invitation with room code:", response);
-        return null;
-      } catch (e) {
-        return null;
-      }
-    });
+            if (!fcmToken) {
+                console.log("No FCM token found for user: ", targetUserId);
+                await event.data.ref.remove();
+                return null;
+            }
+
+            const payload = {
+                notification: {
+                    title: `New Invite from ${invitationData.senderName}`,
+                    // eslint-disable-next-line max-len
+                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
+                },
+                data: {
+                    roomCode: String(invitationData.roomCode)
+                },
+                token: fcmToken,
+            };
+
+            const response = await admin.messaging().send(payload);
+            console.log("Successfully sent invitation with room code:", response);
+
+            // Clean up the invitation record after sending
+            await event.data.ref.remove();
+
+            return null;
+        } catch (e) {
+            console.error("Error sending notification:", e);
+            return null;
+        }
+    }
+);
