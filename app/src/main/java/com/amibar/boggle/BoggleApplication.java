@@ -1,9 +1,16 @@
 package com.amibar.boggle;
 
+
+import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
+
 import android.app.Application;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.amibar.boggle.data.Dictionary;
 import com.amibar.boggle.data.FirebaseHandler;
+
 
 /**
  * Custom Application class for the Boggle app.
@@ -18,5 +25,6 @@ public class BoggleApplication extends Application {
         // This ensures the word list is ready before any game activities are launched.
         Dictionary.getInstance().init(getResources().openRawResource(R.raw.word_list));
         FirebaseHandler.getInstance().updateUserData();
+
     }
 }

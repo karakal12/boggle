@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -17,10 +19,13 @@ import com.amibar.boggle.databinding.ActivityFriendlistBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FriendListActivity extends AppCompatActivity {
 
@@ -51,11 +56,56 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new FriendAdapter(friend -> {
-            Toast.makeText(this, "Inviting " + friend.getDisplayName(), Toast.LENGTH_SHORT).show();
-            // TODO: Implement invitation logic
-        });
+        adapter = new FriendAdapter(this::showInviteDialog);
         binding.friendsRecyclerView.setAdapter(adapter);
+    }
+
+    private void showInviteDialog(User friend) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Invite " + friend.getDisplayName());
+        builder.setMessage("Enter room code to invite them to play:");
+
+        final EditText input = new EditText(this);
+        input.setHint("Room Code");
+        builder.setView(input);
+
+        builder.setPositiveButton("Send", (dialog, which) -> {
+            String roomCode = input.getText().toString().trim();
+            if (!roomCode.isEmpty()) {
+                sendInvitation(friend, roomCode);
+            } else {
+                Toast.makeText(this, "Room code cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void sendInvitation(User friend, String roomCode) {
+        String currentUserId = firebaseHandler.getCurrentUserId();
+        User currentUser = firebaseHandler.getUserData();
+        
+        if (currentUserId == null || currentUser == null) {
+            Toast.makeText(this, "Error: You must be logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DatabaseReference invitationsRef = firebaseHandler.getRootRef()
+                .child("invitations")
+                .child(friend.getUid())
+                .push();
+
+        Map<String, Object> invitation = new HashMap<>();
+        invitation.put("senderId", currentUserId);
+        invitation.put("senderName", currentUser.getDisplayName());
+        invitation.put("message", "Join my Boggle game!");
+        invitation.put("roomCode", roomCode);
+        invitation.put("timestamp", ServerValue.TIMESTAMP);
+
+        invitationsRef.setValue(invitation)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Invitation sent to " + friend.getDisplayName(), Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to send invitation", Toast.LENGTH_SHORT).show());
     }
 
     private void setupClickListeners() {

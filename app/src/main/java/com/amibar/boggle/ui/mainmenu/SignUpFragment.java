@@ -157,7 +157,7 @@ public class SignUpFragment extends DialogFragment {
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        saveUserToDatabase(user, displayName, base64Image, pd);
+                        fetchFcmTokenAndSaveUser(user, displayName, base64Image, pd);
                     } else {
                         pd.dismiss();
                         Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
@@ -166,9 +166,23 @@ public class SignUpFragment extends DialogFragment {
     }
 
     @SuppressWarnings("deprecation")
-    private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
+    private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
+        pd.setMessage("Fetching FCM Token...");
+        FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+            String token = null;
+            if (task.isSuccessful()) {
+                token = task.getResult();
+            } else {
+                Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+            }
+            saveUserToDatabase(user, displayName, base64Image, token, pd);
+        });
+    }
+
+    @SuppressWarnings("deprecation")
+    private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
         pd.setMessage("Saving User Data...");
-        User newUser = new User(displayName, user.getEmail(), base64Image);
+        User newUser = new User(user.getUid(), displayName, user.getEmail(), base64Image, fcmToken);
 
         DatabaseReference userRef = FirebaseHandler.getInstance().getRootRef().child("users").child(user.getUid());
         userRef.setValue(newUser)
@@ -176,13 +190,13 @@ public class SignUpFragment extends DialogFragment {
                     pd.dismiss();
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), "User created successfully!", Toast.LENGTH_SHORT).show();
+                        if (getActivity() instanceof MainActivity mainActivity){
+                            mainActivity.updateUI();
+                        }
                         dismiss();
                     } else {
                         Toast.makeText(requireContext(), "Failed to save user data", Toast.LENGTH_SHORT).show();
                     }
                 });
-        if (getActivity() instanceof MainActivity mainActivity){
-            mainActivity.updateUI();
-        }
     }
 }
