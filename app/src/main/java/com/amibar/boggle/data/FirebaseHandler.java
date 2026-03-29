@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * Singleton class that centralizes Firebase Authentication and Realtime Database logic.
@@ -19,7 +20,10 @@ public class FirebaseHandler {
     private final FirebaseAuth mAuth;
     /** Instance of Firebase Realtime Database. */
     private final FirebaseDatabase mDatabase;
+    /** Instance of Firebase Messaging */
+    private final FirebaseMessaging mMessaging;
 
+    /** Current user data */
     private User user;
 
     /**
@@ -28,6 +32,7 @@ public class FirebaseHandler {
     private FirebaseHandler() {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
+        mMessaging = FirebaseMessaging.getInstance();
     }
 
     /**
@@ -53,6 +58,14 @@ public class FirebaseHandler {
     public static synchronized FirebaseDatabase getDatabase() {
         return getInstance().mDatabase;
     }
+
+    /**
+     * @return The Firebase Messaging instance.
+     */
+    public static synchronized FirebaseMessaging getMessaging() {
+        return getInstance().mMessaging;
+    }
+
 
     /**
      * @return The currently authenticated FirebaseUser, or null if no user is signed in.

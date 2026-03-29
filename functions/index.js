@@ -49,7 +49,7 @@ exports.sendInvitationNotification = functions.database.ref("/invitations/{targe
             // eslint-disable-next-line max-len
             body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
           },
-          roomCode: String(invitationData.roomCode),
+          data: { roomCode: String(invitationData.roomCode) },
           token: fcmToken,
         };
 

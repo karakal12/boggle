@@ -88,7 +88,11 @@ public class LoginFragment extends DialogFragment {
                         Log.i("LoginFragment", "signInWithEmail:success");
                         FirebaseUser user = FirebaseHandler.getAuth().getCurrentUser();
                         assert user != null;
-                        toastMessage = "User logged in successfully\nUid: "+user.getUid();
+                        
+                        // Update FCM Token on successful login
+                        updateFcmToken();
+                        
+                        toastMessage = "User logged in successfully";
                         dismiss();
                     } else {
                         toastMessage = switch (task.getException()){
@@ -100,5 +104,21 @@ public class LoginFragment extends DialogFragment {
                     }
                     Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show();
                     });
+    }
+
+    private void updateFcmToken() {
+        FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                String token = task.getResult();
+                FirebaseHandler.getInstance().getUserRef().child("fcmToken").setValue(token)
+                        .addOnSuccessListener(aVoid -> {
+                            // Refresh local user data to include the new token
+                            FirebaseHandler.getInstance().updateUserData();
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to update FCM token", e));
+            } else {
+                Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+            }
+        });
     }
 }
