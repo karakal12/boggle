@@ -140,7 +140,8 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
                     game.getScore(),
                     game.getFoundWords().size(),
                     game.getSolutions().size(),
-                    game.getMaxScore()
+                    game.getMaxScore(),
+                    game.getFoundWords()
             );
 
             // Generate a formatted timestamp to serve as the database key

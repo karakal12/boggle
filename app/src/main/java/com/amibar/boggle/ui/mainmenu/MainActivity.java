@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
+import com.amibar.boggle.data.PlayerRole;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ActivityMainBinding;
 import com.amibar.boggle.databinding.NavHeaderBinding;
@@ -94,7 +95,11 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("roomCode")) {
             String roomCode = intent.getStringExtra("roomCode");
             if (roomCode != null && !roomCode.isEmpty()) {
-                JoinOrCreateRoomFragment.newInstance(roomCode)
+                PlayerRole role = PlayerRole.HOST;
+                if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){ // join.equals to avoid NullPointerException
+                    role = PlayerRole.GUEST;
+                }
+                JoinOrCreateRoomFragment.newInstance(roomCode, role)
                         .show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
             }
         }

@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.ui.mainmenu.MainActivity;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -35,17 +36,37 @@ public class InvitationService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
+        Map<String, String> data = remoteMessage.getData();
+        
+        // Delete the invitation from the database now that it's received
+        if (data.containsKey("invitationId")) {
+            String invitationId = data.get("invitationId");
+            deleteInvitation(invitationId);
+        }
+
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             String title = remoteMessage.getNotification().getTitle();
             String body = remoteMessage.getNotification().getBody();
-            showNotification(title, body, remoteMessage.getData());
-        } else if (remoteMessage.getData().size() > 0) {
+            showNotification(title, body, data);
+        } else if (data.size() > 0) {
             // Handle data payload if notification is null
-            Map<String, String> data = remoteMessage.getData();
             String title = "New Game Invitation";
             String body = "Someone invited you to play Boggle!";
             showNotification(title, body, data);
+        }
+    }
+
+    private void deleteInvitation(String invitationId) {
+        String currentUserId = FirebaseAuth.getInstance().getUid();
+        if (currentUserId != null) {
+            FirebaseHandler.getInstance().getRootRef()
+                    .child("invitations")
+                    .child(currentUserId)
+                    .child(invitationId)
+                    .removeValue()
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Invitation deleted from DB: " + invitationId))
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to delete invitation", e));
         }
     }
 
@@ -56,6 +77,7 @@ public class InvitationService extends FirebaseMessagingService {
         // Pass room code if present
         if (data != null && data.containsKey("roomCode")) {
             intent.putExtra("roomCode", data.get("roomCode"));
+            intent.putExtra("action", "join");
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,

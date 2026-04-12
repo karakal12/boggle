@@ -1,9 +1,11 @@
 package com.amibar.boggle.ui.mainmenu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -35,7 +37,7 @@ public class FriendListActivity extends AppCompatActivity {
     private final List<User> friendsList = new ArrayList<>();
     private FirebaseHandler firebaseHandler;
 
-    private DataSnapshot users;
+    private DataSnapshot usersSnapshot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,9 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void loadUsers() {
-        firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(dataSnapshot -> users = dataSnapshot);
+        firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
+            usersSnapshot = snapshot;
+        });
         loadFriends();
     }
 
@@ -73,6 +77,10 @@ public class FriendListActivity extends AppCompatActivity {
             String roomCode = input.getText().toString().trim();
             if (!roomCode.isEmpty()) {
                 sendInvitation(friend, roomCode);
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("roomCode", roomCode);
+                intent.putExtra("action", "host");
+                startActivity(intent);
             } else {
                 Toast.makeText(this, "Room code cannot be empty", Toast.LENGTH_SHORT).show();
             }
@@ -113,6 +121,29 @@ public class FriendListActivity extends AppCompatActivity {
             loadFriends();
             loadUsers();
         });
+
+        binding.addFriendButton.setOnClickListener(v -> {
+            User searchedUser = binding.getSearchedUser();
+            if (searchedUser != null) {
+                addFriend(searchedUser);
+            } else {
+                Toast.makeText(this, "Please search for a user by email first", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addFriend(User friend) {
+        String currentUserId = firebaseHandler.getCurrentUserId();
+        if (currentUserId == null) return;
+
+        firebaseHandler.getUserRef().child("friends").child(friend.getUid()).setValue(true)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show();
+                    loadFriends();
+                    binding.friendEmailInput.setText("");
+                    binding.setSearchedUser(null);
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add friend", Toast.LENGTH_SHORT).show());
     }
 
     private void setupSearchInput() {
@@ -122,13 +153,28 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String email = s.toString().trim();
+                if (email.isEmpty() || usersSnapshot == null) {
+                    binding.setSearchedUser(null);
+                    return;
+                }
 
+                User foundUser = null;
+                for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
+                    User user = userSnapshot.getValue(User.class);
+                    if (user != null && user.getEmail() != null && email.equalsIgnoreCase(user.getEmail())) {
+                        foundUser = user;
+                        break;
+                    }
+                }
+                binding.setSearchedUser(foundUser);
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
     }
+
     private void loadFriends() {
         DatabaseReference userRef = firebaseHandler.getUserRef();
         if (userRef == null) return;
@@ -164,7 +210,7 @@ public class FriendListActivity extends AppCompatActivity {
                     if (friend != null) {
                         boolean exists = false;
                         for (User u : friendsList) {
-                            if (u.getEmail().equals(friend.getEmail())) {
+                            if (u.getUid().equals(friend.getUid())) {
                                 exists = true;
                                 break;
                             }

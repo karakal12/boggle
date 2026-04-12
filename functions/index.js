@@ -47,7 +47,7 @@ exports.sendInvitationNotification = onValueCreated(
 
             if (!fcmToken) {
                 console.log("No FCM token found for user: ", targetUserId);
-                await event.data.ref.remove();
+                // We keep the invitation even if notification fails so user can see it manually
                 return null;
             }
 
@@ -58,16 +58,14 @@ exports.sendInvitationNotification = onValueCreated(
                     body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
                 },
                 data: {
-                    roomCode: String(invitationData.roomCode)
+                    roomCode: String(invitationData.roomCode),
+                    invitationId: String(event.params.invitationId)
                 },
                 token: fcmToken,
             };
 
             const response = await admin.messaging().send(payload);
             console.log("Successfully sent invitation with room code:", response);
-
-            // Clean up the invitation record after sending
-            await event.data.ref.remove();
 
             return null;
         } catch (e) {

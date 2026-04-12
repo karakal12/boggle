@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class JoinOrCreateRoomFragment extends DialogFragment {
     public static final String TAG = "JoinOrCreateRoomFragment";
     private static final String ARG_INITIAL_ROOM_CODE = "initial_room_code";
+    private static final String ARG_INITIAL_PLAYER_ROLE = "initial_player_role";
 
     private FragmentJoinOrCreateRoomBinding binding;
 
@@ -29,10 +30,11 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static JoinOrCreateRoomFragment newInstance(String roomCode) {
+    public static JoinOrCreateRoomFragment newInstance(String roomCode, PlayerRole playerRole) {
         JoinOrCreateRoomFragment fragment = new JoinOrCreateRoomFragment();
         Bundle args = new Bundle();
         args.putString(ARG_INITIAL_ROOM_CODE, roomCode);
+        args.putString(ARG_INITIAL_PLAYER_ROLE, playerRole.toString());
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,14 +62,17 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init();
+        if (getArguments() == null) return;
+        if (!getArguments().containsKey(ARG_INITIAL_ROOM_CODE)) return;
+        PlayerRole role = PlayerRole.valueOf(getArguments().getString(ARG_INITIAL_PLAYER_ROLE, PlayerRole.HOST.toString()));
 
-        if (getArguments() != null && getArguments().containsKey(ARG_INITIAL_ROOM_CODE)) {
-            String initialRoomCode = getArguments().getString(ARG_INITIAL_ROOM_CODE);
-            binding.roomCodeTV.setText(initialRoomCode);
-            binding.roomCodeTIL.setVisibility(View.VISIBLE);
-            binding.createRoom.setVisibility(View.GONE);
-            binding.joinRoom.setOnClickListener(this::joinRoom);
-        }
+        String initialRoomCode = getArguments().getString(ARG_INITIAL_ROOM_CODE);
+        binding.roomCodeTV.setText(initialRoomCode);
+        binding.roomCodeTIL.setVisibility(View.VISIBLE);
+        binding.createRoom.setVisibility(role == PlayerRole.HOST ? View.VISIBLE: View.GONE);
+        binding.createRoom.setOnClickListener(this::createRoom);
+        binding.joinRoom.setVisibility(role == PlayerRole.GUEST  ? View.VISIBLE: View.GONE);
+        binding.joinRoom.setOnClickListener(this::joinRoom);
     }
 
     private void init() {
