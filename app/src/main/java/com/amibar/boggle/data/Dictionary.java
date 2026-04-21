@@ -49,7 +49,7 @@ public final class Dictionary {
      * @return True if the word is present and valid, false otherwise.
      */
     public boolean contains(@NonNull String word) {
-        return root.get(word) != null;
+        return root.get(word).isEndOfWord();
     }
 
     /**
