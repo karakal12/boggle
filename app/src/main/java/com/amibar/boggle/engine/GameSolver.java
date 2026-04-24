@@ -3,6 +3,7 @@ package com.amibar.boggle.engine;
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.data.PathTrie;
 import com.amibar.boggle.data.Trie;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ import java.util.concurrent.RecursiveAction;
 public class GameSolver {
     /**
      * A Trie to store all unique words found on the board.
-     * The value associated with each word is its path representation (indices in hex).
+     * The value associated with each terminal node is the hex-encoded path representing the word's discovery.
      */
-    private Trie solutions;
+    private PathTrie solutions;
 
     /**
      * A thread-safe queue used to collect every valid path discovered during the search.
@@ -34,20 +35,20 @@ public class GameSolver {
     /**
      * Container for the results of a solve operation.
      *
-     * @param solutions A Trie containing all unique words found and their primary paths.
+     * @param solutions A PathTrie containing all unique words found and their primary paths.
      * @param allPaths  A list of all valid word paths found (including duplicates for the same word).
      */
-    public record SolverResult(Trie solutions, List<String> allPaths) {
+    public record SolverResult(PathTrie solutions, List<String> allPaths) {
     }
 
     /**
      * A recursive task that explores the board from a specific cell to find valid words.
-     * Inherits from {@link RecursiveAction} to enable parallel execution via ForkJoinPool.
+     * Inherits from {@link RecursiveAction} to enable parallel execution via a ForkJoinPool.
      */
     class GameSolverTask extends RecursiveAction {
 
         /** The current node in the dictionary Trie corresponding to the prefix formed so far. */
-        private final Trie root;
+        private final Dictionary root;
 
         /** The 4x4 Boggle board. */
         private final char[][] board;
@@ -65,7 +66,7 @@ public class GameSolver {
          */
         private short visited;
 
-        /** The sequence of board indices (as hex strings) representing the current path. */
+        /** The sequence of board indices (as hex digits) representing the current path. */
         private final String path;
 
         /** The actual string formed by the current path. */
@@ -82,7 +83,7 @@ public class GameSolver {
          * @param path    The path of indices followed so far.
          * @param string  The string formed so far in this path.
          */
-        public GameSolverTask(Trie root, char[][] board, int i, int j, short visited, String path, String string) {
+        public GameSolverTask(Dictionary root, char[][] board, int i, int j, short visited, String path, String string) {
             this.root = root;
             this.board = board;
             // The solver is currently optimized for a standard 4x4 Boggle board.
@@ -100,36 +101,39 @@ public class GameSolver {
          */
         @Override
         protected void compute() {
-            // Check if we've reached a leaf in the Trie (no further characters possible).
+            // Check if we've reached a leaf in the dictionary (no further characters possible).
             if (root.isLeaf()) {
                 // Standard Boggle rules require words to be at least 3 letters long.
                 if (string.length() > 2) {
                     allPaths.add(path);
-                    // Add to unique solutions if not already discovered by another path.
+                    // Add to unique solutions if this word hasn't been discovered yet.
                     if (solutions.get(string) == null) {
                         solutions.put(string, path);
                     }
                 }
+                // Terminate recursion branch as no further extensions are possible from this Trie node.
                 return;
             }
 
-            // If the current node marks a valid word in the dictionary (but may also be a prefix for longer words).
+            // If the current node marks a valid word in the dictionary (it may also be a prefix for longer words).
             if (root.isEndOfWord()) {
                 if (string.length() > 2) {
                     allPaths.add(path);
+                    // Ensure the word is added to the unique solutions set if not already present.
                     if (solutions.get(string) == null) {
                         solutions.put(string, path);
                     }
                 }
             }
 
-            // Mark the current cell as visited in the bitmap to prevent reuse in the same path.
+            // Mark the current cell as visited in the bitmap for child branches to prevent reuse.
             visited = (short) (visited | (1 << (i * board.length + j)));
 
             List<GameSolverTask> tasks = new ArrayList<>();
 
+            // Iterate through possible next characters in the Trie to filter neighbor exploration.
             for (char ch = 'a'; ch <= 'z'; ch++) {
-                // Only check characters ('a'-'z') that actually exist as next steps in the Trie.
+                // Only proceed if the character exists as a child of the current Trie node.
                 if (root.get(ch) == null) continue;
 
                 // Explore all 8 adjacent neighbors (horizontal, vertical, and diagonal).
@@ -143,9 +147,10 @@ public class GameSolver {
                         // Check if neighbor is within bounds, not visited in this path, and matches character 'ch'.
                         if (isSafe(nextI, nextJ, visited) && board[nextI][nextJ] == ch) {
                             char c = board[nextI][nextJ];
-                            Trie nextNode = root.get(c);
+                            Dictionary nextNode = root.get(c);
 
                             if (nextNode != null) {
+                                // Append the neighbor's index (as a hex digit) to the path tracking.
                                 String nextPath = path + Integer.toHexString(nextI * board.length + nextJ);
                                 String nextString = string + c;
 
@@ -153,7 +158,7 @@ public class GameSolver {
                                 // In many Boggle versions, 'Q' is treated as 'Qu' on a single die.
                                 if (c == 'q') {
                                     nextNode = nextNode.get('u');
-                                    // If 'qu' is not a valid prefix in the dictionary, abandon this path.
+                                    // If 'qu' is not a valid prefix in the dictionary, skip this path.
                                     if (nextNode == null) continue;
                                     nextString = string + "qu";
                                 }
@@ -166,7 +171,7 @@ public class GameSolver {
                 }
             }
 
-            // Parallelize the search by invoking all identified sub-tasks in the ForkJoinPool.
+            // Parallelize the search by invoking all sub-tasks in the ForkJoinPool.
             if (!tasks.isEmpty()) {
                 invokeAll(tasks);
             }
@@ -194,7 +199,7 @@ public class GameSolver {
      * @return A {@link SolverResult} containing the unique words found and all valid paths.
      */
     public SolverResult solve(char[][] board, Dictionary dictionary) {
-        solutions = new Trie();
+        solutions = new PathTrie();
         allPaths = new ConcurrentLinkedQueue<>();
         List<GameSolverTask> tasks = new ArrayList<>();
 
@@ -202,13 +207,13 @@ public class GameSolver {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 char c = board[i][j];
-                Trie node = dictionary.getRoot().get(c);
+                Dictionary node = dictionary.get(c);
 
                 if (node != null) {
                     String s = String.valueOf(c);
                     String path = Integer.toHexString(i * board.length + j);
 
-                    // Handle special 'Qu' case if the word starts with a 'Q'.
+                    // Handle special 'Qu' case if the word starts with 'Q'.
                     if (c == 'q') {
                         node = node.get('u');
                         if (node == null) continue;

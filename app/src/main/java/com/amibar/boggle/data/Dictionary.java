@@ -7,20 +7,16 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 /**
- * Singleton class representing the game dictionary.
- * Uses a Trie (Prefix Tree) data structure to store words efficiently and allow for fast lookups.
+ * Singleton Trie (Prefix Tree) implementation representing the game dictionary.
+ * Inherits from {@link Trie} to store words efficiently and allow for fast lookups.
  */
-public final class Dictionary {
+public final class Dictionary extends Trie<Dictionary>{
     /**
      * Singleton instance.
      */
     private static final Dictionary instance = new Dictionary();
     private boolean isInitialized = false;
 
-    /**
-     * The root node of the Trie.
-     */
-    private final Trie root = new Trie();
 
     /**
      * Private constructor for singleton pattern.
@@ -35,21 +31,16 @@ public final class Dictionary {
         return instance;
     }
 
-    /**
-     * Returns the root node of the word Trie.
-     * @return The root Trie node.
-     */
-    public Trie getRoot() {
-        return root;
-    }
 
     /**
      * Checks if a word exists in the dictionary.
+     *
      * @param word The word to search for.
      * @return True if the word is present and valid, false otherwise.
      */
     public boolean contains(@NonNull String word) {
-        return root.get(word).isEndOfWord();
+        Trie<?> node = get(word);
+        return node != null && node.isEndOfWord();
     }
 
     /**
@@ -76,6 +67,6 @@ public final class Dictionary {
      * @param word The word to insert.
      */
     private void insert(@NonNull String word) {
-        root.put(word, null);
+        put(word);
     }
 }

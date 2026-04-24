@@ -3,6 +3,7 @@ package com.amibar.boggle.ui.game.multiplayer;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -13,6 +14,10 @@ import com.amibar.boggle.data.FirebaseHandler;
 import com.amibar.boggle.data.PlayerRole;
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ActivityMultiplayerBinding;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,6 +77,27 @@ public class MultiplayerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FirebaseHandler.getDatabase().getReference("rooms").child(roomCode).removeValue();
+        if (roomCode != null) {
+            String userId = FirebaseHandler.getInstance().getCurrentUserId();
+            if (userId != null) {
+                DatabaseReference roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
+                // Remove only this player
+                roomRef.child("players").child(userId).removeValue().addOnCompleteListener(task -> {
+                    // Check if there are any players left in the room
+                    roomRef.child("players").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                                // Last player left, delete the entire room
+                                roomRef.removeValue();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+                });
+            }
+        }
     }
 }

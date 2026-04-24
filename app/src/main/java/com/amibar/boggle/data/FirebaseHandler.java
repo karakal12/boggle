@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -140,4 +141,13 @@ public class FirebaseHandler {
         user = null;
     }
 
+    public void addFriend(String id) {
+        DatabaseReference usersRef = mDatabase.getReference("users");
+        DatabaseReference friendsRef = getUserRef().child("friends").child(id);
+        friendsRef.setValue(true);
+        DatabaseReference friendFriendsRef = usersRef.child(id).child("friends").child(getCurrentUserId());
+        friendFriendsRef.setValue(true);
+        Log.d(TAG, "Friend added: " + id);
+
+    }
 }

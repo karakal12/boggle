@@ -29,6 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity for managing and viewing a user's friend list.
+ * Allows users to search for others, add friends, and invite them to game rooms.
+ */
 public class FriendListActivity extends AppCompatActivity {
 
     private static final String TAG = "FriendListActivity";
@@ -52,6 +56,9 @@ public class FriendListActivity extends AppCompatActivity {
         loadUsers();
     }
 
+    /**
+     * Loads the global user list and the current user's friends list.
+     */
     private void loadUsers() {
         firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
             usersSnapshot = snapshot;
@@ -59,11 +66,18 @@ public class FriendListActivity extends AppCompatActivity {
         loadFriends();
     }
 
+    /**
+     * Initializes the RecyclerView for displaying friends.
+     */
     private void setupRecyclerView() {
         adapter = new FriendAdapter(this::showInviteDialog);
         binding.friendsRecyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Displays a dialog to invite a friend to a specific game room.
+     * @param friend The user to invite.
+     */
     private void showInviteDialog(User friend) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Invite " + friend.getDisplayName());
@@ -90,6 +104,11 @@ public class FriendListActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Sends a game invitation via Firebase.
+     * @param friend   The recipient of the invitation.
+     * @param roomCode The room code to join.
+     */
     private void sendInvitation(User friend, String roomCode) {
         String currentUserId = firebaseHandler.getCurrentUserId();
         User currentUser = firebaseHandler.getUserData();
@@ -116,36 +135,35 @@ public class FriendListActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to send invitation", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Sets up listeners for refresh and add friend buttons.
+     */
     private void setupClickListeners() {
         binding.refreshButton.setOnClickListener(v -> {
-            loadFriends();
             loadUsers();
+            loadFriends();
         });
-
-        binding.addFriendButton.setOnClickListener(v -> {
-            User searchedUser = binding.getSearchedUser();
-            if (searchedUser != null) {
-                addFriend(searchedUser);
-            } else {
-                Toast.makeText(this, "Please search for a user by email first", Toast.LENGTH_SHORT).show();
-            }
-        });
+        binding.addFriendButton.setOnClickListener(this::addFriend);
     }
 
-    private void addFriend(User friend) {
-        String currentUserId = firebaseHandler.getCurrentUserId();
-        if (currentUserId == null) return;
-
-        firebaseHandler.getUserRef().child("friends").child(friend.getUid()).setValue(true)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show();
-                    loadFriends();
-                    binding.friendEmailInput.setText("");
-                    binding.setSearchedUser(null);
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add friend", Toast.LENGTH_SHORT).show());
+    /**
+     * Adds a selected user as a friend.
+     * @param view The clicked view.
+     */
+    private void addFriend(View view) {
+        String friendId = binding.getSearchedUser().getUid();
+        if (friendId.isEmpty()) {
+            Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        firebaseHandler.addFriend(friendId);
+        binding.friendEmailInput.setText("");
+        Toast.makeText(this, "Friend request sent", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Configures the search input field with live filtering of users.
+     */
     private void setupSearchInput() {
         binding.friendEmailInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -153,21 +171,18 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String email = s.toString().trim();
-                if (email.isEmpty() || usersSnapshot == null) {
-                    binding.setSearchedUser(null);
-                    return;
-                }
-
-                User foundUser = null;
+                String query = s.toString().toLowerCase();
+                List<User> filteredList = new ArrayList<>();
                 for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
-                    User user = userSnapshot.getValue(User.class);
-                    if (user != null && user.getEmail() != null && email.equalsIgnoreCase(user.getEmail())) {
-                        foundUser = user;
-                        break;
+                    if (userSnapshot.exists()) {
+                        User user = userSnapshot.getValue(User.class);
+                        if (user != null && user.getEmail().toLowerCase().contains(query)) {
+                            filteredList.add(user);
+                        }
                     }
                 }
-                binding.setSearchedUser(foundUser);
+                filteredList.sort((u1, u2) -> u1.getDisplayName().compareToIgnoreCase(u2.getDisplayName()));
+                binding.setSearchedUser(filteredList.isEmpty() ? null : filteredList.get(0));
             }
 
             @Override
@@ -175,6 +190,9 @@ public class FriendListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads the current user's friend IDs and fetches their details.
+     */
     private void loadFriends() {
         DatabaseReference userRef = firebaseHandler.getUserRef();
         if (userRef == null) return;
@@ -203,6 +221,10 @@ public class FriendListActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fetches detailed user data for a specific friend ID.
+     * @param friendId The UID of the friend to fetch.
+     */
     private void fetchFriendData(String friendId) {
         firebaseHandler.getRootRef().child("users").child(friendId).get()
                 .addOnSuccessListener(dataSnapshot -> {

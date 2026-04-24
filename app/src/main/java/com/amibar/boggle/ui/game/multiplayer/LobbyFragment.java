@@ -91,7 +91,10 @@ public class LobbyFragment extends Fragment {
             listenForPlayers();
             
             if (player != null) {
-                roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId()).setValue(player);
+                DatabaseReference myPlayerRef = roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId());
+                myPlayerRef.setValue(player);
+                // Ensure the player is removed if they disconnect abruptly
+                myPlayerRef.onDisconnect().removeValue();
             }
         }
     }

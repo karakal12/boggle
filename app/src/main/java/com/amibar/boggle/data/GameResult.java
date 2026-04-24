@@ -8,17 +8,19 @@ public class GameResult {
     private int possibleWords;
     private int maxScore;
     private List<String> foundWords;
+    private String board;
 
     public GameResult() {
         // Default constructor required for calls to DataSnapshot.getValue(GameResult.class)
     }
 
-    public GameResult(int score, int wordsFound, int possibleWords, int maxScore, List<String> foundWords) {
+    public GameResult(int score, int wordsFound, int possibleWords, int maxScore, List<String> foundWords, String board) {
         this.score = score;
         this.wordsFound = wordsFound;
         this.possibleWords = possibleWords;
         this.maxScore = maxScore;
         this.foundWords = foundWords;
+        this.board = board;
     }
 
     public List<String> getFoundWords() {
@@ -39,5 +41,8 @@ public class GameResult {
 
     public int getMaxScore() {
         return maxScore;
+    }
+    public String getBoard() {
+        return board;
     }
 }

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
+import com.amibar.boggle.data.PathTrie;
 import com.amibar.boggle.data.Trie;
 import com.amibar.boggle.utils.Timer;
 
@@ -48,7 +49,7 @@ public class BoggleGame {
     private final List<OnTickListener> onTickListeners = new CopyOnWriteArrayList<>();
 
     /** Trie containing all valid words that can be formed on the current board. */
-    private final Trie solutions;
+    private final PathTrie solutions;
     /** List of all possible valid paths on the board. */
     private final List<String> allPaths;
     /** Timer managing the game countdown. */
@@ -115,6 +116,7 @@ public class BoggleGame {
         solutions = result.solutions();
         allPaths = result.allPaths();
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions and " + allPaths.size() + " total paths");
+        Log.v("BoggleGame", "Solutions: " + solutions);
 
         // Initialize the game timer with total duration and callbacks for ticks and completion.
         gameTimer = new Timer(GAME_TIME_MILLIS,
@@ -254,7 +256,7 @@ public class BoggleGame {
      * Returns all possible valid words that can be found on this board as a Trie.
      * @return A Trie of solution words.
      */
-    public Trie getSolutions() {
+    public PathTrie getSolutions() {
         return solutions;
     }
 

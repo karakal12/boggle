@@ -30,7 +30,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     @Override
     public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
         User player = playerList.get(position);
-        // Bind the player data to the view
         holder.binding.setPlayer(player);
     }
 
@@ -40,7 +39,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     }
 
     public static class PlayerViewHolder extends RecyclerView.ViewHolder {
-        // Store the binding instead of individual views
         final ItemPlayerBinding binding;
 
         public PlayerViewHolder(@NonNull ItemPlayerBinding binding) {

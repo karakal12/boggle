@@ -4,33 +4,34 @@ import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * Represents a thread-safe Trie (Prefix Tree) data structure.
- * Each node in the Trie can also store a path, useful for Boggle word tracking.
+ * This is a generic base class that can be extended to store additional metadata per node.
+ *
+ * @param <T> The concrete type of the Trie node.
  */
-public class Trie {
-    /** The number of letters in the English alphabet. */
-    private static final int ALPHABET_SIZE = 26;
+public abstract class Trie<T extends Trie<T>> {
+    /** The number of letters in the English alphabet ('a' through 'z'). */
+    protected static final int ALPHABET_SIZE = 26;
 
     /** Atomic array of pointers to child nodes, indexed by character ('a' to 'z'). */
-    private final AtomicReferenceArray<Trie> children = new AtomicReferenceArray<>(ALPHABET_SIZE);
+    protected final AtomicReferenceArray<T> children = new AtomicReferenceArray<>(ALPHABET_SIZE);
 
     /** Flag indicating if this node represents the end of a complete word. */
-    private volatile boolean isEndOfWord;
+    protected volatile boolean isEndOfWord;
 
     /** Flag indicating if this node has no children. */
-    private volatile boolean isLeaf;
+    protected volatile boolean isLeaf;
 
-    /** Optional path string associated with this word (e.g., coordinates on a Boggle board). */
-    private volatile String path;
 
     /** Atomic integer to track the number of words stored in the subtree rooted at this node. */
-    private final AtomicInteger size = new AtomicInteger(0);
+    protected final AtomicInteger size = new AtomicInteger(0);
 
     /**
      * Initializes a new Trie node.
@@ -57,7 +58,7 @@ public class Trie {
      * @param ch The character ('a' to 'z').
      * @return The child Trie node or null if it doesn't exist.
      */
-    public Trie get(char ch) {
+    public T get(char ch) {
         int index = ch - 'a';
         if (index < 0 || index >= ALPHABET_SIZE) return null;
         return children.get(index);
@@ -69,8 +70,9 @@ public class Trie {
      * @param s The string to search for.
      * @return The Trie node representing the end of the string, or null if not found.
      */
-    public Trie get(String s){
-        Trie node = this;
+    @SuppressWarnings("unchecked")
+    public T get(String s){
+        T node = (T) this;
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
             if (node.containsKey(ch)) {
@@ -80,6 +82,25 @@ public class Trie {
             }
         }
         return node;
+
+    }
+
+    /**
+     * Adds a child node for a given character by instantiating the specialized type via reflection.
+     *
+     * @param ch The character ('a' to 'z').
+     */
+    @SuppressWarnings("unchecked")
+    public void put(char ch){
+        ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+        assert genericSuperclass != null : "Failed to instantiate Trie node";
+        Class<T> type = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
+        try {
+            Constructor<T> constructor = type.getDeclaredConstructor();
+            put(ch, constructor.newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to instantiate Trie node", e);
+        }
     }
 
     /**
@@ -88,7 +109,7 @@ public class Trie {
      * @param ch   The character ('a' to 'z').
      * @param node The node to associate with the character.
      */
-    public void put(char ch, Trie node) {
+    public void put(char ch, T node) {
         int index = ch - 'a';
         if (index >= 0 && index < ALPHABET_SIZE) {
             children.set(index, node);
@@ -97,27 +118,28 @@ public class Trie {
     }
 
     /**
-     * Inserts a word and its associated path into the Trie.
+     * Inserts a word into the Trie.
      *
-     * @param str  The word string to insert.
-     * @param path The optional path string associated with the word.
+     * @param str The word string to insert.
+     * @return The Trie node representing the end of the inserted word.
      */
-    public void put(String str, String path){
-        if (get(str) != null) return;
-        Trie node = this;
+    @SuppressWarnings("unchecked")
+    public T put(String str){
+        T existing = get(str);
+        if (existing != null && existing.isEndOfWord()) return existing;
+
+        T node = (T) this;
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             if (ch < 'a' || ch > 'z') continue;
             if (node.get(ch) == null) {
-                node.put(ch, new Trie());
+                node.put(ch);
             }
-            node.size.addAndGet(1);
+            node.size.incrementAndGet();
             node = node.get(ch);
         }
-        if (path != null) {
-            node.path = path;
-        }
         node.setEndOfWord(true);
+        return node;
     }
 
     /**
@@ -147,25 +169,9 @@ public class Trie {
         return isLeaf;
     }
 
-    /**
-     * Returns the path associated with this word node.
-     *
-     * @return The path string, or null if not set.
-     */
-    public String getPath() {
-        return path;
-    }
 
     /**
-     * Sets the path associated with this word node.
-     * @param path The path string.
-     */
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Returns the number of words in the Trie rooted at this node.
+     * Returns the number of words stored in the Trie rooted at this node.
      *
      * @return Total word count.
      */
@@ -176,7 +182,7 @@ public class Trie {
     /**
      * Retrieves all words stored in the Trie.
      *
-     * @return A set of all complete words.
+     * @return A set containing all complete words.
      */
     public Set<String> getWords(){
         Set<String> words = new ArraySet<>(size());
@@ -190,13 +196,13 @@ public class Trie {
      * @param word The prefix string accumulated so far.
      * @param set  The set to add discovered words to.
      */
-    private void getWordsRec(String word, Set<String> set) {
+    protected void getWordsRec(String word, Set<String> set) {
         if (isEndOfWord()) {
             set.add(word);
         }
         if (isLeaf) return;
         for (int i = 0; i < ALPHABET_SIZE; i++) {
-            Trie child = children.get(i);
+            T child = children.get(i);
             if (child != null) {
                 child.getWordsRec(word + (char)(i + 'a'), set);
             }
@@ -204,17 +210,9 @@ public class Trie {
     }
 
 
-    public HashMap<String, String> toMap() {
-        HashMap<String, String> map = new HashMap<>();
-        for (String s : getWords()) {
-            map.put(s, get(s).getPath());
-        }
-        return map;
-    }
-
     @NonNull
     @Override
     public String toString() {
-        return toMap().keySet().toString();
+        return getWords().toString();
     }
 }
