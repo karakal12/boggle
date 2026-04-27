@@ -20,10 +20,21 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
+/**
+ * Service that handles Firebase Cloud Messaging (FCM) messages.
+ * It is primarily used for receiving and displaying game invitations as system notifications.
+ */
 public class InvitationService extends FirebaseMessagingService {
+    /** Tag used for logging. */
     private static final String TAG = "InvitationService";
+    /** Notification channel ID for game invitations. */
     private static final String CHANNEL_ID = "invitation_channel";
 
+    /**
+     * Called when a new FCM registration token is generated for the device.
+     * Updates the token in the Firebase Realtime Database for the current user.
+     * @param token The new registration token.
+     */
     @Override
     public void onNewToken(@NonNull String token) {
         Log.d(TAG, "Refreshed token: " + token);
@@ -32,13 +43,19 @@ public class InvitationService extends FirebaseMessagingService {
         }
     }
 
+    /**
+     * Called when a message is received from FCM.
+     * Parses the message data, deletes the invitation record from the database,
+     * and displays a local notification.
+     * @param remoteMessage The received message object.
+     */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         Map<String, String> data = remoteMessage.getData();
         
-        // Delete the invitation from the database now that it's received
+        // Delete the invitation from the database now that it's received to avoid stale invites
         if (data.containsKey("invitationId")) {
             String invitationId = data.get("invitationId");
             deleteInvitation(invitationId);
@@ -50,13 +67,17 @@ public class InvitationService extends FirebaseMessagingService {
             String body = remoteMessage.getNotification().getBody();
             showNotification(title, body, data);
         } else if (data.size() > 0) {
-            // Handle data payload if notification is null
+            // Handle data-only payload if notification block is missing
             String title = "New Game Invitation";
             String body = "Someone invited you to play Boggle!";
             showNotification(title, body, data);
         }
     }
 
+    /**
+     * Removes an invitation entry from the Firebase Realtime Database.
+     * @param invitationId The unique ID of the invitation to delete.
+     */
     private void deleteInvitation(String invitationId) {
         String currentUserId = FirebaseAuth.getInstance().getUid();
         if (currentUserId != null) {
@@ -70,11 +91,18 @@ public class InvitationService extends FirebaseMessagingService {
         }
     }
 
+    /**
+     * Builds and displays a system notification for the game invitation.
+     * Includes a PendingIntent that opens MainActivity with the room code.
+     * @param title Notification title.
+     * @param body  Notification body text.
+     * @param data  Data payload containing game room details.
+     */
     private void showNotification(String title, String body, Map<String, String> data) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         
-        // Pass room code if present
+        // Pass room code and action if present to allow joining directly from notification
         if (data != null && data.containsKey("roomCode")) {
             intent.putExtra("roomCode", data.get("roomCode"));
             intent.putExtra("action", "join");
@@ -86,6 +114,7 @@ public class InvitationService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // Create the NotificationChannel for Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "Game Invitations",

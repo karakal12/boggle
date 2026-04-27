@@ -13,8 +13,9 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 /**
  * Represents a thread-safe Trie (Prefix Tree) data structure.
  * This is a generic base class that can be extended to store additional metadata per node.
+ * It uses atomic components to support concurrent read and write operations safely.
  *
- * @param <T> The concrete type of the Trie node.
+ * @param <T> The concrete type of the Trie node, allowing for extension.
  */
 public abstract class Trie<T extends Trie<T>> {
     /** The number of letters in the English alphabet ('a' through 'z'). */
@@ -34,7 +35,7 @@ public abstract class Trie<T extends Trie<T>> {
     protected final AtomicInteger size = new AtomicInteger(0);
 
     /**
-     * Initializes a new Trie node.
+     * Initializes a new Trie node as a leaf and not an end-of-word.
      */
     public Trie() {
         this.isEndOfWord = false;
@@ -87,6 +88,7 @@ public abstract class Trie<T extends Trie<T>> {
 
     /**
      * Adds a child node for a given character by instantiating the specialized type via reflection.
+     * This allows the generic Trie to create nodes of the correct subclass (e.g., PathTrie).
      *
      * @param ch The character ('a' to 'z').
      */
@@ -105,6 +107,7 @@ public abstract class Trie<T extends Trie<T>> {
 
     /**
      * Adds or updates a child node for a given character.
+     * Sets the leaf flag to false upon adding a child.
      *
      * @param ch   The character ('a' to 'z').
      * @param node The node to associate with the character.
@@ -118,7 +121,8 @@ public abstract class Trie<T extends Trie<T>> {
     }
 
     /**
-     * Inserts a word into the Trie.
+     * Inserts a word into the Trie, creating nodes as necessary.
+     * Increments the size of each node along the path if a new word is being added.
      *
      * @param str The word string to insert.
      * @return The Trie node representing the end of the inserted word.
@@ -191,7 +195,7 @@ public abstract class Trie<T extends Trie<T>> {
     }
 
     /**
-     * Recursive helper to collect words from the trie structure.
+     * Recursive helper to collect words from the trie structure via Depth-First Search.
      *
      * @param word The prefix string accumulated so far.
      * @param set  The set to add discovered words to.
@@ -210,6 +214,10 @@ public abstract class Trie<T extends Trie<T>> {
     }
 
 
+    /**
+     * Returns a string representation of all words in the Trie.
+     * @return A string containing the words set.
+     */
     @NonNull
     @Override
     public String toString() {

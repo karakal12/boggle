@@ -14,6 +14,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
  * This simplifies Firebase access across various fragments and activities in the app.
  */
 public class FirebaseHandler {
+    /** Tag used for logging. */
     private static final String TAG = "FirebaseHandler";
     /** Singleton instance. */
     private static FirebaseHandler instance;
@@ -21,10 +22,10 @@ public class FirebaseHandler {
     private final FirebaseAuth mAuth;
     /** Instance of Firebase Realtime Database. */
     private final FirebaseDatabase mDatabase;
-    /** Instance of Firebase Messaging */
+    /** Instance of Firebase Messaging. */
     private final FirebaseMessaging mMessaging;
 
-    /** Current user data */
+    /** Cached local user data. */
     private User user;
 
     /**
@@ -37,7 +38,8 @@ public class FirebaseHandler {
     }
 
     /**
-     * @return The singleton instance of FirebaseHandler.
+     * Returns the singleton instance of FirebaseHandler.
+     * @return The FirebaseHandler instance.
      */
     public static synchronized FirebaseHandler getInstance() {
         if (instance == null) {
@@ -47,21 +49,24 @@ public class FirebaseHandler {
     }
 
     /**
-     * @return The Firebase Authentication instance.
+     * Returns the Firebase Authentication instance.
+     * @return The FirebaseAuth instance.
      */
     public static synchronized FirebaseAuth getAuth() {
         return getInstance().mAuth;
     }
 
     /**
-     * @return The Firebase Realtime Database instance.
+     * Returns the Firebase Realtime Database instance.
+     * @return The FirebaseDatabase instance.
      */
     public static synchronized FirebaseDatabase getDatabase() {
         return getInstance().mDatabase;
     }
 
     /**
-     * @return The Firebase Messaging instance.
+     * Returns the Firebase Messaging instance.
+     * @return The FirebaseMessaging instance.
      */
     public static synchronized FirebaseMessaging getMessaging() {
         return getInstance().mMessaging;
@@ -69,18 +74,23 @@ public class FirebaseHandler {
 
 
     /**
+     * Returns the currently authenticated FirebaseUser.
      * @return The currently authenticated FirebaseUser, or null if no user is signed in.
      */
     public FirebaseUser getCurrentUser() {
         return mAuth.getCurrentUser();
     }
 
+    /**
+     * Returns the local cached User data.
+     * @return The User object containing profile details.
+     */
     public User getUserData() {
         return user;
     }
 
     /**
-     * Checks if the user is still valid in Firebase Auth and updates local user data.
+     * Checks if the user is still valid in Firebase Auth and updates local user data from the database.
      */
     public void updateUserData() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -107,6 +117,7 @@ public class FirebaseHandler {
     }
 
     /**
+     * Returns the Unique ID (UID) of the current user.
      * @return The Unique ID (UID) of the current user, or null if not signed in.
      */
     public String getCurrentUserId() {
@@ -115,6 +126,7 @@ public class FirebaseHandler {
     }
 
     /**
+     * Returns a DatabaseReference pointing to the root of the Realtime Database.
      * @return A DatabaseReference pointing to the root of the Realtime Database.
      */
     public DatabaseReference getRootRef() {
@@ -122,6 +134,7 @@ public class FirebaseHandler {
     }
 
     /**
+     * Returns a DatabaseReference pointing to the current user's entry in the "users" node.
      * @return A DatabaseReference pointing to the current user's entry in the "users" node,
      *         or null if no user is signed in.
      */
@@ -134,20 +147,25 @@ public class FirebaseHandler {
     }
 
     /**
-     * Signs out the current user from Firebase.
+     * Signs out the current user from Firebase and clears local user data.
      */
     public void signOut() {
         mAuth.signOut();
         user = null;
     }
 
+    /**
+     * Adds a user as a friend in the database. Bi-directional link is created.
+     * @param id The UID of the friend to add.
+     */
     public void addFriend(String id) {
         DatabaseReference usersRef = mDatabase.getReference("users");
-        DatabaseReference friendsRef = getUserRef().child("friends").child(id);
-        friendsRef.setValue(true);
-        DatabaseReference friendFriendsRef = usersRef.child(id).child("friends").child(getCurrentUserId());
-        friendFriendsRef.setValue(true);
-        Log.d(TAG, "Friend added: " + id);
-
+        DatabaseReference myFriendRef = getUserRef();
+        if (myFriendRef != null) {
+            myFriendRef.child("friends").child(id).setValue(true);
+            DatabaseReference friendFriendsRef = usersRef.child(id).child("friends").child(getCurrentUserId());
+            friendFriendsRef.setValue(true);
+            Log.d(TAG, "Friend added: " + id);
+        }
     }
 }

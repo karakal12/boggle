@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.GameMode;
@@ -24,6 +25,7 @@ import com.amibar.boggle.databinding.ViewBoggleBinding;
 import com.amibar.boggle.engine.BoggleGame;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.ArrayList;
@@ -46,7 +48,7 @@ public class BoggleView extends LinearLayout {
     private TextView[] cells;
     /** Reference to the last selected cell to manage visual feedback. */
     private TextView lastSelected;
-    /** Badge drawable for the hint button. */
+    /** Badge drawable for the hint button showing number of available hints. */
     private BadgeDrawable hintBadge;
 
     /** The mode of the game, determined by XML attributes. */
@@ -82,6 +84,10 @@ public class BoggleView extends LinearLayout {
     /**
      * Full constructor for BoggleView.
      * Resolves custom XML attributes such as 'gameMode'.
+     * @param context The Context.
+     * @param attrs The AttributeSet.
+     * @param defStyleAttr Default style attribute.
+     * @param defStyleRes Default style resource.
      */
     @SuppressWarnings("unused")
     public BoggleView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -102,6 +108,7 @@ public class BoggleView extends LinearLayout {
      * Initializes the view by inflating the layout, initializing the game engine (if in singleplayer),
      * and setting up UI component bindings.
      */
+    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     private void initView(){
         binding = ViewBoggleBinding.inflate(LayoutInflater.from(getContext()), this, true);
         
@@ -123,7 +130,7 @@ public class BoggleView extends LinearLayout {
         // Attach click listener to the hint button
         binding.ivHint.setOnClickListener(v -> showHint());
 
-        // Initialize the badge
+        // Initialize the badge for hints
         hintBadge = BadgeDrawable.create(getContext());
         hintBadge.setNumber(game.getHints());
 
@@ -212,7 +219,7 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * Formats the remaining time into a MM:SS string.
+     * Formats the remaining time into an MM:SS string.
      * @param elapsedTime Time elapsed since start in milliseconds.
      * @return Formatted time string (e.g., "01:30").
      */
@@ -336,23 +343,22 @@ public class BoggleView extends LinearLayout {
     }
 
     /**
-     * Resets all cell backgrounds to the default state and clears word-related UI.
+     * Resets all cell backgrounds to the default state and clears the engine's current path.
      */
     public void clearSolution() {
         game.deselectPath();
-        int unselectedColor = resolveAttribute(R.attr.colorUnselected);
         for (TextView cell : cells) {
-            cell.setBackgroundColor(unselectedColor);
+            cell.setBackgroundColor(resolveAttribute(R.attr.colorUnselected));
         }
-        lastSelected = null;
         updateWord();
     }
 
     /**
-     * Logic for providing a hint to the user.
-     * Finds a valid word that continues from the current board path and reveals part of it.
+     * Picks a random valid word that hasn't been found yet and highlights its path.
+     * Subtracts a hint from the player's total.
      */
     public void showHint(){
+        if (game.isEnded()) return;
         if (game.getHints() <= 0) return;
 
         // Get current path as hex string
@@ -391,7 +397,7 @@ public class BoggleView extends LinearLayout {
 
         // Shuffle so hints are random among valid completions
         Collections.shuffle(candidatePaths);
-        String fullPath = candidatePaths.getFirst();
+        String fullPath = candidatePaths.get(0);
 
         int currentPathLength = currentPath.length();
         int remainingLength = fullPath.length() - currentPathLength;

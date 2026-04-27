@@ -22,7 +22,6 @@ public class User implements Serializable {
 
     /**
      * Default constructor required for Firebase Realtime Database deserialization.
-     * (e.g., for calls to DataSnapshot.getValue(User.class))
      */
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)

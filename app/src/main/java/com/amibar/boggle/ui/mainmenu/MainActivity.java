@@ -34,12 +34,22 @@ import com.amibar.boggle.utils.ImageUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * The primary entry point of the application.
+ * Manages the main navigation drawer, handles authentication state changes,
+ * and provides access to different game modes and user features.
+ */
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class MainActivity extends AppCompatActivity {
+    /** View binding for the activity layout. */
     private ActivityMainBinding binding;
 
+    /** Listener for Firebase Authentication state changes. */
     private FirebaseAuth.AuthStateListener authStateListener;
 
+    /**
+     * Launcher for SingleplayerActivity to receive the final score when the game ends.
+     */
     private final ActivityResultLauncher<Intent> singleplayerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -50,13 +60,13 @@ public class MainActivity extends AppCompatActivity {
             }
     );
 
+    /**
+     * Launcher for requesting notification permissions (Android 13+).
+     */
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // FCM SDK (and your app) can post notifications.
-                }
-                else {
-                    // TODO: Inform user that that your app will not show notifications.
+                if (!isGranted) {
+                    Toast.makeText(this, "Notifications disabled. You won't receive game invites.", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -65,7 +75,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        
+        // Enable edge-to-edge display
         EdgeToEdge.enable(this);
+        
+        // Handle window insets for both the main content and the navigation drawer
         ViewCompat.setOnApplyWindowInsetsListener(binding.mainContent, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -81,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         askNotificationPermission();
         setupAuthStateListener();
         handleIntent(getIntent());
-
     }
 
     @Override
@@ -91,12 +104,16 @@ public class MainActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
+    /**
+     * Processes incoming intents, specifically for joining multiplayer rooms from notifications.
+     * @param intent The intent to handle.
+     */
     private void handleIntent(Intent intent) {
         if (intent != null && intent.hasExtra("roomCode")) {
             String roomCode = intent.getStringExtra("roomCode");
             if (roomCode != null && !roomCode.isEmpty()) {
                 PlayerRole role = PlayerRole.HOST;
-                if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){ // join.equals to avoid NullPointerException
+                if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){
                     role = PlayerRole.GUEST;
                 }
                 JoinOrCreateRoomFragment.newInstance(roomCode, role)
@@ -105,34 +122,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes UI components, toolbar, and click listeners.
+     */
     private void init(){
-
         setSupportActionBar(binding.toolbar);
 
+        // Navigation for Singleplayer
         binding.singleplayerButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SingleplayerActivity.class);
             singleplayerLauncher.launch(intent);
         });
 
+        // Navigation for Multiplayer - requires login
         binding.multiplayerButton.setOnClickListener(v -> {
             if (FirebaseHandler.getAuth().getCurrentUser() != null){
-                getSupportFragmentManager().beginTransaction().add(new JoinOrCreateRoomFragment(), JoinOrCreateRoomFragment.TAG)
-                        .commit();
+                JoinOrCreateRoomFragment fragment = new JoinOrCreateRoomFragment();
+                fragment.show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
             } else {
-                Toast.makeText(this, "Not Signed In", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Navigation for Friend List
         binding.friendsListButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, FriendListActivity.class);
             startActivity(intent);
         });
 
+        // Easter Egg / Bonus feature
         binding.donutButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, DonutActivity.class);
             startActivity(intent);
         });
 
+        // Setup Drawer and Navigation View
         binding.navView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -141,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
     }
 
+    /**
+     * Sets up the listener that updates the UI when the user signs in or out.
+     */
     private void setupAuthStateListener() {
         authStateListener = firebaseAuth -> {
             updateUI();
@@ -162,12 +189,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates the UI elements based on the current authentication state.
+     * This includes menu visibility (login vs logout) and user profile info in the header.
+     */
     void updateUI() {
         boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
         FirebaseUser user = FirebaseHandler.getInstance().getCurrentUser();
 
-
-        // Update navigation menu
+        // Update navigation menu visibility
         Menu menu = binding.navView.getMenu();
         MenuItem loginItem = menu.findItem(R.id.nav_login);
         MenuItem signupItem = menu.findItem(R.id.nav_signup);
@@ -177,39 +207,46 @@ public class MainActivity extends AppCompatActivity {
         if (signupItem != null) signupItem.setVisible(!isLoggedIn);
         if (logoutItem != null) logoutItem.setVisible(isLoggedIn);
 
-        NavHeaderBinding headerBinding =
-                NavHeaderBinding.bind(binding.navView.getHeaderView(0));
+        // Update navigation header with user info
+        if (binding.navView.getHeaderCount() > 0) {
+            NavHeaderBinding headerBinding = NavHeaderBinding.bind(binding.navView.getHeaderView(0));
 
-        headerBinding.navHeaderTextViewName
-                .setText(user != null ? user.getDisplayName() : "Not Logged In");
-        headerBinding.navHeaderTextViewEmail
-                .setText(user != null ? user.getEmail() : "");
+            headerBinding.navHeaderTextViewName
+                    .setText(user != null ? user.getDisplayName() : "Not Logged In");
+            headerBinding.navHeaderTextViewEmail
+                    .setText(user != null ? user.getEmail() : "");
 
-        // set profile image from firebase user
-        ImageView imageView = headerBinding.navHeaderImageView;
-        if (user != null) {
-            FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    User userData = task.getResult().getValue(User.class);
-                    if (userData != null && userData.getProfileImageBase64() != null) {
-                        Bitmap imageBitMap = ImageUtils.base64ToBitmap(userData.getProfileImageBase64());
-                        imageView.setImageBitmap(imageBitMap);
+            ImageView imageView = headerBinding.navHeaderImageView;
+            if (user != null) {
+                // Fetch additional user data (like profile image) from the database
+                FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        User userData = task.getResult().getValue(User.class);
+                        if (userData != null && userData.getProfileImageBase64() != null) {
+                            Bitmap imageBitMap = ImageUtils.base64ToBitmap(userData.getProfileImageBase64());
+                            imageView.setImageBitmap(imageBitMap);
+                        } else {
+                            imageView.setImageResource(R.drawable.ic_person);
+                        }
                     } else {
                         imageView.setImageResource(R.drawable.ic_person);
                     }
-                } else {
-                    imageView.setImageResource(R.drawable.ic_person);
-                }
-            });
-        } else {
-            imageView.setImageResource(R.drawable.ic_person);
+                });
+            } else {
+                imageView.setImageResource(R.drawable.ic_person);
+            }
         }
     }
 
+    /**
+     * Handles selection of items from the navigation drawer.
+     * @param item The selected MenuItem.
+     * @return True if the event was handled.
+     */
     private boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_logout) {
-            FirebaseHandler.getAuth().signOut();
+            FirebaseHandler.getInstance().signOut();
         } else if (id == R.id.nav_login) {
             LoginFragment loginFragment = new LoginFragment();
             loginFragment.show(getSupportFragmentManager(), "LoginFragment");
@@ -222,17 +259,14 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Requests POST_NOTIFICATIONS permission for Android 13+.
+     */
     private void askNotificationPermission() {
-        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            // FCM SDK (and your app) can post notifications.
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-            // TODO: display an educational UI explaining to the user the features that will be enabled
-            //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-            //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-            //       If the user selects "No thanks," allow the user to continue without notifications.
-        } else {
-            // Directly ask for the permission
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
         }
     }
 }

@@ -6,8 +6,10 @@ import java.util.HashMap;
 /**
  * A specialized Trie implementation that stores a string path for each word.
  * This is used to store discovered words and the sequence of board coordinates that form them.
+ * The path is typically encoded as a sequence of hexadecimal characters representing board indices.
  */
 public class PathTrie extends Trie<PathTrie>{
+    /** The path (sequence of board indices) associated with the word ending at this node. */
     private String path;
 
     /**
@@ -31,6 +33,7 @@ public class PathTrie extends Trie<PathTrie>{
 
     /**
      * Inserts a word and its associated path into the Trie.
+     * If the word already exists, its path is updated if a new one is provided.
      *
      * @param str  The word string to insert.
      * @param path The optional path string associated with the word.
@@ -47,6 +50,7 @@ public class PathTrie extends Trie<PathTrie>{
 
     /**
      * Converts the Trie into a Map where keys are words and values are their associated paths.
+     * This is useful for passing word data between different components or activities.
      *
      * @return A HashMap containing all words and their paths.
      */

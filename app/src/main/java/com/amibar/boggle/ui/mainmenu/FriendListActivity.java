@@ -31,16 +31,23 @@ import java.util.Map;
 
 /**
  * Activity for managing and viewing a user's friend list.
- * Allows users to search for others, add friends, and invite them to game rooms.
+ * Allows users to search for others by email, add friends, and invite them to game rooms.
+ * Uses Firebase Realtime Database for all persistence.
  */
 public class FriendListActivity extends AppCompatActivity {
 
+    /** Tag used for logging. */
     private static final String TAG = "FriendListActivity";
+    /** View binding for the activity. */
     private ActivityFriendlistBinding binding;
+    /** Adapter for the friends list RecyclerView. */
     private FriendAdapter adapter;
+    /** Local list of friend objects fetched from the database. */
     private final List<User> friendsList = new ArrayList<>();
+    /** Singleton instance of the FirebaseHandler. */
     private FirebaseHandler firebaseHandler;
 
+    /** Cached snapshot of all users for searching purposes. */
     private DataSnapshot usersSnapshot;
 
     @Override
@@ -57,17 +64,17 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Loads the global user list and the current user's friends list.
+     * Loads the global user list (for searching) and the current user's friends list.
      */
     private void loadUsers() {
         firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
             usersSnapshot = snapshot;
-        });
+        }).addOnFailureListener(e -> Log.e(TAG, "Failed to load users", e));
         loadFriends();
     }
 
     /**
-     * Initializes the RecyclerView for displaying friends.
+     * Initializes the RecyclerView for displaying friends and its adapter.
      */
     private void setupRecyclerView() {
         adapter = new FriendAdapter(this::showInviteDialog);
@@ -75,8 +82,8 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Displays a dialog to invite a friend to a specific game room.
-     * @param friend The user to invite.
+     * Displays a dialog to invite a friend to a specific game room by entering a code.
+     * @param friend The user object to invite.
      */
     private void showInviteDialog(User friend) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -91,6 +98,7 @@ public class FriendListActivity extends AppCompatActivity {
             String roomCode = input.getText().toString().trim();
             if (!roomCode.isEmpty()) {
                 sendInvitation(friend, roomCode);
+                // After sending, transition the host to the MainActivity which will open the room
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("roomCode", roomCode);
                 intent.putExtra("action", "host");
@@ -105,9 +113,10 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Sends a game invitation via Firebase.
+     * Sends a game invitation record to the recipient's invitations node in Firebase.
+     * This will trigger an FCM notification via the InvitationService.
      * @param friend   The recipient of the invitation.
-     * @param roomCode The room code to join.
+     * @param roomCode The room code the recipient should join.
      */
     private void sendInvitation(User friend, String roomCode) {
         String currentUserId = firebaseHandler.getCurrentUserId();
@@ -136,7 +145,7 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets up listeners for refresh and add friend buttons.
+     * Sets up click listeners for the refresh and add friend UI elements.
      */
     private void setupClickListeners() {
         binding.refreshButton.setOnClickListener(v -> {
@@ -147,7 +156,7 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Adds a selected user as a friend.
+     * Adds the currently searched user as a friend in the database.
      * @param view The clicked view.
      */
     private void addFriend(View view) {
@@ -158,11 +167,14 @@ public class FriendListActivity extends AppCompatActivity {
         }
         firebaseHandler.addFriend(friendId);
         binding.friendEmailInput.setText("");
-        Toast.makeText(this, "Friend request sent", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show();
+        
+        // Refresh local friend list
+        loadFriends();
     }
 
     /**
-     * Configures the search input field with live filtering of users.
+     * Configures the search input field with a TextWatcher for live user filtering.
      */
     private void setupSearchInput() {
         binding.friendEmailInput.addTextChangedListener(new TextWatcher() {
@@ -171,17 +183,21 @@ public class FriendListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (usersSnapshot == null) return;
+                
                 String query = s.toString().toLowerCase();
                 List<User> filteredList = new ArrayList<>();
                 for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
-                    if (userSnapshot.exists()) {
-                        User user = userSnapshot.getValue(User.class);
-                        if (user != null && user.getEmail().toLowerCase().contains(query)) {
+                    User user = userSnapshot.getValue(User.class);
+                    if (user != null && user.getEmail().toLowerCase().contains(query)) {
+                        // Don't show current user in search results
+                        if (!user.getUid().equals(firebaseHandler.getCurrentUserId())) {
                             filteredList.add(user);
                         }
                     }
                 }
                 filteredList.sort((u1, u2) -> u1.getDisplayName().compareToIgnoreCase(u2.getDisplayName()));
+                // Update data binding for the searched user UI
                 binding.setSearchedUser(filteredList.isEmpty() ? null : filteredList.get(0));
             }
 
@@ -191,7 +207,7 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Loads the current user's friend IDs and fetches their details.
+     * Loads the current user's friend list from Firebase.
      */
     private void loadFriends() {
         DatabaseReference userRef = firebaseHandler.getUserRef();
@@ -222,7 +238,7 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     /**
-     * Fetches detailed user data for a specific friend ID.
+     * Fetches details for a specific friend ID and updates the list.
      * @param friendId The UID of the friend to fetch.
      */
     private void fetchFriendData(String friendId) {
@@ -230,6 +246,7 @@ public class FriendListActivity extends AppCompatActivity {
                 .addOnSuccessListener(dataSnapshot -> {
                     User friend = dataSnapshot.getValue(User.class);
                     if (friend != null) {
+                        // Avoid duplicates in the local list
                         boolean exists = false;
                         for (User u : friendsList) {
                             if (u.getUid().equals(friend.getUid())) {

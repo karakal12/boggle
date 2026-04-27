@@ -32,7 +32,7 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     private static final String ARG_SOLUTIONS = "arg_solutions";
     /** Key for the found words list in the arguments bundle. */
     private static final String ARG_FOUND_WORDS = "arg_found_words";
-    /** Key for the score string in the arguments bundle. */
+    /** Key for the score value in the arguments bundle. */
     private static final String ARG_SCORE = "arg_score";
 
     /**
@@ -51,6 +51,7 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     /** Listener for word click events. */
     private OnWordClickListener listener;
 
+    /** View binding for the fragment layout. */
     private FragmentSingleplayerOnGameEndBinding binding;
 
     /**
@@ -67,7 +68,7 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
      *
      * @param solutions  Map of all possible words to their paths.
      * @param foundWords List of words found by the player.
-     * @param score      The final score string to display.
+     * @param score      The final score to display.
      * @return A configured SingleplayerOnGameEndFragment.
      */
     public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
@@ -85,7 +86,10 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         // Ensure arguments are present, as they are required for the dialog to function.
-        assert getArguments() != null;
+        if (getArguments() == null) {
+             return super.onCreateDialog(savedInstanceState);
+        }
+
         @SuppressWarnings("unchecked")
         Map<String, String> solutions = (Map<String, String>) getArguments().getSerializable(ARG_SOLUTIONS);
         List<String> foundWords = getArguments().getStringArrayList(ARG_FOUND_WORDS);
@@ -102,10 +106,12 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
         binding.setScore(score);
 
         if (solutions != null && foundWords != null) {
+            // Set up the RecyclerView with an adapter that highlights found words and handles clicks.
             binding.wordsList.setAdapter(new WordsAdapter(solutions, foundWords, (word, path) -> {
                 if (listener != null) {
                     listener.onWordClick(word, path);
                 }
+                // Dismiss the dialog once a word is selected to show its path on the board behind it.
                 dismiss();
             }));
         }
@@ -129,6 +135,7 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        // Set dialog width to match parent for better usability
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }

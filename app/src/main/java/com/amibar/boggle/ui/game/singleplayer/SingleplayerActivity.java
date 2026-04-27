@@ -27,7 +27,7 @@ import java.util.Locale;
  * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
  * and handles the end-of-game result reporting and summary display.
  */
-public class SingleplayerActivity extends AppCompatActivity implements SingleplayerOnGameEndFragment.OnWordClickListener {
+public class SingleplayerActivity extends AppCompatActivity {
 
     /** Tag used for logging and debugging purposes. */
     private static final String TAG = "SingleplayerActivity";
@@ -39,7 +39,9 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
     /** Key for passing the final score in an Intent result. */
     public static final String EXTRA_SCORE = "extra_score";
 
+    /** The underlying game engine instance. */
     private BoggleGame game;
+    /** Flag to track if the current game session has concluded. */
     private boolean isGameEnded = false;
 
     /**
@@ -93,6 +95,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
                     uploadGameResults(game);
                 }));
 
+        // Secret feature: Finding the word "donut" triggers a special renderer
         game.addOnWordFoundListener(word -> {
             if (word.equalsIgnoreCase("donut")){
                 game.stopTimer();
@@ -101,6 +104,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
             }
         });
 
+        // Handle back press: if game ended, show results; otherwise, allow default behavior
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -117,6 +121,7 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
     @Override
     protected void onResume() {
         super.onResume();
+        // Resume game timer if the game is still active
         if (game != null && !isGameEnded) {
             game.startTimer();
         }
@@ -166,13 +171,14 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
 
         // Initialize and display the custom dialog fragment
         try {
-            // Create fragment instance with the formatted word list and final score string
+            // Create fragment instance with the formatted word list and final score
             SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
                     game.getSolutions().toMap(),
                     game.getFoundWords(),
                     game.getScore()
             );
-            fragment.setOnWordClickListener(this);
+            // Allow user to click missed words to see their paths on the board
+            fragment.setOnWordClickListener((word, path) -> binding.boggleView.showSolution(path));
 
             // Use commitAllowingStateLoss to prevent crashes if the activity state was already saved
             getSupportFragmentManager().beginTransaction()
@@ -182,10 +188,5 @@ public class SingleplayerActivity extends AppCompatActivity implements Singlepla
             // Fallback to prevent app crash if fragment transaction fails
             Log.e(TAG, "Failed to show game end dialog", e);
         }
-    }
-
-    @Override
-    public void onWordClick(String word, String path) {
-        binding.boggleView.showSolution(path);
     }
 }

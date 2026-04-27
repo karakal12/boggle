@@ -4,7 +4,6 @@ import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 import com.amibar.boggle.data.Dictionary;
 import com.amibar.boggle.data.PathTrie;
-import com.amibar.boggle.data.Trie;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -20,17 +20,33 @@ import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+/**
+ * Adapter for displaying the list of words found by each player in a multiplayer game.
+ * It contains nested RecyclerViews (one per player) and synchronizes their horizontal scrolling.
+ */
 public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapter.ViewHolder> {
 
+    /** List of players whose words are being displayed. */
     private final List<User> players;
+    /** Map of each user to their list of found words. */
     private final HashMap<User, ArrayList<String>> playersWords;
+    /** Map of all valid words on the board to their paths. */
     private final HashMap<String, String> solutions;
+    /** Set of words that were found by more than one player. */
     private final Set<String> commonWords;
+    /** Inflater for creating item views. */
     private final LayoutInflater inflater;
+    /** Listener for word click events. */
     private final WordsAdapter.OnWordClickListener onWordClickListener;
 
+    /** Set of child RecyclerViews to synchronize scrolling across. */
     private final Set<RecyclerView> childRecyclerViews = Collections.newSetFromMap(new WeakHashMap<>());
+    /** Current horizontal scroll position to maintain consistency. */
     private int currentScrollX = 0;
+    
+    /**
+     * Scroll listener attached to child RecyclerViews to synchronize their horizontal movement.
+     */
     private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -38,7 +54,7 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
 
             currentScrollX += dx;
 
-            // only scroll if this view was scrolled by user and not another view
+            // Only propagate scroll if the user is actively dragging this specific view
             if (recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE){
                 for (RecyclerView rv : childRecyclerViews) {
                     if (rv != recyclerView) {
@@ -50,10 +66,23 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     };
 
 
+    /**
+     * Constructs a PlayersWordsAdapter.
+     * @param context Current context.
+     * @param playersWords Mapping of players to their words.
+     * @param solutions Map of all solutions.
+     */
     public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords, HashMap<String, String> solutions) {
         this(context, playersWords, solutions, null);
     }
 
+    /**
+     * Constructs a PlayersWordsAdapter with a click listener.
+     * @param context Current context.
+     * @param playersWords Mapping of players to their words.
+     * @param solutions Map of all solutions.
+     * @param onWordClickListener Callback for when a word is clicked.
+     */
     public PlayersWordsAdapter(Context context, HashMap<User, ArrayList<String>> playersWords, HashMap<String, String> solutions, WordsAdapter.OnWordClickListener onWordClickListener) {
         this.playersWords = playersWords;
         this.solutions = solutions;
@@ -63,6 +92,11 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
         this.onWordClickListener = onWordClickListener;
     }
 
+    /**
+     * Identifies words found by at least two different players.
+     * @param playersWords Mapping of users to their word lists.
+     * @return A set of common words.
+     */
     private Set<String> findCommonWords(HashMap<User, ArrayList<String>> playersWords) {
         Set<String> allWords = new HashSet<>();
         Set<String> common = new HashSet<>();
@@ -87,11 +121,14 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User player = players.get(position);
         holder.binding.setPlayerName(player.getDisplayName());
+        
         ArrayList<String> playerWords = playersWords.get(player);
         holder.binding.wordsList.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
+        // Setup inner adapter for this player's words
         holder.binding.wordsList.setAdapter(new WordsAdapter(solutions, playerWords, commonWords, onWordClickListener));
         holder.binding.executePendingBindings();
 
+        // Manage synchronized scrolling for the horizontal list
         RecyclerView innerRv = holder.binding.wordsList;
         childRecyclerViews.add(innerRv);
         innerRv.clearOnScrollListeners();
@@ -104,7 +141,11 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
         return players.size();
     }
 
+    /**
+     * ViewHolder for individual player score items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        /** Binding for the player score item. */
         final ItemPlayerScoreBinding binding;
         ViewHolder(ItemPlayerScoreBinding binding) {
             super(binding.getRoot());

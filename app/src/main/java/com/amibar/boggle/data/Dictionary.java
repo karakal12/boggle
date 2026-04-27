@@ -15,6 +15,8 @@ public final class Dictionary extends Trie<Dictionary>{
      * Singleton instance.
      */
     private static final Dictionary instance = new Dictionary();
+
+    /** Flag indicating if the dictionary has been loaded with words. */
     private boolean isInitialized = false;
 
 

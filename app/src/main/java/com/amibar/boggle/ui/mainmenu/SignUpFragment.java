@@ -36,15 +36,30 @@ import com.google.firebase.database.DatabaseReference;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * A DialogFragment that provides a sign-up interface for new users.
+ * Handles user creation with Firebase Authentication, profile image selection, 
+ * and storing user metadata in the Realtime Database.
+ */
 public class SignUpFragment extends DialogFragment {
-    FragmentSignUpBinding binding;
+    /** View binding for the fragment layout. */
+    private FragmentSignUpBinding binding;
 
+    /** Tag used for logging. */
     private static final String TAG = "SignUpFragment";
 
+    /** View for displaying the selected profile image. */
     private ImageView IVProfileImage;
-    private TextInputEditText ETDisplayName, ETEmail, ETPassword;
+    /** Input field for the display name. */
+    private TextInputEditText ETDisplayName;
+    /** Input field for the email address. */
+    private TextInputEditText ETEmail;
+    /** Input field for the password. */
+    private TextInputEditText ETPassword;
+    /** Uri of the profile image selected from the gallery. */
     private Uri selectedImageUri;
 
+    /** Launcher for the system photo picker. */
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 if (uri != null) {
@@ -55,6 +70,9 @@ public class SignUpFragment extends DialogFragment {
                 }
             });
 
+    /**
+     * Default constructor for SignUpFragment.
+     */
     public SignUpFragment() {
         // Required empty public constructor
     }
@@ -62,6 +80,7 @@ public class SignUpFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        // Set dialog width to match parent for a consistent UI
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -83,6 +102,9 @@ public class SignUpFragment extends DialogFragment {
         init();
     }
 
+    /**
+     * Initializes UI components and sets up click listeners for image selection and sign-up.
+     */
     private void init() {
         IVProfileImage = binding.IVProfileImage;
         Button btnSelectImage = binding.btnSelectImage;
@@ -98,6 +120,10 @@ public class SignUpFragment extends DialogFragment {
         signup_button.setOnClickListener(v -> createUser());
     }
 
+    /**
+     * Orchestrates the user creation process.
+     * Validates inputs, creates an account with Firebase Auth, and initiates profile updates.
+     */
     @SuppressWarnings("deprecation")
     private void createUser() {
         String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
@@ -123,10 +149,11 @@ public class SignUpFragment extends DialogFragment {
                             String base64Image = null;
                             if (selectedImageUri != null) {
                                 try {
+                                    // Convert selected image to Base64 for database storage
                                     base64Image = ImageUtils.uriToBase64(selectedImageUri, requireContext());
                                 } catch (IOException e) {
-                                    // Handle the exception by logging it and setting a default image
                                     Log.e(TAG, "Error converting image to Base64", e);
+                                    // Use default person icon if conversion fails
                                     base64Image = ImageUtils.bitmapToBase64(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person));
                                 }
                             }
@@ -147,6 +174,13 @@ public class SignUpFragment extends DialogFragment {
     }
 
 
+    /**
+     * Updates the user's Firebase Authentication profile with their chosen display name.
+     * @param user         The created FirebaseUser.
+     * @param displayName  The chosen display name.
+     * @param base64Image  The encoded profile image.
+     * @param pd           The progress dialog to update.
+     */
     @SuppressWarnings("deprecation")
     private void updateProfile(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
         pd.setMessage("Updating Profile...");
@@ -165,6 +199,10 @@ public class SignUpFragment extends DialogFragment {
                 });
     }
 
+    /**
+     * Retrieves the FCM token for the device before saving the final user record.
+     * This ensures the user is ready to receive notifications immediately.
+     */
     @SuppressWarnings("deprecation")
     private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
         pd.setMessage("Fetching FCM Token...");
@@ -179,6 +217,14 @@ public class SignUpFragment extends DialogFragment {
         });
     }
 
+    /**
+     * Saves the complete User object to the Firebase Realtime Database.
+     * @param user         The FirebaseUser.
+     * @param displayName  Display name.
+     * @param base64Image  Encoded image.
+     * @param fcmToken     Device token.
+     * @param pd           The progress dialog to dismiss.
+     */
     @SuppressWarnings("deprecation")
     private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
         pd.setMessage("Saving User Data...");

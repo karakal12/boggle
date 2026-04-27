@@ -5,39 +5,48 @@ import android.os.Handler;
 import android.os.Looper;
 
 /**
- * A utility class to manage a countdown timer.
- * Notifies a listener of progress every second.
+ * A utility class to manage a countdown timer for the Boggle game.
+ * It periodically notifies listeners of the elapsed time and executes a callback when the time is up.
+ * Implements {@link Runnable} to run on the main thread via a {@link Handler}.
  */
 public class Timer implements Runnable {
     /** The total duration of the timer in milliseconds. */
     private final long millisTime;
-    /** The system time when the timer was started. */
+    /** The system time when the timer was started or resumed. */
     private final long millisTimeBegan;
-    /** Handler to schedule the next update. */
+    /** Handler used to schedule the next periodic update on the main UI thread. */
     private final Handler handler = new Handler(Looper.getMainLooper());
+    /** Listener to be notified when the timer reaches its duration. */
     private final OnTimerEndListener onTimerEnd;
+    /** Listener to be notified on every tick (increment). */
     private final OnTickListener onTick;
+    /** Flag to track if the timer has been stopped or paused. */
     private boolean isStopped = false;
 
     /**
-     * Interface to receive a notification when the timer expires.
+     * Interface definition for a callback to be invoked when the timer expires.
      */
     public interface OnTimerEndListener{
+        /** Called when the elapsed time meets or exceeds the set duration. */
         void onTimerEnd();
     }
 
     /**
-     * Interface to receive a notification on every tick.
+     * Interface definition for a callback to be invoked on every timer tick.
      */
     public interface OnTickListener {
+        /**
+         * Called periodically to report progress.
+         * @param elapsedTime The total time in milliseconds since the timer started.
+         */
         void onTick(long elapsedTime);
     }
 
     /**
-     * Initializes a new Timer.
-     * @param timeInMillis The total countdown time in milliseconds.
-     * @param onTick Callback executed on every tick.
-     * @param onTimerEnd Callback executed when the timer reaches zero.
+     * Initializes a new Timer with the specified duration and callbacks.
+     * @param timeInMillis The total duration in milliseconds.
+     * @param onTick       Callback for periodic updates.
+     * @param onTimerEnd   Callback for completion.
      */
     public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd) {
         this.millisTimeBegan = System.currentTimeMillis();
@@ -47,7 +56,8 @@ public class Timer implements Runnable {
     }
 
     /**
-     * Updates the state and schedules the next execution.
+     * The main execution loop of the timer.
+     * Calculates elapsed time, notifies listeners, and schedules the next tick.
      */
     @Override
     public void run() {
@@ -55,21 +65,26 @@ public class Timer implements Runnable {
 
         long elapsedTime = System.currentTimeMillis() - millisTimeBegan;
 
-        // Notify listener of progress
-        onTick.onTick(elapsedTime);
+        // Notify listener of the current progress
+        if (onTick != null) {
+            onTick.onTick(elapsedTime);
+        }
         
-        // Check if timer finished
+        // Check if the timer has reached its final duration
         if (elapsedTime >= millisTime) {
-            onTimerEnd.onTimerEnd();
+            if (onTimerEnd != null) {
+                onTimerEnd.onTimerEnd();
+            }
             return;
         }
         
-        // Schedule next update precisely at the turn of the next second
+        // Schedule the next update.
+        // The delay is calculated to align the next tick precisely with the next whole second boundary.
         handler.postDelayed(this, 1000L - (elapsedTime % 1000L));
     }
 
     /**
-     * Starts the timer execution.
+     * Starts or resumes the timer.
      */
     public void start(){
         isStopped = false;
@@ -77,7 +92,7 @@ public class Timer implements Runnable {
     }
 
     /**
-     * Stops the timer and cancels any pending updates.
+     * Stops the timer and cancels any pending scheduled updates.
      */
     public void stop() {
         isStopped = true;

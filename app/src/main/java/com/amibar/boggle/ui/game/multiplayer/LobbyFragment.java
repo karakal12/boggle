@@ -26,19 +26,39 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment that displays the multiplayer lobby.
+ * It shows the list of players currently in the room and allows the host to start the game.
+ * It listens for changes in the Firebase room data to update the player list and detect game start.
+ */
 public class LobbyFragment extends Fragment {
+    /** Tag used for identifying this fragment. */
     public static final String TAG = "LobbyFragment";
 
+    /** View binding for fragment layout. */
     private FragmentLobbyBinding binding;
+    /** Adapter for the player list RecyclerView. */
     private PlayerAdapter playerAdapter;
+    /** Local list of users currently in the lobby. */
     private final List<User> playerList = new ArrayList<>();
 
+    /** The unique code for the current game room. */
     private String roomCode;
+    /** The role of the local player (HOST or GUEST). */
     private PlayerRole playerRole;
+    /** The local player's user data. */
     private User player;
+    /** Reference to the room's node in Firebase Realtime Database. */
     private DatabaseReference roomRef;
+    /** Listener for player list and game start updates in Firebase. */
     private ValueEventListener playerListener;
 
+    /**
+     * Creates a new instance of LobbyFragment.
+     * @param roomCode The code of the room to join.
+     * @param playerRole The role of the player.
+     * @return A new instance.
+     */
     public static LobbyFragment newInstance(String roomCode, PlayerRole playerRole) {
         LobbyFragment fragment = new LobbyFragment();
         Bundle args = new Bundle();
@@ -59,12 +79,12 @@ public class LobbyFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // set up the RecyclerView and adapter
+        // Set up the RecyclerView and adapter for displaying players
         binding.playerList.setLayoutManager(new LinearLayoutManager(requireContext()));
         playerAdapter = new PlayerAdapter(playerList);
         binding.playerList.setAdapter(playerAdapter);
 
-        // get the room code from the arguments
+        // Extract room code and player role from arguments
         Bundle args = getArguments();
         if (args != null) {
             roomCode = args.getString(ARG_ROOM_CODE);
@@ -75,9 +95,10 @@ public class LobbyFragment extends Fragment {
             }
         }
         
-        // Get player data from FirebaseHandler to avoid large Binder transactions
+        // Retrieve local player data from FirebaseHandler
         player = FirebaseHandler.getInstance().getUserData();
 
+        // Only the host can see and click the "Start Game" button
         if (playerRole == PlayerRole.HOST) {
             binding.startButton.setVisibility(View.VISIBLE);
             binding.startButton.setOnClickListener(this::startGame);
@@ -85,7 +106,7 @@ public class LobbyFragment extends Fragment {
             binding.startButton.setVisibility(View.GONE);
         }
 
-        // Initialize Firebase reference and start listening for players
+        // Connect to Firebase and register as a player in this room
         if (roomCode != null) {
             roomRef = FirebaseHandler.getInstance().getRootRef().child("rooms").child(roomCode);
             listenForPlayers();
@@ -93,17 +114,23 @@ public class LobbyFragment extends Fragment {
             if (player != null) {
                 DatabaseReference myPlayerRef = roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId());
                 myPlayerRef.setValue(player);
-                // Ensure the player is removed if they disconnect abruptly
+                // Ensure the player is removed from the room list if they disconnect or close the app
                 myPlayerRef.onDisconnect().removeValue();
             }
         }
     }
 
+    /**
+     * Attaches a listener to the Firebase room reference.
+     * Updates the player list when players join/leave and navigates to the game when started.
+     */
     private void listenForPlayers() {
         playerListener = new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded()) return;
+
                 playerList.clear();
                 DataSnapshot playersSnapshot = snapshot.child("players");
                 for (DataSnapshot playerSnapshot : playersSnapshot.getChildren()) {
@@ -114,18 +141,16 @@ public class LobbyFragment extends Fragment {
                 }
                 playerAdapter.notifyDataSetChanged();
                 
-                // Check if the game has started
+                // If the host has marked the game as started, transition to the game fragment
                 Boolean gameStarted = snapshot.child("gameStarted").getValue(Boolean.class);
                 if (Boolean.TRUE.equals(gameStarted)) {
-                    if (isAdded()) {
-                        ((MultiplayerActivity) requireActivity()).startGame();
-                    }
+                    ((MultiplayerActivity) requireActivity()).startGame();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
+                // Potential error handling
             }
         };
         roomRef.addValueEventListener(playerListener);
@@ -134,12 +159,18 @@ public class LobbyFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Remove the Firebase listener when the view is destroyed to avoid memory leaks
         if (roomRef != null && playerListener != null) {
             roomRef.removeEventListener(playerListener);
         }
         binding = null;
     }
 
+    /**
+     * Sets the 'gameStarted' flag to true in Firebase.
+     * This is only callable by the host.
+     * @param view The clicked view.
+     */
     private void startGame(View view) {
         if (playerRole == PlayerRole.HOST && roomRef != null) {
             roomRef.child("gameStarted").setValue(true);

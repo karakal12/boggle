@@ -35,15 +35,23 @@ import java.util.Map;
  * listens for game completion, and handles real-time updates for found words.
  */
 public class MultiplayerGameFragment extends Fragment {
+    /** Tag used for logging and fragment identification. */
     public static final String TAG = "MultiplayerGameFragment";
     
+    /** View binding for the fragment layout. */
     private FragmentMultiplayerGameBinding binding;
+    /** The code of the current multiplayer room. */
     private String roomCode;
+    /** The role of the local player (HOST or GUEST). */
     private PlayerRole playerRole;
 
+    /** Reference to the room node in Firebase Realtime Database. */
     private DatabaseReference roomRef;
+    /** Listener for the game board string in Firebase. */
     private ValueEventListener boardListener;
+    /** Listener for the game end flag in Firebase. */
     private ValueEventListener gameEndListener;
+    /** Listener to detect if the room is deleted from outside. */
     private ChildEventListener gameDestroyedListener;
 
     /**
