@@ -71,13 +71,6 @@ dependencies {
 }
 
 afterEvaluate {
-    /**
-     * Generate Javadoc using the debug variant's configuration.
-     * To resolve "package does not exist" errors for generated code like ViewBinding or DataBinding,
-     * we must include the compiled classes in the Javadoc classpath.
-     *
-     * @author Gemini AI
-     */
     tasks.register<Javadoc>("generateJavadoc") {
         group = "documentation"
         description = "Generates Javadoc for the debug variant."
