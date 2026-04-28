@@ -7,31 +7,23 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 /**
- * Singleton Trie (Prefix Tree) implementation representing the game dictionary.
+ * Trie (Prefix Tree) implementation representing the game dictionary.
  * Inherits from {@link Trie} to store words efficiently and allow for fast lookups.
  */
 public final class Dictionary extends Trie<Dictionary>{
     /**
-     * Singleton instance.
+     * Static root instance of the dictionary.
      */
-    private static final Dictionary instance = new Dictionary();
+    public static final Dictionary ROOT = new Dictionary();
 
     /** Flag indicating if the dictionary has been loaded with words. */
     private boolean isInitialized = false;
 
 
     /**
-     * Private constructor for singleton pattern.
+     * Public constructor for Dictionary.
      */
-    private Dictionary() {}
-
-    /**
-     * Returns the singleton instance of the Dictionary.
-     * @return The Dictionary instance.
-     */
-    public static Dictionary getInstance() {
-        return instance;
-    }
+    public Dictionary() {}
 
 
     /**

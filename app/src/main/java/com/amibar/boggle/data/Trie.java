@@ -4,10 +4,8 @@ import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -29,10 +27,6 @@ public abstract class Trie<T extends Trie<T>> {
 
     /** Flag indicating if this node has no children. */
     protected volatile boolean isLeaf;
-
-
-    /** Atomic integer to track the number of words stored in the subtree rooted at this node. */
-    protected final AtomicInteger size = new AtomicInteger(0);
 
     /**
      * Initializes a new Trie node as a leaf and not an end-of-word.
@@ -83,7 +77,6 @@ public abstract class Trie<T extends Trie<T>> {
             }
         }
         return node;
-
     }
 
     /**
@@ -91,32 +84,29 @@ public abstract class Trie<T extends Trie<T>> {
      * This allows the generic Trie to create nodes of the correct subclass (e.g., PathTrie).
      *
      * @param ch The character ('a' to 'z').
+     * @return the node that was added or null if the character is out of range.
      */
     @SuppressWarnings("unchecked")
-    public void put(char ch){
-        ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-        assert genericSuperclass != null : "Failed to instantiate Trie node";
-        Class<T> type = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
+    public T putIfAbsent(char ch){
+        int index = ch - 'a';
+        if (index < 0 || index >= ALPHABET_SIZE) return null;
+        if (containsKey(ch)) return get(ch);
+
+        T newNode;
         try {
-            Constructor<T> constructor = type.getDeclaredConstructor();
-            put(ch, constructor.newInstance());
+            ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+            assert genericSuperclass != null : "Failed to instantiate Trie node";
+            Class<T> type = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
+            newNode = type.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Failed to instantiate Trie node", e);
         }
-    }
 
-    /**
-     * Adds or updates a child node for a given character.
-     * Sets the leaf flag to false upon adding a child.
-     *
-     * @param ch   The character ('a' to 'z').
-     * @param node The node to associate with the character.
-     */
-    public void put(char ch, T node) {
-        int index = ch - 'a';
-        if (index >= 0 && index < ALPHABET_SIZE) {
-            children.set(index, node);
+        if (children.compareAndSet(index, null, newNode)) {
             isLeaf = false;
+            return newNode;
+        } else {
+            return children.get(index);
         }
     }
 
@@ -129,20 +119,13 @@ public abstract class Trie<T extends Trie<T>> {
      */
     @SuppressWarnings("unchecked")
     public T put(String str){
-        T existing = get(str);
-        if (existing != null && existing.isEndOfWord()) return existing;
-
         T node = (T) this;
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             if (ch < 'a' || ch > 'z') continue;
-            if (node.get(ch) == null) {
-                node.put(ch);
-            }
-            node.size.incrementAndGet();
-            node = node.get(ch);
+            node = node.putIfAbsent(ch);
         }
-        node.setEndOfWord(true);
+        node.isEndOfWord = true;
         return node;
     }
 
@@ -180,7 +163,14 @@ public abstract class Trie<T extends Trie<T>> {
      * @return Total word count.
      */
     public int size() {
-        return size.get();
+        int toAdd = isEndOfWord ? 1: 0;
+        for (int i = 0; i < ALPHABET_SIZE; i++) {
+            T child = children.get(i);
+            if (child != null) {
+                toAdd += child.size();
+            }
+        }
+        return toAdd;
     }
 
     /**
@@ -190,7 +180,7 @@ public abstract class Trie<T extends Trie<T>> {
      */
     public Set<String> getWords(){
         Set<String> words = new ArraySet<>(size());
-        getWordsRec("", words);
+        _getWords("", words);
         return words;
     }
 
@@ -200,7 +190,7 @@ public abstract class Trie<T extends Trie<T>> {
      * @param word The prefix string accumulated so far.
      * @param set  The set to add discovered words to.
      */
-    protected void getWordsRec(String word, Set<String> set) {
+    protected void _getWords(String word, Set<String> set) {
         if (isEndOfWord()) {
             set.add(word);
         }
@@ -208,7 +198,7 @@ public abstract class Trie<T extends Trie<T>> {
         for (int i = 0; i < ALPHABET_SIZE; i++) {
             T child = children.get(i);
             if (child != null) {
-                child.getWordsRec(word + (char)(i + 'a'), set);
+                child._getWords(word + (char)(i + 'a'), set);
             }
         }
     }

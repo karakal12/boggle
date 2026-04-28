@@ -110,9 +110,9 @@ public class BoggleGame {
         this.selectedIndices = new ArrayDeque<>();
         this.gameEnded = false;
 
-        // Solve the board using the GameSolver and the dictionary singleton.
+        // Solve the board using the GameSolver and the dictionary root.
         // This is done upfront to provide immediate feedback on word validity during the game.
-        GameSolver.SolverResult result = new GameSolver().solve(getDice(), Dictionary.getInstance());
+        GameSolver.SolverResult result = new GameSolver().solve(getDice(), Dictionary.ROOT);
         solutions = result.solutions();
         allPaths = result.allPaths();
         Log.d("BoggleGame", "Found " + solutions.size() + " solutions and " + allPaths.size() + " total paths");
@@ -340,7 +340,7 @@ public class BoggleGame {
             return ALREADY_FOUND;
         }
         // Check if word exists in the dictionary. Using solutions trie would also work and be faster.
-        if (Dictionary.getInstance().contains(formedWord)) {
+        if (Dictionary.ROOT.contains(formedWord)) {
             score += wordScore(formedWord);
             foundWords.add(formedWord);
             for (OnWordFoundListener listener : onWordFoundListeners) {
