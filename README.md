@@ -10,6 +10,12 @@
 
 ## קבצי הפרוייקט
 
+| קבצי קוד | קבצי משאב |
+| :---: | :---: |
+| ![code files](https://github.com/user-attachments/assets/e715ff5f-a94b-4a83-89f1-e172fc92c3ce) | ![res files](https://github.com/user-attachments/assets/b1503308-0418-4e0a-a403-ef0054967a96) |
+
+
+
 ## מסכי הפרוייקט
 
 ## תרשים זרימת מסכים
