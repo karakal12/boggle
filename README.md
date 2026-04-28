@@ -306,10 +306,93 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 </manifest>
 ```
 ## תיאור מחלקות UML
+<img width="7160" height="2386" alt="UML Chart" src="https://github.com/user-attachments/assets/4e7f9871-8ec7-4ce1-a1c3-4314dffc1ff8" />
+
+### פירוק לחלקים:
+
+מסך ראשי:
+<img width="1710" height="838" alt="Main Menu" src="https://github.com/user-attachments/assets/b6017e9f-272c-4185-8e34-7835dc67f12a" />
+
+לוגיקת משחק:
+<img width="984" height="624" alt="Game logic" src="https://github.com/user-attachments/assets/e172fbb0-0df4-4ee7-bb3f-0174f94c62ff" />
+
+מחלקות עזר:
+<img width="1629" height="1074" alt="Utility classes" src="https://github.com/user-attachments/assets/7154cd94-94ec-4497-b667-f67e31ae83e9" />
+
+מרובה שחקנים:
+<img width="3705" height="1345" alt="Multiplayer Logic" src="https://github.com/user-attachments/assets/50fbdacd-e711-42aa-bad8-cabdf27b3d51" />
+
+שחקן יחיד:
+<img width="1201" height="842" alt="Singleplayer" src="https://github.com/user-attachments/assets/9c46cfbd-2d32-4f9d-8137-2b1c5fb5a298" />
+
+ביצת הפתעה (דונאט מסתובב):
+<img width="577" height="465" alt="Donut easter egg" src="https://github.com/user-attachments/assets/d9e0774a-4b74-4958-9024-6935ef04ccad" />
+
+
+
 
 ## בסיס נתונים
 
 ## פונקציות שרת
+
+``` node.js
+const {setGlobalOptions} = require("firebase-functions");
+
+setGlobalOptions({maxInstances: 10});
+
+const functions = require("firebase-functions");
+const { onValueCreated } = require("firebase-functions/v2/database");
+const admin = require("firebase-admin");
+admin.initializeApp();
+
+// eslint-disable-next-line max-len
+exports.sendInvitationNotification = onValueCreated(
+    {
+        ref: "/invitations/{targetUserId}/{invitationId}",
+        region: "europe-west1",
+        instance: "idk-a-school-project-or-smth-default-rtdb"
+    },
+    async (event) => {
+        // get everything from the single 'event' object
+        const targetUserId = event.params.targetUserId;
+        const invitationData = event.data.val();
+
+        try {
+            // eslint-disable-next-line max-len
+            const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
+            const fcmToken = tokenSnapshot.val();
+
+            if (!fcmToken) {
+                console.log("No FCM token found for user: ", targetUserId);
+                // keep the invitation even if notification fails so user can see it manually
+                return null;
+            }
+
+            const payload = {
+                notification: {
+                    title: `New Invite from ${invitationData.senderName}`,
+                    // eslint-disable-next-line max-len
+                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
+                },
+                data: {
+                    roomCode: String(invitationData.roomCode),
+                    invitationId: String(event.params.invitationId)
+                },
+                token: fcmToken,
+            };
+
+            const response = await admin.messaging().send(payload);
+            console.log("Successfully sent invitation with room code:", response);
+
+            return null;
+        } catch (e) {
+            console.error("Error sending notification:", e);
+            return null;
+        }
+    }
+);
+```
+מטרה: כאשר נכתבת הזמנה למסד הנתונים, תשלח הודעה לשחקן שהוזמן כדי שתקפוץ לו בטלפון התרעה
 
 ## מחלקות הפרוייקט
 
