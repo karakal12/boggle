@@ -112,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("roomCode")) {
             String roomCode = intent.getStringExtra("roomCode");
             if (roomCode != null && !roomCode.isEmpty()) {
-                PlayerRole role = PlayerRole.HOST;
+                PlayerRole role = PlayerRole.host;
                 if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){
-                    role = PlayerRole.GUEST;
+                    role = PlayerRole.guest;
                 }
                 JoinOrCreateRoomFragment.newInstance(roomCode, role)
                         .show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);

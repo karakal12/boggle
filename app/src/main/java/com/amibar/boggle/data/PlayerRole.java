@@ -5,7 +5,7 @@ package com.amibar.boggle.data;
  */
 public enum PlayerRole {
     /** The player who created the room and starts the game. */
-    HOST,
+    host,
     /** A player who joined an existing room. */
-    GUEST
+    guest
 }

@@ -99,7 +99,7 @@ public class LobbyFragment extends Fragment {
         player = FirebaseHandler.getInstance().getUserData();
 
         // Only the host can see and click the "Start Game" button
-        if (playerRole == PlayerRole.HOST) {
+        if (playerRole == PlayerRole.host) {
             binding.startButton.setVisibility(View.VISIBLE);
             binding.startButton.setOnClickListener(this::startGame);
         } else {
@@ -172,7 +172,7 @@ public class LobbyFragment extends Fragment {
      * @param view The clicked view.
      */
     private void startGame(View view) {
-        if (playerRole == PlayerRole.HOST && roomRef != null) {
+        if (playerRole == PlayerRole.host && roomRef != null) {
             roomRef.child("gameStarted").setValue(true);
         }
     }

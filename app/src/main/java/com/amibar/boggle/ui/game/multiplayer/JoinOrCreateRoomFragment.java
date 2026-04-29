@@ -84,16 +84,16 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
         if (getArguments() == null) return;
         if (!getArguments().containsKey(ARG_INITIAL_ROOM_CODE)) return;
         
-        PlayerRole role = PlayerRole.valueOf(getArguments().getString(ARG_INITIAL_PLAYER_ROLE, PlayerRole.HOST.toString()));
+        PlayerRole role = PlayerRole.valueOf(getArguments().getString(ARG_INITIAL_PLAYER_ROLE, PlayerRole.host.toString()));
         String initialRoomCode = getArguments().getString(ARG_INITIAL_ROOM_CODE);
         
         binding.roomCodeTV.setText(initialRoomCode);
         binding.roomCodeTIL.setVisibility(View.VISIBLE);
         
         // Toggle visibility based on the intended role
-        binding.createRoom.setVisibility(role == PlayerRole.HOST ? View.VISIBLE: View.GONE);
+        binding.createRoom.setVisibility(role == PlayerRole.host ? View.VISIBLE: View.GONE);
         binding.createRoom.setOnClickListener(this::createRoom);
-        binding.joinRoom.setVisibility(role == PlayerRole.GUEST  ? View.VISIBLE: View.GONE);
+        binding.joinRoom.setVisibility(role == PlayerRole.guest ? View.VISIBLE: View.GONE);
         binding.joinRoom.setOnClickListener(this::joinRoom);
     }
 
@@ -119,7 +119,7 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
      * @param view The clicked view.
      */
     private void createRoom(View view) {
-        Intent intent = makeIntent(PlayerRole.HOST);
+        Intent intent = makeIntent(PlayerRole.host);
         if (intent != null) {
             startActivity(intent);
         }
@@ -141,7 +141,7 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
         roomRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 // Room exists, proceed to join as GUEST
-                Intent intent = makeIntent(PlayerRole.GUEST);
+                Intent intent = makeIntent(PlayerRole.guest);
                 if (intent != null) {
                     startActivity(intent);
                     dismiss();

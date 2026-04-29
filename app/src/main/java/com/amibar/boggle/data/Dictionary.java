@@ -21,9 +21,11 @@ public final class Dictionary extends Trie<Dictionary>{
 
 
     /**
-     * Public constructor for Dictionary.
+     * Private constructor for Dictionary.
      */
-    public Dictionary() {}
+    private Dictionary() {
+        super();
+    }
 
 
     /**
@@ -32,8 +34,8 @@ public final class Dictionary extends Trie<Dictionary>{
      * @param word The word to search for.
      * @return True if the word is present and valid, false otherwise.
      */
-    public boolean contains(@NonNull String word) {
-        Trie<?> node = get(word);
+    public static boolean contains(@NonNull String word) {
+        Trie<?> node = ROOT.get(word);
         return node != null && node.isEndOfWord();
     }
 
@@ -49,18 +51,10 @@ public final class Dictionary extends Trie<Dictionary>{
         while (sc.hasNextLine()) {
             String word = sc.nextLine().trim().toLowerCase();
             if (!word.isEmpty()) {
-                insert(word);
+                put(word);
             }
         }
         sc.close();
         isInitialized = true;
-    }
-
-    /**
-     * Inserts a word into the Trie structure.
-     * @param word The word to insert.
-     */
-    private void insert(@NonNull String word) {
-        put(word);
     }
 }

@@ -101,7 +101,7 @@ public class MultiplayerGameFragment extends Fragment {
         listenForGameEnd();
         listenForGameDestroyed();
 
-        if (playerRole == PlayerRole.HOST) {
+        if (playerRole == PlayerRole.host) {
             // The Host is responsible for generating the game board and sharing it
             BoggleGame game = binding.boggleView.newGame();
             roomRef.child("board").setValue(new String(game.getBoard()))
@@ -254,7 +254,7 @@ public class MultiplayerGameFragment extends Fragment {
         
         // Listen for game end (timer expire)
         game.addOnGameEndListener(() -> {
-            if (playerRole == PlayerRole.HOST) {
+            if (playerRole == PlayerRole.host) {
                 // Host marks the game as ended globally in Firebase
                 roomRef.child("gameEnded").setValue(true);
             }

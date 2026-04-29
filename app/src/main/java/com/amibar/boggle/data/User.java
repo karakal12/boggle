@@ -8,7 +8,7 @@ import java.io.Serializable;
  * interacting with Firebase Realtime Database.
  */
 @SuppressWarnings("unused")
-public class User implements Serializable {
+public class User {
     /** The user's unique ID. */
     private String uid;
     /** The user's chosen display name. */

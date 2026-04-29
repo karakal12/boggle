@@ -11,7 +11,6 @@ import android.util.Log;
 import com.amibar.boggle.R;
 import com.amibar.boggle.data.Dictionary;
 import com.amibar.boggle.data.PathTrie;
-import com.amibar.boggle.data.Trie;
 import com.amibar.boggle.utils.Timer;
 
 import java.util.ArrayDeque;
@@ -340,7 +339,7 @@ public class BoggleGame {
             return ALREADY_FOUND;
         }
         // Check if word exists in the dictionary. Using solutions trie would also work and be faster.
-        if (Dictionary.ROOT.contains(formedWord)) {
+        if (Dictionary.contains(formedWord)) {
             score += wordScore(formedWord);
             foundWords.add(formedWord);
             for (OnWordFoundListener listener : onWordFoundListeners) {

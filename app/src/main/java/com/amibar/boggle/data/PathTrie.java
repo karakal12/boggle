@@ -61,15 +61,4 @@ public class PathTrie extends Trie<PathTrie>{
         }
         return map;
     }
-
-    /**
-     * Returns a string representation of the words in the Trie.
-     *
-     * @return A string containing all stored words.
-     */
-    @NonNull
-    @Override
-    public String toString() {
-        return toMap().keySet().toString();
-    }
 }
