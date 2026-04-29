@@ -10,6 +10,12 @@
 
 ## קבצי הפרוייקט
 
+| קבצי קוד | קבצי משאב |
+| :---: | :---: |
+| ![code files](https://github.com/user-attachments/assets/e715ff5f-a94b-4a83-89f1-e172fc92c3ce) | ![res files](https://github.com/user-attachments/assets/b1503308-0418-4e0a-a403-ef0054967a96) |
+
+
+
 ## מסכי הפרוייקט
 
 ## תרשים זרימת מסכים
@@ -92,6 +98,58 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+afterEvaluate {
+    tasks.register<Javadoc>("generateJavadoc") {
+        group = "documentation"
+        description = "Generates Javadoc for the debug variant."
+
+        val debugVariant = android.applicationVariants.find { it.name == "debug" }
+        if (debugVariant != null) {
+            val javaCompile = debugVariant.javaCompileProvider.get()
+            
+            // Source files from the variant (includes manual and some generated sources)
+            source = javaCompile.source
+            
+            // Classpath must include:
+            // 1. All dependencies (javaCompile.classpath)
+            // 2. Android SDK (android.bootClasspath)
+            // 3. Compiled classes of the module (javaCompile.destinationDir) 
+            //    This is crucial for Javadoc to resolve symbols from generated classes.
+            classpath = javaCompile.classpath + 
+                        files(android.bootClasspath) + 
+                        files(javaCompile.destinationDirectory)
+            
+            // Ensure the project is compiled so all generated classes are available
+            dependsOn(javaCompile)
+        }
+
+        // We change the destination to a non-ignored folder so it can be committed to GitHub.
+        destinationDir = file("${project.rootDir}/docs/javadoc")
+
+        options {
+            (this as StandardJavadocDocletOptions).apply {
+                encoding = "UTF-8"
+                // Link to online Android documentation.
+                // Added a trailing slash to ensure Javadoc tool resolves it correctly.
+                links("https://developer.android.com/reference/")
+                
+                // Removed the problematic Firebase link as it lacks a valid package-list/element-list 
+                // at the expected location, which was causing the FileNotFoundException.
+
+                // Silence linting errors that often break Javadoc on Android
+                addStringOption("Xdoclint:none", "-quiet")
+            }
+        }
+
+        // Exclude internal/generated classes from the final documentation output
+        exclude("**/R.java", "**/BuildConfig.java", "**/databinding/**", "**/BR.java")
+        
+        // Javadoc often encounters errors with Android's complex dependency graph; 
+        // we set this to false to allow the task to complete even with minor resolution warnings.
+        isFailOnError = false
+    }
 }
 ```
 רמת פרוייקט:
@@ -254,10 +312,93 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 </manifest>
 ```
 ## תיאור מחלקות UML
+<img width="7160" height="2386" alt="UML Chart" src="https://github.com/user-attachments/assets/4e7f9871-8ec7-4ce1-a1c3-4314dffc1ff8" />
+
+### פירוק לחלקים:
+
+מסך ראשי:
+<img width="1710" height="838" alt="Main Menu" src="https://github.com/user-attachments/assets/b6017e9f-272c-4185-8e34-7835dc67f12a" />
+
+לוגיקת משחק:
+<img width="984" height="624" alt="Game logic" src="https://github.com/user-attachments/assets/e172fbb0-0df4-4ee7-bb3f-0174f94c62ff" />
+
+מחלקות עזר:
+<img width="1629" height="1074" alt="Utility classes" src="https://github.com/user-attachments/assets/7154cd94-94ec-4497-b667-f67e31ae83e9" />
+
+מרובה שחקנים:
+<img width="3705" height="1345" alt="Multiplayer Logic" src="https://github.com/user-attachments/assets/50fbdacd-e711-42aa-bad8-cabdf27b3d51" />
+
+שחקן יחיד:
+<img width="1201" height="842" alt="Singleplayer" src="https://github.com/user-attachments/assets/9c46cfbd-2d32-4f9d-8137-2b1c5fb5a298" />
+
+ביצת הפתעה (דונאט מסתובב):
+<img width="577" height="465" alt="Donut easter egg" src="https://github.com/user-attachments/assets/d9e0774a-4b74-4958-9024-6935ef04ccad" />
+
+
+
 
 ## בסיס נתונים
 
 ## פונקציות שרת
+
+``` node.js
+const {setGlobalOptions} = require("firebase-functions");
+
+setGlobalOptions({maxInstances: 10});
+
+const functions = require("firebase-functions");
+const { onValueCreated } = require("firebase-functions/v2/database");
+const admin = require("firebase-admin");
+admin.initializeApp();
+
+// eslint-disable-next-line max-len
+exports.sendInvitationNotification = onValueCreated(
+    {
+        ref: "/invitations/{targetUserId}/{invitationId}",
+        region: "europe-west1",
+        instance: "idk-a-school-project-or-smth-default-rtdb"
+    },
+    async (event) => {
+        // get everything from the single 'event' object
+        const targetUserId = event.params.targetUserId;
+        const invitationData = event.data.val();
+
+        try {
+            // eslint-disable-next-line max-len
+            const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
+            const fcmToken = tokenSnapshot.val();
+
+            if (!fcmToken) {
+                console.log("No FCM token found for user: ", targetUserId);
+                // keep the invitation even if notification fails so user can see it manually
+                return null;
+            }
+
+            const payload = {
+                notification: {
+                    title: `New Invite from ${invitationData.senderName}`,
+                    // eslint-disable-next-line max-len
+                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
+                },
+                data: {
+                    roomCode: String(invitationData.roomCode),
+                    invitationId: String(event.params.invitationId)
+                },
+                token: fcmToken,
+            };
+
+            const response = await admin.messaging().send(payload);
+            console.log("Successfully sent invitation with room code:", response);
+
+            return null;
+        } catch (e) {
+            console.error("Error sending notification:", e);
+            return null;
+        }
+    }
+);
+```
+מטרה: כאשר נכתבת הזמנה למסד הנתונים, תשלח הודעה לשחקן שהוזמן כדי שתקפוץ לו בטלפון התרעה
 
 ## מחלקות הפרוייקט
 
@@ -265,7 +406,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [] הסבר
 
-#### `abstract class Trie<T extends Trie<T>`
+#### `public abstract class Trie<T extends Trie<T>`
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
 שדות המחלקה:
@@ -281,17 +422,338 @@ protected volatile boolean isEndOfWord;
 
 /** Flag indicating if this node has no children. */
 protected volatile boolean isLeaf;
-
-
-/** Atomic integer to track the number of words stored in the subtree rooted at this node. */
-protected final AtomicInteger size = new AtomicInteger(0);
 ```
 תכונות המחלקה:
 ``` java
-- isEndOfWord - from IsEndOfWord()
-- isLeaf - from IsLeaf()
-- words - from getWords()
-- string representation - from toString()
+- boolean isEndOfWord
+- boolean isLeaf
+- Set<String> words
+- int size
+- toString()
 ```
 
 פעולות המחלקה:
+``` java
+public boolean containsKey(char ch) {
+    int index = ch - 'a';
+    return index >= 0 && index < ALPHABET_SIZE && children.get(index) != null;
+}
+```
+בודק ומחזיר האם יש ילד ב"כיוון" של האות
+
+``` java
+public T get(char ch) {
+    int index = ch - 'a';
+    if (index < 0 || index >= ALPHABET_SIZE) return null;
+    return children.get(index);
+}
+```
+מחזיר את הילד בכיוון של אות, או null אם לא קיים, או אם מחוץ לתחום.
+
+``` java
+public T get(String s){
+    T node = (T) this;
+    for (int i = 0; i < s.length(); i++) {
+        char ch = s.charAt(i);
+        if (node.containsKey(ch)) {
+            node = node.get(ch);
+        } else {
+            return null;
+        }
+    }
+    return node;
+}
+```
+מחפש איטרטיבית את הצומת של השרשרת המדוברת, או null אם לא קיים.
+
+``` java
+public T putIfAbsent(char ch){
+    if (ch > 'z' || ch < 'a') return null;
+    if (containsKey(ch)) return get(ch);
+
+    T newNode;
+    try {
+        ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+        assert genericSuperclass != null : "Failed to instantiate Trie node";
+        Class<T> type = (Class<T>) genericSuperclass.getActualTypeArguments()[0];
+        newNode = type.getDeclaredConstructor().newInstance();
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to instantiate Trie node", e);
+    }
+
+    if (children.compareAndSet(ch - 'a', null, newNode)) {
+        isLeaf = false;
+        return newNode;
+    } else {
+        return children.get(ch - 'a');
+    }
+}
+```
+מוסיף את הילד בכיוון האות אם הוא חסר, ומחזיר את מה שהוסיף אם לא היה או את מה שהיה.
+משתמש בשיקוף (reflection) כדי להשיג את הבנאי הנכון למחלקה גם למחלקות בנות.
+משתמש בפעולות מוגנות לתהליכונים בשביל שימוש במקביל.
+
+```
+public T put(String str){
+    T node = (T) this;
+    for (int i = 0; i < str.length(); i++) {
+        char ch = str.charAt(i);
+        if (ch < 'a' || ch > 'z') continue;
+        node = node.putIfAbsent(ch);
+    }
+    node.isEndOfWord = true;
+    return node;
+}
+```
+מוסיף את כל השרשרת מהצומת והלאה, ומסמן את הצומת האחרונה כסוף המילה.
+מחזיר את הצומת האחרונה.
+
+``` java
+public int size() {
+    int toAdd = isEndOfWord ? 1: 0;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        T child = children.get(i);
+        if (child != null) {
+            toAdd += child.size();
+        }
+    }
+    return toAdd;
+}
+```
+מחשב את כמות המילים שנמצאות בעץ מהצומת הנוכחית והלאה בצורה רקורסיבית.
+
+``` java
+public Set<String> getWords(){
+    Set<String> words = new ArraySet<>(size());
+    _getWords("", words);
+    return words;
+}
+
+protected void _getWords(String word, Set<String> set) {
+    if (isEndOfWord()) {
+        set.add(word);
+    }
+    if (isLeaf) return;
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        T child = children.get(i);
+        if (child != null) {
+            child._getWords(word + (char)(i + 'a'), set);
+        }
+    }
+}
+```
+זוג פונקציות, רקורסיבית ומעטפת, שאוספות את כל המילים בעץ ומחזירות אותר בקבוצה.
+
+#### `public final class Dictionary extends Trie<Dictionary>`
+שדות המחלקה:
+``` java
+/**
+ * Static root instance of the dictionary.
+ */
+public static final Dictionary ROOT = new Dictionary();
+
+/** Flag indicating if the dictionary has been loaded with words. */
+private boolean isInitialized = false;
+```
+תגונות המחלקה: אין ייחודיות
+
+פעולות המחלקה:
+``` java
+public static boolean contains(@NonNull String word) {
+    Trie<?> node = ROOT.get(word);
+    return node != null && node.isEndOfWord();
+}
+```
+בודק אם המילה קיימת במילון, תמיד בודק מהשורש.
+
+``` java
+public synchronized void init(InputStream file) {
+    if (isInitialized) return;
+    
+    Scanner sc = new Scanner(file);
+    while (sc.hasNextLine()) {
+        String word = sc.nextLine().trim().toLowerCase();
+        if (!word.isEmpty()) {
+            put(word);
+        }
+    }
+    sc.close();
+    isInitialized = true;
+}
+```
+ממלא את המילון עם הקובץ שהועבר.
+זה synchronized כדי להגן מקריאה יותר מפעם אחת, גם אם הקריאות באותו הזמן.
+
+#### `public class PathTrie extends Trie<PathTrie>`
+תפקיד המחלקה: להרחיב את Trie עם יכולת גם לשמור את המסלול על הלוח עליו הצירוף אותיות נמצא, יכול לשמור רק מסלול אחד לכל צירוף.
+
+שדות המחלקה:
+``` java
+    /** The path (sequence of board indices) associated with the word ending at this node. */
+    private String path;
+```
+
+תכונות המחלקה:
+``` java
+- String path
+```
+
+פעולות המחלקה:
+``` java
+public PathTrie put(String str, String path){
+    PathTrie node = super.put(str);
+    if (path != null) {
+        node.path = path;
+    }
+    return node;
+}
+```
+מוסיף גם את המסלול לצומת האחרונה.
+
+``` java
+public HashMap<String, String> toMap() {
+    HashMap<String, String> map = new HashMap<>();
+    for (String s : getWords()) {
+        map.put(s, get(s).getPath());
+    }
+    return map;
+}
+```
+יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
+
+#### `public class FirebaseHandler'
+תפקיד המחלקה: מחלקה יחידנית ששומרת אצלה את כל הדברים שקשורים לFirebase ולשחקן הנוכחי.
+
+שדות המחלקה:
+``` java
+/** Tag used for logging. */
+private static final String TAG = "FirebaseHandler";
+/** Singleton instance. */
+private static FirebaseHandler instance;
+/** Instance of Firebase Authentication. */
+private final FirebaseAuth mAuth;
+/** Instance of Firebase Realtime Database. */
+private final FirebaseDatabase mDatabase;
+/** Instance of Firebase Messaging. */
+private final FirebaseMessaging mMessaging;
+
+/** Cached local user data. */
+private User user;
+```
+
+תכונות המחלקה:
+``` java
+- FirebaseHandler instance
+- FirebaseAuth auth
+- FirebaseDatabase database
+- FirebaseMessaging messaging
+- FirebaseUser currentUser
+- User Userdata
+- String currentUserId
+- DatabaseReference rootRef
+- DatabaseReference userRef
+```
+
+פעולות המחלקה:
+``` java
+public void updateUserData() {
+    FirebaseUser currentUser = mAuth.getCurrentUser();
+    if (currentUser != null) {
+        // First, reload the user to check if they are still valid in Firebase Auth
+        currentUser.reload().addOnCompleteListener(reloadTask -> {
+            if (reloadTask.isSuccessful()) {
+                // User is still valid in Auth, now check the database
+                DatabaseReference userRef = getUserRef();
+                if (userRef != null) {
+                    userRef.get().addOnCompleteListener(dbTask -> {
+                        if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
+                            user = dbTask.getResult().getValue(User.class);
+                        }
+                    });
+                }
+            } else {
+                Log.e(TAG, "User reload failed", reloadTask.getException());
+            }
+        });
+    } else {
+        user = null;
+    }
+}
+```
+בודק אם המשתמש עדיין ואלידי (אם לא נמחק או הוקפא) ומעדכן את הפרטים שלו מהמוסד נתונים
+
+``` java
+public void signOut() {
+    mAuth.signOut();
+    user = null;
+}
+```
+מנתק את המשתמש ומנקה את המידע השמור מקומית.
+
+``` java
+public void addFriend(String id) {
+    DatabaseReference usersRef = mDatabase.getReference("users");
+    DatabaseReference myFriendRef = getUserRef();
+    if (myFriendRef != null) {
+        myFriendRef.child("friends").child(id).setValue(true);
+        DatabaseReference friendFriendsRef = usersRef.child(id).child("friends").child(getCurrentUserId());
+        friendFriendsRef.setValue(true);
+        Log.d(TAG, "Friend added: " + id);
+    }
+}
+```
+מוסיף מתשתמש לרשימת החברים
+
+
+#### `public enum GameMode`
+שדות המחלקה:
+`singleplayer`
+`multiplayer`
+תכונות המחלקה:
+``` java
+- GameMode singleplayer
+- GameMode multiplayer
+```
+פעולות המחלקה: הפעולות שהורשו מ <Enum<E
+
+#### `public enum PlayerRole`
+שדות המחלקה:
+`host`
+`guest`
+תכונות המחלקה:
+``` java
+- PlayerRole host
+- PlayerRole guest
+```
+פעולות המחלקה: הפעולות שהורשו מ <Enum<E
+
+#### `public class User`
+
+ץפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
+בגלל שכל מה שהמחלקה עושה היא לשמור מידע,והיא לא תלוייה בשום דבר אחר, היא גם נקראת POJO (Plain Old Java Object)
+
+שדות המחלקה:
+``` java
+/** The user's unique ID. */
+private String uid;
+/** The user's chosen display name. */
+private String displayName;
+/** The user's email address, used for authentication and identification. */
+private String email;
+/** A Base64 encoded string of the user's profile picture. */
+private String profileImageBase64;
+/** The User's current device's Firebase Cloud Messaging (FCM) token. */
+private String fcmToken;
+```
+
+תכונות המחלקה:
+``` java
+- String uid;
+- String displayName;
+- String email;
+- String profileImageBase64;
+- String fcmToken;
+```
+
+פעולות המחלקה: אין
+
