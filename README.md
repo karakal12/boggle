@@ -256,58 +256,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
                 android:name="com.google.firebase.messaging.default_notification_color"
                 android:resource="@color/primary"/>
         </service>
-    </application><?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-
-    <application
-        android:name=".BoggleApplication"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="false"
-        android:theme="@style/Theme.Boggle">
-        <activity
-            android:name=".ui.game.singleplayer.SingleplayerActivity"
-            android:exported="false" />
-        <activity android:name=".ui.game.multiplayer.MultiplayerActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".ui.mainmenu.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.mainmenu.FriendListActivity"
-            android:exported="false"
-            android:label="Friends List" />
-        <activity
-            android:name=".ui.DonutActivity"
-            android:exported="true"/>
-        <service android:name=".services.InvitationService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-            <meta-data
-                android:name="com.google.firebase.messaging.default_notification_icon"
-                android:resource="@mipmap/ic_launcher" />
-            <meta-data
-                android:name="com.google.firebase.messaging.default_notification_color"
-                android:resource="@color/primary"/>
-        </service>
     </application>
-
-</manifest>
 
 </manifest>
 ```
@@ -404,8 +353,6 @@ exports.sendInvitationNotification = onValueCreated(
 
 ### חבילה: data
 
-[] הסבר
-
 #### `public abstract class Trie<T extends Trie<T>`
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
@@ -493,7 +440,7 @@ public T putIfAbsent(char ch){
 משתמש בשיקוף (reflection) כדי להשיג את הבנאי הנכון למחלקה גם למחלקות בנות.
 משתמש בפעולות מוגנות לתהליכונים בשביל שימוש במקביל.
 
-```
+``` java
 public T put(String str){
     T node = (T) this;
     for (int i = 0; i < str.length(); i++) {
@@ -621,7 +568,7 @@ public HashMap<String, String> toMap() {
 ```
 יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
 
-#### `public class FirebaseHandler'
+#### `public class FirebaseHandler`
 תפקיד המחלקה: מחלקה יחידנית ששומרת אצלה את כל הדברים שקשורים לFirebase ולשחקן הנוכחי.
 
 שדות המחלקה:
@@ -729,7 +676,7 @@ public void addFriend(String id) {
 
 #### `public class User`
 
-ץפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
+תפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
 בגלל שכל מה שהמחלקה עושה היא לשמור מידע,והיא לא תלוייה בשום דבר אחר, היא גם נקראת POJO (Plain Old Java Object)
 
 שדות המחלקה:
@@ -757,3 +704,497 @@ private String fcmToken;
 
 פעולות המחלקה: אין
 
+### חבילה: engine
+
+#### `public class BoggleGame`
+תפקיד המחלקה: מייצגת מופע של משחק בוגל, מנהלת את מצב המשחק, הקוביות, הניקוד ואימות המילים. היא מטפלת ביצירת הלוח, בחירת מילים על ידי השחקן, לוגיקת הניקוד וחישוב מראש של כל הפתרונות האפשריים.
+
+שדות המחלקה:
+```java
+/** The total duration of a game in milliseconds. */
+public static final long GAME_TIME_MILLIS = 180000;
+
+/** The 1D array representation of the 4x4 board letters. */
+private final char[] board;
+/** Tracks the indices of dice currently selected by the player to form a word. */
+private final ArrayDeque<Integer> selectedIndices;
+/** Stores words successfully found and submitted by the player. */
+private final ArrayList<String> foundWords;
+/** The player's current cumulative score. */
+private int score = 0;
+/** Number of hints available to the player. */
+private int hints = 999;
+/** Flag indicating if the game has concluded. */
+private boolean gameEnded;
+
+// Listeners for game events, using CopyOnWriteArrayList for thread safety during iteration
+private final List<OnGameEndListener> onGameEndListeners = new CopyOnWriteArrayList<>();
+private final List<OnWordFoundListener> onWordFoundListeners = new CopyOnWriteArrayList<>();
+private final List<OnTickListener> onTickListeners = new CopyOnWriteArrayList<>();
+
+/** Trie containing all valid words that can be formed on the current board. */
+private final PathTrie solutions;
+/** List of all possible valid paths on the board. */
+private final List<String> allPaths;
+/** Timer managing the game countdown. */
+private final Timer gameTimer;
+```
+
+ממשקי המאזינים (Listeners):
+```java
+public interface OnGameEndListener {
+    /** Called when the game timer expires or the game is manually ended. */
+    void onGameEnd();
+}
+
+public interface OnWordFoundListener {
+    /** Called when a valid word is found. @param word The word that was found. */
+    void onWordFound(String word);
+}
+
+public interface OnTickListener {
+    /** Called on every timer tick. @param elapsedTime Time elapsed since start in ms. */
+    void onTick(long elapsedTime);
+}
+```
+
+תכונות המחלקה:
+``` java
+- int score
+- int hints
+- ArrayList<String> foundWords
+- int[] selectedIndices
+- char[][] dice
+- String word
+- PathTrie solutions
+- List<String> allPaths
+- boolean isEnded
+- char[] board
+- List<OnGameEndListener> onGameEndListeners
+- List<OnWordFoundListener> onWordFoundListeners
+- List<OnTickListener> onTickListeners
+```
+
+פעולות המחלקה:
+``` java
+public BoggleGame() {
+    this(generateBoard());
+}
+```
+בנאי המאתחל משחק חדש עם לוח שנוצר אקראית.
+
+``` java
+public BoggleGame(char[] board) {
+    this.board = board;
+    this.foundWords = new ArrayList<>();
+    this.selectedIndices = new ArrayDeque<>();
+    this.gameEnded = false;
+
+    // Solve the board using the GameSolver and the dictionary root.
+    // This is done upfront to provide immediate feedback on word validity during the game.
+    GameSolver.SolverResult result = new GameSolver().solve(getDice(), Dictionary.ROOT);
+    solutions = result.solutions();
+    allPaths = result.allPaths();
+
+    // Initialize the game timer with total duration and callbacks for ticks and completion.
+    gameTimer = new Timer(GAME_TIME_MILLIS,
+            (elapsedTime) -> {
+                for (OnTickListener listener : onTickListeners) {
+                    listener.onTick(elapsedTime);
+                }
+            },
+            this::endGame);
+}
+```
+בנאי המאתחל משחק עם לוח ספציפי. הוא פותר את הלוח מראש ומגדיר את הטיימר.
+
+``` java
+private static char[] generateBoard() {
+    ArrayList<Die> diceList = Die.generateDice();
+    Collections.shuffle(diceList);
+    char[] board = new char[16];
+    for (int i = 0; i < 16; i++) {
+        Die die = diceList.get(i);
+        die.roll();
+        board[i] = die.getLetter();
+    }
+    return board;
+}
+```
+מייצר לוח אקראי של 16 אותיות על בסיס קוביות הבוגל הסטנדרטיות.
+
+``` java
+public void addOnGameEndListener(OnGameEndListener listener) {
+    this.onGameEndListeners.add(listener);
+}
+
+public void addOnWordFoundListener(OnWordFoundListener listener) {
+    this.onWordFoundListeners.add(listener);
+}
+
+public void addOnTickListener(OnTickListener listener) {
+    this.onTickListeners.add(listener);
+}
+```
+פעולות להוספת מאזינים לאירועי סיום משחק, מציאת מילה ותקתוק של הטיימר.
+
+``` java
+public WordCheckResult submitWord() {
+    String formedWord = formWord(); // Note: this clears the selection indices
+    if (formedWord.isBlank()) return NULL_WORD;
+    if (formedWord.length() < 3) return TOO_SHORT;
+    if (foundWords.contains(formedWord)) return ALREADY_FOUND;
+    
+    // Check if word exists in the dictionary. Using solutions trie would also work and be faster.
+    if (Dictionary.contains(formedWord)) {
+        score += wordScore(formedWord);
+        foundWords.add(formedWord);
+        for (OnWordFoundListener listener : onWordFoundListeners) {
+            listener.onWordFound(formedWord);
+        }
+        return VALID;
+    }
+    return INVALID;
+}
+```
+בודק את המילה שנבחרה, מעדכן את הניקוד ומודיע למאזינים אם המילה תקינה.
+
+``` java
+public int wordScore(String word) {
+    int wordLength = word.length();
+    return switch (wordLength) {
+        case 3, 4 -> 1;
+        case 5 -> 2;
+        case 6 -> 3;
+        case 7 -> 5;
+        default -> wordLength >= 8 ? 11 : 0;
+    };
+}
+```
+מחשב ניקוד למילה לפי חוקי המשחק הסטנדרטיים.
+
+``` java
+public boolean selectDie(int index) {
+    if (selectedIndices.isEmpty()) {
+        selectedIndices.add(index);
+        return true;
+    }
+    int lastIndex = selectedIndices.getLast();
+    if (isAdjacent(lastIndex, index) && !selectedIndices.contains(index)) {
+        selectedIndices.add(index);
+        return true;
+    }
+    return false;
+}
+```
+מנסה לבחור קובייה בלוח. הבחירה תצליח אם זו הקובייה הראשונה או שהיא סמוכה לקובייה האחרונה שנבחרה וטרם נעשה בה שימוש במילה הנוכחית.
+
+``` java
+public int getMaxScore() {
+    int maxScore = 0;
+    for (String s : solutions.getWords()) {
+        maxScore += wordScore(s);
+    }
+    return maxScore;
+}
+```
+מחשב את הניקוד המקסימלי האפשרי ללוח הנוכחי.
+
+``` java
+public void endGame() {
+    if (gameEnded) return;
+    gameEnded = true;
+    gameTimer.stop();
+    for (OnGameEndListener listener : onGameEndListeners) {
+        listener.onGameEnd();
+    }
+}
+```
+מסיימת את המשחק, עוצרת את הטיימר ומעדכנת את המאזינים.
+
+#### `public class GameSolver`
+תפקיד המחלקה: מספקת את לוגיקת הליבה לפתרון לוח בוגל בצורה יעילה ומקבילית. היא מזהה את כל המילים התקינות מהמילון שניתן ליצור על לוח 4x4 על ידי חיבור קוביות סמוכות, תוך שימוש באלגוריתם חיפוש לעומק (DFS) ומסגרת ה-ForkJoin לניצול מעבדים מרובי ליבות.
+
+שדות המחלקה:
+```java
+/**
+ * A Trie to store all unique words found on the board.
+ * The value associated with each terminal node is the hex-encoded path representing the word's discovery.
+ */
+private PathTrie solutions;
+
+/**
+ * A thread-safe queue used to collect every valid path discovered during the search.
+ * Since multiple paths can form the same word, this stores all of them for visualization or scoring purposes.
+ */
+private ConcurrentLinkedQueue<String> allPaths;
+```
+
+תכונות המחלקה:
+``` java
+- PathTrie solutions
+- List<String> allPaths
+```
+
+פעולות המחלקה:
+``` java
+public SolverResult solve(char[][] board, Dictionary dictionary)
+```
+הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
+
+##### `class GameSolverTask extends RecursiveAction`
+מחלקה פנימית המבצעת את החיפוש הרקורסיבי. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
+
+פעולות המחלקה הפנימית:
+``` java
+public GameSolverTask(Dictionary root, char[][] board, int i, int j, short visited, String path, String string)
+```
+בנאי המאתחל משימת חיפוש עבור מיקום ספציפי בלוח, תוך שמירה על מצב החיפוש (הצומת הנוכחי במילון, תאים שבוקרו, והמילה שנוצרה עד כה).
+
+``` java
+@Override
+protected void compute()
+```
+מבצעת את לוגיקת החיפוש המקבילית:
+1. בודקת אם הצומת הנוכחי במילון הוא עלה (אין מילים ארוכות יותר). אם כן, מוסיפה את המילה לפתרונות ומפסיקה.
+2. בודקת אם הצומת הוא סוף מילה (מילה תקנית). אם כן, מוסיפה לפתרונות וממשיכה לחפש מילים ארוכות יותר.
+3. מסמנת את התא הנוכחי כ"בוקר" ב-bitmap.
+4. סורקת את כל 8 השכנים בלוח. עבור כל שכן שתואם לאות אפשרית במילון ולא בוקר בעבר, יוצרת משימת משנה (`GameSolverTask`) חדשה.
+5. מפעילה את כל משימות המשנה במקביל באמצעות `invokeAll`.
+
+``` java
+private boolean isSafe(int i, int j, short visited)
+```
+פעולת עזר הבודקת האם קואורדינטות `(i, j)` נמצאות בתוך גבולות הלוח והאם התא טרם בוקר במסלול הנוכחי (באמצעות בדיקת הביט המתאים ב-`visited`).
+
+#### `public class DonutRenderer`
+תפקיד המחלקה: ביצת הפתעה. מחלקה האחראית על רינדור תלת-ממדי בזמן אמת של צורת טורוס (דונאט) מסתובבת על גבי `SurfaceView`. המימוש הושרא מהקוד המפורסם `Donut.c` של `a1k0n`.
+
+שדות המחלקה:
+```java
+/** Default rotation rates for angles A and B */
+public static final double A_RATE = 0.005;
+public static final double B_RATE = 0.007;
+
+/** Paints for scaling and drawing segments */
+public static final Paint scalingPaint = new Paint();
+public static final Paint shapePaint = new Paint();
+
+/** Light source settings */
+private static final double[] lightVector = normalize(new double[]{0, 1, -1});
+public static final float MIN_LIGHT = 0.2f;
+
+/** Rotation angles around two axes */
+private double A = 0, B = 0;
+
+/** Back-buffer bitmap for rendering before displaying on surface */
+private Bitmap bitmap;
+
+private int screenWidth;
+private int screenHeight;
+
+/** The vector representing the light source direction in 3D space */
+private static final double[] lightVector = normalize(new double[]{0, 1, -1});
+/** Minimum light level for lighting calculations */
+public static final float MIN_LIGHT = 0.2f;
+
+// Geometry resolution settings
+private static final double thetaSpacing = 0.1;
+private static final double phiSpacing = 0.07;
+private static final int thetaSteps = (int) (2 * Math.PI / thetaSpacing + 1);
+private static final int phiSteps = (int) (2 * Math.PI / phiSpacing + 1);
+
+// Torus dimensions
+private static final double R1 = 1; // Radius of the tube
+private static final double R2 = 2; // Radius from center to tube center
+
+/** Distance from the viewer to the object center */
+private static double K2 = 10;
+/** Projection constant based on screen size */
+private double K1;
+
+/** Rotation angles around two axes */
+private double A = 0, B = 0;
+
+/** Flag indicating if the surface is ready for drawing */
+private boolean isSurfaceReady = false;
+
+```
+
+תכונות המחלקה:
+``` java
+- double A_RATE
+- double B_RATE
+- float MIN_LIGHT
+```
+
+פעולות המחלקה:
+``` java
+public DonutRenderer(SurfaceView surfaceView) {
+    this.surfaceView = surfaceView;
+    scalingPaint.setFilterBitmap(false);
+    shapePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+    shapePaint.setStrokeWidth(5);
+    surfaceView.getHolder().addCallback(this);
+    
+    // If surface is already valid, initialize immediately
+    if (surfaceView.getHolder().getSurface().isValid()) {
+        isSurfaceReady = true;
+        initResources(surfaceView.getWidth(), surfaceView.getHeight());
+    }
+}
+```
+בנאי המאתחל את הרנדרר ומקשר אותו ל-`SurfaceView`.
+
+``` java
+@Override
+public void doFrame(long frameTimeNanos) {
+    if (choreographer == null) return;
+
+    if (isSurfaceReady) {
+        int width = surfaceView.getWidth();
+        int height = surfaceView.getHeight();
+        if (width > 0 && height > 0) {
+            initResources(width, height);
+
+            if (bitmap != null) {
+                Canvas surfaceCanvas = surfaceView.getHolder().lockCanvas();
+                if (surfaceCanvas != null) {
+                    drawDonut();
+                    // Draw the back-buffer bitmap to the surface
+                    surfaceCanvas.drawBitmap(bitmap, 0, 0, null);
+                    surfaceView.getHolder().unlockCanvasAndPost(surfaceCanvas);
+                }
+            }
+        }
+    }
+
+    // Request next frame
+    choreographer.postFrameCallback(this);
+}
+```
+מתודה המופעלת בכל פריים על ידי ה-`Choreographer` לניהול האנימציה.
+
+``` java
+private void drawDonut() {
+    if (bitmap == null) return;
+
+    // Create a canvas to draw on the back-buffer BITMAP
+    Canvas bitmapCanvas = new Canvas(bitmap);
+    bitmapCanvas.drawColor(Color.DKGRAY);
+
+    // Precompute trigonometric values for current rotation angles to optimize performance
+    double cosA = Math.cos(A), sinA = Math.sin(A);
+    double cosB = Math.cos(B), sinB = Math.sin(B);
+
+    // Generate the 3D grid of points projected into 2D screen space
+    PointAndDepth[][] grid = getToroidalMap(cosA, sinA, cosB, sinB);
+
+    // Thread-safe list to store quadrilateral faces for depth sorting
+    java.util.List<Quad> quadsToDraw = Collections.synchronizedList(new java.util.ArrayList<>());
+
+    // Use a parallel stream to distribute heavy mathematical computations across CPU cores
+    IntStream.range(0, thetaSteps).parallel().forEach(thetaIndex -> {
+        int nextTheta = (thetaIndex + 1) % thetaSteps;
+        double theta = thetaIndex * thetaSpacing;
+        double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
+
+        for (int phiIndex = 0; phiIndex < phiSteps; phiIndex++) {
+            int nextPhi = (phiIndex + 1) % phiSteps;
+            double phi = phiIndex * phiSpacing;
+            double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+
+            // --- Lighting Logic ---
+            // 1. Define the surface normal in local coordinates
+            double nx = cosTheta * cosPhi;
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            double ny = sinTheta;
+            
+            // 2. Rotate the normal to match the current orientation of the torus (A and B angles)
+            double rotNx = nx * (cosB * cosPhi + sinA * sinB * sinPhi) - ny * cosA * sinB;
+            double rotNy = nx * (sinB * cosPhi - sinA * cosB * sinPhi) + ny * cosA * cosB;
+            double rotNz = nx * cosA * sinPhi + ny * sinA;
+            
+            // 3. Calculate luminosity via dot product with the light source vector
+            float L = (float) (lightVector[0] * rotNx + lightVector[1] * rotNy + lightVector[2] * rotNz);
+
+            // --- Geometry Mapping ---
+            // Retrieve the four projected corners of the current quad face
+            PointAndDepth p1 = grid[thetaIndex][phiIndex];
+            PointAndDepth p2 = grid[nextTheta][phiIndex];
+            PointAndDepth p3 = grid[thetaIndex][nextPhi];
+            PointAndDepth p4 = grid[nextTheta][nextPhi];
+            
+            // Calculate average inverse depth (1/z) for sorting (larger ooz means closer to viewer)
+            double avgOoz = (p1.ooz() + p2.ooz() + p3.ooz() + p4.ooz()) * 0.25;
+
+            // --- Styling ---
+            // Calculate final brightness, hue (based on phi), and saturation (based on theta)
+            float luminosity = getLuminosityWithMinLight(L);
+            float hue = (phiIndex * 360f / phiSteps) % 360;
+            float saturation = Math.abs(thetaIndex - thetaSteps * 0.5f) / (thetaSteps * 0.5f);
+            int color = Color.HSVToColor(new float[]{hue, saturation, luminosity});
+
+            // Define the 2D path for the quad face
+            Path path = new Path();
+            path.moveTo((float)p1.screenX(), (float)p1.screenY());
+            path.lineTo((float)p2.screenX(), (float)p2.screenY());
+            path.lineTo((float)p4.screenX(), (float)p4.screenY());
+            path.lineTo((float)p3.screenX(), (float)p3.screenY());
+            path.close();
+
+            quadsToDraw.add(new Quad(path, color, avgOoz));
+        }
+    });
+    
+    // Painter's Algorithm: Sort quads by depth (back-to-front) to ensure correct occlusion
+    quadsToDraw.sort(Comparator.comparingDouble(Quad::avgOoz));
+    
+    // Render the sorted quads to the bitmap canvas
+    for (Quad quad : quadsToDraw) {
+        shapePaint.setColor(quad.color());
+        bitmapCanvas.drawPath(quad.path(), shapePaint);
+    }
+}
+}
+```
+הלוגיקה המרכזית של הרינדור: ביצוע טרנספורמציות גיאומטריות, חישובי תאורה, מיון לפי עומק וציור בפועל.
+
+``` java
+public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, double sinB) {
+    PointAndDepth[][] grid = new PointAndDepth[thetaSteps][phiSteps];
+
+    IntStream.range(0, thetaSteps).parallel().forEach(i -> {
+        double theta = i * thetaSpacing;
+        double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
+        
+        // 2D Circle in the XY plane (cross-section of the torus)
+        double circleX = R2 + R1 * cosTheta;
+        double circleY = R1 * sinTheta;
+
+        for (int j = 0; j < phiSteps; j++) {
+            double phi = j * phiSpacing;
+            double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+
+            // 3D Rotation and projection math
+            // Final X position after rotations
+            double x = circleX * (cosB * cosPhi + sinA * sinB * sinPhi) - circleY * cosA * sinB;
+            // Final Y position after rotations
+            double y = circleX * (sinB * cosPhi - sinA * cosB * sinPhi) + circleY * cosA * cosB;
+            // Final Z position (depth)
+            double z = K2 + cosA * circleX * sinPhi + circleY * sinA;
+            
+            // One over Z (inverse depth)
+            double ooz = 1 / z;
+
+            // Project to screen coordinates
+            int screenX = toScreenX(screenWidth, x, ooz);
+            int screenY = toScreenY(screenHeight, y, ooz);
+
+            grid[i][j] = new PointAndDepth(screenX, screenY, ooz);
+        }
+    });
+    return grid;
+}
+```
+מחשבת את המיקומים של כל הנקודות על הטורוס במרחב התלת-ממדי ומטילה אותן לקואורדינטות מסך.
