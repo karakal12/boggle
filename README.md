@@ -357,7 +357,7 @@ exports.sendInvitationNotification = onValueCreated(
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
 שדות המחלקה:
-```java
+``` java
 /** The number of letters in the English alphabet ('a' through 'z'). */
 protected static final int ALPHABET_SIZE = 26;
 
@@ -943,7 +943,7 @@ public SolverResult solve(char[][] board, Dictionary dictionary)
 הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
 
 ##### `class GameSolverTask extends RecursiveAction`
-מחלקה פנימית המבצעת את החיפוש הרקורסיבי. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
+מחלקה פנימית המבצעת את החיפוש הרקורסיבית. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
 
 פעולות המחלקה הפנימית:
 ``` java
@@ -1198,3 +1198,826 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 }
 ```
 מחשבת את המיקומים של כל הנקודות על הטורוס במרחב התלת-ממדי ומטילה אותן לקואורדינטות מסך.
+
+### חבילה: services
+
+#### `public class InvitationService extends FirebaseMessagingService`
+תפקיד המחלקה: אחראית על קבלת הודעות דחיפה (Push Notifications) מ-Firebase, ניהול הזמנות למשחק בזמן אמת והצגת התראות למשתמש.
+
+שדות המחלקה:
+
+```java
+/** Tag used for logging. */
+private static final String TAG = "InvitationService";
+/** Notification channel ID for game invitations. */
+private static final String CHANNEL_ID = "invitation_channel";
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+
+```java
+@Override
+public void onNewToken(@NonNull String token) {
+    Log.d(TAG, "Refreshed token: " + token);
+    if (FirebaseHandler.getAuth().getCurrentUser() != null){
+        FirebaseHandler.getInstance().getUserRef().child("fcmToken").setValue(token);
+    }
+}
+```
+מתעדכנת כאשר נוצר אסימון (Token) חדש עבור ה-FCM של המכשיר. היא מעדכנת את האסימון החדש במסד הנתונים תחת פרטי המשתמש הנוכחי כדי לאפשר שליחת הודעות אליו.
+
+```java
+@Override
+public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+    Log.d(TAG, "From: " + remoteMessage.getFrom());
+
+    Map<String, String> data = remoteMessage.getData();
+    
+    // Delete the invitation from the database now that it's received to avoid stale invites
+    if (data.containsKey("invitationId")) {
+        String invitationId = data.get("invitationId");
+        deleteInvitation(invitationId);
+    }
+
+    // Check if message contains a notification payload.
+    if (remoteMessage.getNotification() != null) {
+        String title = remoteMessage.getNotification().getTitle();
+        String body = remoteMessage.getNotification().getBody();
+        showNotification(title, body, data);
+    } else if (data.size() > 0) {
+        // Handle data-only payload if notification block is missing
+        String title = "New Game Invitation";
+        String body = "Someone invited you to play Boggle!";
+        showNotification(title, body, data);
+    }
+}
+```
+מתודה המופעלת כאשר מתקבלת הודעת FCM. היא מחלצת את נתוני ההזמנה, מוחקת את ההזמנה ממסד הנתונים (כדי שלא תישאר כ"פתוחה" לאחר שכבר הגיעה ליעד) ומציגה התראה למשתמש.
+
+```java
+private void deleteInvitation(String invitationId) {
+    String currentUserId = FirebaseAuth.getInstance().getUid();
+    if (currentUserId != null) {
+        FirebaseHandler.getInstance().getRootRef()
+                .child("invitations")
+                .child(currentUserId)
+                .child(invitationId)
+                .removeValue()
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Invitation deleted from DB: " + invitationId))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to delete invitation", e));
+    }
+}
+```
+פעולת עזר המוחקת את ההזמנה הספציפית ממסד הנתונים של Firebase.
+
+```java
+private void showNotification(String title, String body, Map<String, String> data) {
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    
+    // Pass room code and action if present to allow joining directly from notification
+    if (data != null && data.containsKey("roomCode")) {
+        intent.putExtra("roomCode", data.get("roomCode"));
+        intent.putExtra("action", "join");
+    }
+
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+
+    NotificationManager notificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+    // Create the NotificationChannel for Android O and above
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                "Game Invitations",
+                NotificationManager.IMPORTANCE_DEFAULT);
+        notificationManager.createNotificationChannel(channel);
+    }
+
+    NotificationCompat.Builder notificationBuilder =
+            new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title)
+                    .setContentText(body)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
+
+    notificationManager.notify(0, notificationBuilder.build());
+}
+```
+בונה ומציגה התראה במכשיר. היא מגדירה Intent שיוביל את המשתמש ישירות לחדר המשחק אם ההתראה מכילה קוד חדר, ומגדירה את ערוץ ההתראות עבור גרסאות אנדרואיד חדשות.
+
+
+### חבילה: ui.mainmenu
+
+#### `public class MainActivity extends AppCompatActivity`
+
+מטרת מחלקה: המסך הראשי של האפליקציה. הוא משמש כנקודת הכניסה המרכזית, מנהל את התפריט הצידי (Navigation Drawer), את המעברים למצבי המשחק השונים (שחקן יחיד ומרובה שחקנים), את רשימת החברים, ואת הגישה למערכת ההזדהות (Login/Signup). בנוסף, הוא מטפל בקבלת הזמנות למשחק דרך Intent-ים.
+
+שדות המחלקה:
+```java
+/** View binding for the activity layout. */
+private ActivityMainBinding binding;
+
+/** Listener for Firebase Authentication state changes. */
+private FirebaseAuth.AuthStateListener authStateListener;
+
+/**
+ * Launcher for SingleplayerActivity to receive the final score when the game ends.
+ */
+private final ActivityResultLauncher<Intent> singleplayerLauncher = registerForActivityResult(
+        new ActivityResultContracts.StartActivityForResult(),
+        result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                int score = result.getData().getIntExtra(SingleplayerActivity.EXTRA_SCORE, 0);
+                Toast.makeText(this, "Game finished! Your score: " + score, Toast.LENGTH_LONG).show();
+            }
+        }
+);
+
+/**
+ * Launcher for requesting notification permissions (Android 13+).
+ */
+private final ActivityResultLauncher<String> requestPermissionLauncher =
+        registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (!isGranted) {
+                Toast.makeText(this, "Notifications disabled. You won't receive game invites.", Toast.LENGTH_SHORT).show();
+            }
+        });
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    binding = ActivityMainBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
+    
+    // Enable edge-to-edge display
+    EdgeToEdge.enable(this);
+    
+    // Handle window insets for both the main content and the navigation drawer
+    ViewCompat.setOnApplyWindowInsetsListener(binding.mainContent, (v, insets) -> {
+        Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        return insets;
+    });
+    ViewCompat.setOnApplyWindowInsetsListener(binding.navView, (v, insets) -> {
+        Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        return insets;
+    });
+
+    init();
+    askNotificationPermission();
+    setupAuthStateListener();
+    handleIntent(getIntent());
+}
+```
+מאתחלת את ה-View Binding, מגדירה תצוגה מקצה לקצה (EdgeToEdge), מגדירה מאזינים למרווחים של מערכת ההפעלה (Insets), ומפעילה את פונקציות האתחול של המסך, ההרשאות ומצב המשתמש.
+
+```java
+@Override
+protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    setIntent(intent);
+    handleIntent(intent);
+}
+```
+נקראת כאשר האקטיביטי כבר פתוחה ומקבלת Intent חדש (למשל מלחיצה על התראה). היא מעדכנת את ה-Intent של האקטיביטי ומפעילה את הטיפול בו.
+
+```java
+private void handleIntent(Intent intent) {
+    if (intent != null && intent.hasExtra("roomCode")) {
+        String roomCode = intent.getStringExtra("roomCode");
+        if (roomCode != null && !roomCode.isEmpty()) {
+            PlayerRole role = PlayerRole.host;
+            if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){
+                role = PlayerRole.guest;
+            }
+            JoinOrCreateRoomFragment.newInstance(roomCode, role)
+                    .show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
+        }
+    }
+}
+```
+בודקת אם ה-Intent מכיל קוד חדר (roomCode). אם כן, היא קובעת את תפקיד השחקן (מארח או אורח) ופותחת את הדיאלוג להצטרפות או יצירת חדר.
+
+```java
+private void init(){
+    setSupportActionBar(binding.toolbar);
+
+    // Navigation for Singleplayer
+    binding.singleplayerButton.setOnClickListener(v -> {
+        Intent intent = new Intent(this, SingleplayerActivity.class);
+        singleplayerLauncher.launch(intent);
+    });
+
+    // Navigation for Multiplayer - requires login
+    binding.multiplayerButton.setOnClickListener(v -> {
+        if (FirebaseHandler.getAuth().getCurrentUser() != null){
+            JoinOrCreateRoomFragment fragment = new JoinOrCreateRoomFragment();
+            fragment.show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
+        } else {
+            Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    // Navigation for Friend List
+    binding.friendsListButton.setOnClickListener(v -> {
+        Intent intent = new Intent(this, FriendListActivity.class);
+        startActivity(intent);
+    });
+
+    // Easter Egg / Bonus feature
+    binding.donutButton.setOnClickListener(v -> {
+        Intent intent = new Intent(this, DonutActivity.class);
+        startActivity(intent);
+    });
+
+    // Setup Drawer and Navigation View
+    binding.navView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+
+    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+            this, binding.main, binding.toolbar, R.string.open_nav, R.string.close_nav);
+    binding.main.addDrawerListener(toggle);
+    toggle.syncState();
+}
+```
+מגדירה את סרגל הכלים (Toolbar), את המאזינים לכפתורי הניווט (שחקן יחיד, מרובה שחקנים, רשימת חברים, וביצת ההפתעה), ואת התפריט הצידי.
+
+```java
+private void setupAuthStateListener() {
+    authStateListener = firebaseAuth -> {
+        updateUI();
+        FirebaseHandler.getInstance().updateUserData();
+    };
+}
+
+@Override
+protected void onStart() {
+    super.onStart();
+    FirebaseHandler.getAuth().addAuthStateListener(authStateListener);
+}
+
+@Override
+protected void onStop() {
+    super.onStop();
+    if (authStateListener != null) {
+        FirebaseHandler.getAuth().removeAuthStateListener(authStateListener);
+    }
+}
+```
+מגדירה, רושמת ומסירה את המאזין לשינויים במצב ההתחברות של Firebase בהתאם למחזור החיים של האקטיביטי.
+
+```java
+void updateUI() {
+    boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
+    FirebaseUser user = FirebaseHandler.getInstance().getCurrentUser();
+
+    // Update navigation menu visibility
+    Menu menu = binding.navView.getMenu();
+    MenuItem loginItem = menu.findItem(R.id.nav_login);
+    MenuItem signupItem = menu.findItem(R.id.nav_signup);
+    MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+
+    if (loginItem != null) loginItem.setVisible(!isLoggedIn);
+    if (signupItem != null) signupItem.setVisible(!isLoggedIn);
+    if (logoutItem != null) logoutItem.setVisible(isLoggedIn);
+
+    // Update navigation header with user info
+    if (binding.navView.getHeaderCount() > 0) {
+        NavHeaderBinding headerBinding = NavHeaderBinding.bind(binding.navView.getHeaderView(0));
+
+        headerBinding.navHeaderTextViewName
+                .setText(user != null ? user.getDisplayName() : "Not Logged In");
+        headerBinding.navHeaderTextViewEmail
+                .setText(user != null ? user.getEmail() : "");
+
+        ImageView imageView = headerBinding.navHeaderImageView;
+        if (user != null) {
+            // Fetch additional user data (like profile image) from the database
+            FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    User userData = task.getResult().getValue(User.class);
+                    if (userData != null && userData.getProfileImageBase64() != null) {
+                        Bitmap imageBitMap = ImageUtils.base64ToBitmap(userData.getProfileImageBase64());
+                        imageView.setImageBitmap(imageBitMap);
+                    } else {
+                        imageView.setImageResource(R.drawable.ic_person);
+                    }
+                } else {
+                    imageView.setImageResource(R.drawable.ic_person);
+                }
+            });
+        } else {
+            imageView.setImageResource(R.drawable.ic_person);
+        }
+    }
+}
+```
+מעדכנת את הניראות של פריטי התפריט (כניסה/הרשמה מול התנתקות) ואת פרטי המשתמש (שם, אימייל ותמונה) בראש התפריט הצידי על סמך המשתמש המחובר.
+
+```java
+private boolean onNavigationItemSelected(MenuItem item) {
+    int id = item.getItemId();
+    if (id == R.id.nav_logout) {
+        FirebaseHandler.getInstance().signOut();
+    } else if (id == R.id.nav_login) {
+        LoginFragment loginFragment = new LoginFragment();
+        loginFragment.show(getSupportFragmentManager(), "LoginFragment");
+    } else if (id == R.id.nav_signup) {
+        SignUpFragment signUpFragment = new SignUpFragment();
+        signUpFragment.show(getSupportFragmentManager(), "SignUpFragment");
+    }
+
+    binding.main.closeDrawer(GravityCompat.START);
+    return true;
+}
+```
+מטפלת בלחיצות על פריטים בתפריט הצידי, כמו התנתקות או פתיחת דיאלוגים של התחברות והרשמה.
+
+```java
+private void askNotificationPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+}
+```
+מבקשת מהמשתמש הרשאת התראות (עבור אנדרואיד 13 ומעלה) כדי שיוכל לקבל הזמנות למשחק.
+
+#### `public class LoginFragment extends DialogFragment`
+תפקיד המחלקה: `DialogFragment` המספק ממשק התחברות למשתמשים קיימים. הוא מטפל באימות מול Firebase, דיווח על שגיאות ועדכון ה-FCM token של המשתמש לאחר כניסה מוצלחת.
+
+שדות המחלקה:
+```java
+/** View binding for the fragment layout. */
+private FragmentLoginBinding binding;
+
+/** Tag used for logging. */
+private static final String TAG = "LoginFragment";
+
+/** Input field for user email. */
+private EditText ETEmail;
+/** Input field for user password. */
+private EditText ETPassword;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+
+```java
+private void init(){
+    Button loginButton = binding.loginButton;
+    ETPassword = binding.ETPassword;
+    ETEmail = binding.ETEmail;
+
+    loginButton.setOnClickListener(this::loginUser);
+}
+```
+מאתחלת את רכיבי ה-UI ומגדירה מאזין לכפתור ההתחברות.
+
+```java
+private void loginUser(View view){
+    String email = ETEmail.getText().toString();
+    String password = ETPassword.getText().toString();
+    
+    if (email.isEmpty() || password.isEmpty()){
+        Toast.makeText(requireContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    
+    @SuppressWarnings("deprecation")
+    ProgressDialog pd = new ProgressDialog(requireContext());
+    pd.setTitle("Connecting");
+    pd.setMessage("Logging in...");
+    pd.show();
+    
+    FirebaseHandler.getAuth().signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(requireActivity(), task -> {
+                String toastMessage;
+                pd.dismiss();
+                if (task.isSuccessful()){
+                    Log.i(TAG, "signInWithEmail:success");
+                    
+                    // Update FCM Token on successful login for push notifications
+                    updateFcmToken();
+                    
+                    toastMessage = "User logged in successfully";
+                    dismiss();
+                } else {
+                    // Map Firebase exceptions to user-friendly messages
+                    toastMessage = switch (task.getException()){
+                        case FirebaseAuthInvalidUserException ignored        -> "User does not exist";
+                        case FirebaseAuthInvalidCredentialsException ignored -> "Invalid Password";
+                        case FirebaseNetworkException ignored                -> "Network Error. Please check your connection";
+                        case null, default                                   -> "An error occurred. Please try again later";
+                    };
+                }
+                Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show();
+            });
+}
+```
+מנסה לבצע כניסה באמצעות Firebase Auth. היא מאמתת שכל השדות מלאים, מציגה תיבת התקדמות, ומטפלת בשגיאות אימות נפוצות (כמו משתמש לא קיים או סיסמה שגויה) עם הודעות ידידותיות למשתמש.
+
+```java
+private void updateFcmToken() {
+    FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+        if (task.isSuccessful() && task.getResult() != null) {
+            String token = task.getResult();
+            FirebaseHandler.getInstance().getUserRef().child("fcmToken").setValue(token)
+                    .addOnSuccessListener(aVoid -> {
+                        // Refresh local user data to include the new token
+                        FirebaseHandler.getInstance().updateUserData();
+                    })
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to update FCM token", e));
+        } else {
+            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+        }
+    });
+}
+```
+משיגה את ה-FCM token העדכני של המכשיר ושומרת אותו במסד הנתונים תחת המשתמש המחובר, מה שמאפשר לו לקבל הזמנות למשחק כהתראות.
+
+#### `public class SignUpFragment extends DialogFragment`
+תפקיד המחלקה: `DialogFragment` המספק ממשק הרשמה למשתמשים חדשים. הוא מטפל ביצירת חשבון ב-Firebase Authentication, בחירת תמונת פרופיל מהגלריה, ושמירת כל נתוני המשתמש (כולל ה-FCM token) במסד הנתונים בזמן אמת.
+
+שדות המחלקה:
+```java
+/** View binding for the fragment layout. */
+private FragmentSignUpBinding binding;
+
+/** Tag used for logging. */
+private static final String TAG = "SignUpFragment";
+
+/** View for displaying the selected profile image. */
+private ImageView IVProfileImage;
+/** Input field for the display name. */
+private TextInputEditText ETDisplayName;
+/** Input field for the email address. */
+private TextInputEditText ETEmail;
+/** Input field for the password. */
+private TextInputEditText ETPassword;
+/** Uri of the profile image selected from the gallery. */
+private Uri selectedImageUri;
+
+/** Launcher for the system photo picker. */
+private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
+        registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri != null) {
+                selectedImageUri = uri;
+                IVProfileImage.setImageURI(uri);
+            } else {
+                Log.d(TAG, "No media selected");
+            }
+        });
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+
+```java
+private void init() {
+    IVProfileImage = binding.IVProfileImage;
+    Button btnSelectImage = binding.btnSelectImage;
+    ETDisplayName = binding.ETDisplayName;
+    ETEmail = binding.ETEmail;
+    ETPassword = binding.ETPassword;
+    Button signup_button = binding.signupButton;
+
+    btnSelectImage.setOnClickListener(v -> pickMedia.launch(new PickVisualMediaRequest.Builder()
+            .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+            .build()));
+
+    signup_button.setOnClickListener(v -> createUser());
+}
+```
+מאתחלת את רכיבי המסך ומגדירה מאזינים לבחירת תמונה (באמצעות Photo Picker) ולתהליך ההרשמה.
+
+```java
+private void createUser() {
+    String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
+    String email = Objects.requireNonNull(ETEmail.getText()).toString().trim();
+    String password = Objects.requireNonNull(ETPassword.getText()).toString().trim();
+
+    if (displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    ProgressDialog pd = new ProgressDialog(requireContext());
+    pd.setTitle("Connecting");
+    pd.setMessage("Creating User...");
+    pd.setCancelable(false);
+    pd.show();
+
+    FirebaseHandler.getAuth().createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener((requireActivity()), task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = FirebaseHandler.getAuth().getCurrentUser();
+                    if (user != null) {
+                        String base64Image = null;
+                        if (selectedImageUri != null) {
+                            try {
+                                // Convert selected image to Base64 for database storage
+                                base64Image = ImageUtils.uriToBase64(selectedImageUri, requireContext());
+                            } catch (IOException e) {
+                                Log.e(TAG, "Error converting image to Base64", e);
+                                // Use default person icon if conversion fails
+                                base64Image = ImageUtils.bitmapToBase64(BitmapFactory.decodeResource(getResources(), R.drawable.ic_person));
+                            }
+                        }
+                        updateProfile(user, displayName, base64Image, pd);
+                    }
+                } else {
+                    pd.dismiss();
+                    String toastMessage = switch (task.getException()){
+                        case FirebaseAuthWeakPasswordException ignored -> "Password is too weak";
+                        case FirebaseAuthInvalidCredentialsException ignored -> "Invalid Email Address";
+                        case FirebaseAuthUserCollisionException ignored -> "User already exists";
+                        case FirebaseNetworkException ignored -> "Network Error. Please check your connection";
+                        case null, default -> "An error occurred. Please try again later";
+                    };
+                    Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+}
+```
+מנהלת את תהליך יצירת המשתמש: אימות קלטים, יצירת החשבון ב-Firebase Auth, המרת התמונה הנבחרת לפורמט Base64 לשמירה יעילה, וטיפול בשגיאות נפוצות.
+
+```java
+private void updateProfile(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
+    pd.setMessage("Updating Profile...");
+    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+            .setDisplayName(displayName)
+            .build();
+
+    user.updateProfile(profileUpdates)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    fetchFcmTokenAndSaveUser(user, displayName, base64Image, pd);
+                } else {
+                    pd.dismiss();
+                    Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
+                }
+            });
+}
+```
+מעדכנת את הפרופיל של המשתמש ב-Firebase Authentication עם שם התצוגה שנבחר.
+
+```java
+private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
+    pd.setMessage("Fetching FCM Token...");
+    FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+        String token = null;
+        if (task.isSuccessful()) {
+            token = task.getResult();
+        } else {
+            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+        }
+        saveUserToDatabase(user, displayName, base64Image, token, pd);
+    });
+}
+```
+משיגה את ה-FCM token של המכשיר לפני שמירת רשומת המשתמש המלאה, כדי להבטיח שהמשתמש מוכן לקבל התראות מיד עם סיום ההרשמה.
+
+```java
+private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
+    pd.setMessage("Saving User Data...");
+    User newUser = new User(user.getUid(), displayName, user.getEmail(), base64Image, fcmToken);
+
+    DatabaseReference userRef = FirebaseHandler.getInstance().getRootRef().child("users").child(user.getUid());
+    userRef.setValue(newUser)
+            .addOnCompleteListener(task -> {
+                pd.dismiss();
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireContext(), "User created successfully!", Toast.LENGTH_SHORT).show();
+                    if (getActivity() instanceof MainActivity mainActivity){
+                        mainActivity.updateUI();
+                    }
+                    dismiss();
+                } else {
+                    Toast.makeText(requireContext(), "Failed to save user data", Toast.LENGTH_SHORT).show();
+                }
+            });
+}
+```
+יוצרת אובייקט `User` מלא ושומרת אותו במסד הנתונים של Firebase. בסיום מוצלח, היא מעדכנת את ממשק המשתמש במסך הראשי וסוגרת את הדיאלוג.
+
+#### `public class FriendListActivity extends AppCompatActivity`
+
+תפקיד המחלקה: ניהול רשימת החברים של המשתמש. מאפשרת חיפוש משתמשים לפי אימייל, הוספת חברים חדשים, צפייה ברשימה הקיימת ושליחת הזמנות למשחקים מרובי משתתפים.
+
+שדות המחלקה:
+```java
+/** Tag used for logging. */
+private static final String TAG = "FriendListActivity";
+/** View binding for the activity layout. */
+private ActivityFriendlistBinding binding;
+/** Adapter for the friends list RecyclerView. */
+private FriendAdapter adapter;
+/** Local list of friend objects fetched from the database. */
+private final List<User> friendsList = new ArrayList<>();
+/** Singleton instance of the FirebaseHandler. */
+private FirebaseHandler firebaseHandler;
+/** Cached snapshot of all users for searching purposes. */
+private DataSnapshot usersSnapshot;
+```
+
+תכונות המחלקה:
+``` java
+- List<User> friendsList
+- FriendAdapter adapter
+```
+
+פעולות המחלקה:
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    binding = DataBindingUtil.setContentView(this, R.layout.activity_friendlist);
+    firebaseHandler = FirebaseHandler.getInstance();
+
+    setupRecyclerView();
+    setupClickListeners();
+    setupSearchInput();
+
+    loadUsers();
+}
+```
+מאתחלת את ה-Data Binding, את המאזינים לרכיבי ה-UI (חיפוש, כפתורים), ומפעילה את טעינת המשתמשים והחברים.
+
+```java
+private void loadUsers() {
+    firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
+        usersSnapshot = snapshot;
+    }).addOnFailureListener(e -> Log.e(TAG, "Failed to load users", e));
+    loadFriends();
+}
+```
+טוענת את רשימת כל המשתמשים הרשומים (לצורך חיפוש) ולאחר מכן טוענת את רשימת החברים הספציפית של המשתמש.
+
+```java
+private void showInviteDialog(User friend) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("Invite " + friend.getDisplayName());
+    builder.setMessage("Enter room code to invite them to play:");
+
+    final EditText input = new EditText(this);
+    input.setHint("Room Code");
+    builder.setView(input);
+
+    builder.setPositiveButton("Send", (dialog, which) -> {
+        String roomCode = input.getText().toString().trim();
+        if (!roomCode.isEmpty()) {
+            sendInvitation(friend, roomCode);
+            // After sending, transition the host to the MainActivity which will open the room
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("roomCode", roomCode);
+            intent.putExtra("action", "host");
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Room code cannot be empty", Toast.LENGTH_SHORT).show();
+        }
+    });
+    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+    builder.show();
+}
+```
+מציגה דיאלוג המאפשר למשתמש להזין קוד חדר ולהזמין חבר למשחק. לאחר השליחה, המשתמש מועבר למסך הראשי במצב מארח.
+
+```java
+private void sendInvitation(User friend, String roomCode) {
+    String currentUserId = firebaseHandler.getCurrentUserId();
+    User currentUser = firebaseHandler.getUserData();
+    
+    if (currentUserId == null || currentUser == null) {
+        Toast.makeText(this, "Error: You must be logged in", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    DatabaseReference invitationsRef = firebaseHandler.getRootRef()
+            .child("invitations")
+            .child(friend.getUid())
+            .push();
+
+    Map<String, Object> invitation = new HashMap<>();
+    invitation.put("senderId", currentUserId);
+    invitation.put("senderName", currentUser.getDisplayName());
+    invitation.put("message", "Join my Boggle game!");
+    invitation.put("roomCode", roomCode);
+    invitation.put("timestamp", ServerValue.TIMESTAMP);
+
+    invitationsRef.setValue(invitation)
+            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Invitation sent to " + friend.getDisplayName(), Toast.LENGTH_SHORT).show())
+            .addOnFailureListener(e -> Toast.makeText(this, "Failed to send invitation", Toast.LENGTH_SHORT).show());
+}
+```
+יוצרת רשומת הזמנה חדשה ב-Firebase תחת המזהה של החבר המוזמן. זה יפעיל את ה-Cloud Function שישלח הודעת דחיפה לחבר.
+
+```java
+private void setupSearchInput() {
+    binding.friendEmailInput.addTextChangedListener(new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (usersSnapshot == null) return;
+            
+            String query = s.toString().toLowerCase();
+            List<User> filteredList = new ArrayList<>();
+            for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
+                User user = userSnapshot.getValue(User.class);
+                if (user != null && user.getEmail().toLowerCase().contains(query)) {
+                    if (!user.getUid().equals(firebaseHandler.getCurrentUserId())) {
+                        filteredList.add(user);
+                    }
+                }
+            }
+            filteredList.sort((u1, u2) -> u1.getDisplayName().compareToIgnoreCase(u2.getDisplayName()));
+            binding.setSearchedUser(filteredList.isEmpty() ? null : filteredList.get(0));
+        }
+        // ...
+    });
+}
+```
+מגדירה מאזין לשינויי טקסט בשדה החיפוש שמסנן את רשימת המשתמשים בזמן אמת ומציג את התוצאה הראשונה המתאימה.
+
+```java
+private void loadFriends() {
+    DatabaseReference userRef = firebaseHandler.getUserRef();
+    if (userRef == null) return;
+
+    DatabaseReference friendsRef = userRef.child("friends");
+    friendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            friendsList.clear();
+            if (!snapshot.exists()) {
+                adapter.submitList(new ArrayList<>(friendsList));
+                return;
+            }
+            for (DataSnapshot friendSnapshot : snapshot.getChildren()) {
+                String friendId = friendSnapshot.getKey();
+                if (friendId != null) {
+                    fetchFriendData(friendId);
+                }
+            }
+        }
+        // ...
+    });
+}
+```
+טוענת את רשימת מזהי החברים של המשתמש הנוכחי ומפעילה שליפה של הנתונים המלאים עבור כל אחד מהם.
+
+#### `public class FriendAdapter extends ListAdapter<User, FriendAdapter.FriendViewHolder>`
+
+תפקיד המחלקה: אדפטר ל-RecyclerView המציג את רשימת החברים. הוא אחראי על קישור נתוני המשתמשים (User objects) לתצוגה הגרפית ועל טיפול בלחיצות על כפתור ההזמנה. הוא משתמש ב-ListAdapter ו-DiffUtil לעדכונים יעילים.
+
+שדות המחלקה:
+```java
+/** Callback for when the invite button is clicked for a specific friend. */
+private final OnInviteClickListener inviteClickListener;
+```
+
+ממשק האזנה:
+```java
+public interface OnInviteClickListener {
+    void onInviteClick(User friend);
+}
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+
+```java
+@Override
+public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
+    User friend = getItem(position);
+    holder.binding.setFriend(friend);
+    
+    holder.binding.inviteButton.setOnClickListener(v -> {
+        if (inviteClickListener != null) {
+            inviteClickListener.onInviteClick(friend);
+        }
+    });
+    
+    holder.binding.executePendingBindings();
+}
+```
+מקשרת בין אובייקט המשתמש ל-ViewHolder, מגדירה את המאזין לכפתור ההזמנה ומבצעת את הקישור (Binding) באופן מיידי למניעת ריצודים.
+
+מחלקה פנימית: `private static class UserDiffCallback extends DiffUtil.ItemCallback<User>`
+מחלקה פנימית המשמשת להשוואה יעילה בין רשימות חברים לצורך עדכון חלקי של ה-RecyclerView במקום ריענון של כל הרשימה. בודקת זהות לפי אימייל ותוכן לפי שם ותמונה.
