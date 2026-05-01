@@ -1,3 +1,13 @@
+<img width="384" height="384" alt="ic_launcher" id="image" src="https://github.com/user-attachments/assets/5d371bfc-9165-4fc2-a521-64d310c6e3a5" />
+
+מגיש: יותם עמיבר  
+ת.ז:  
+בית ספר: העמק המערבי יפעת  
+מנחה: גבי לוינהיים  
+חלופה: טלפונים חכמים  
+תאריך הגשה:  
+
+<img src="https://yifat.mashov.info/wp-content/uploads/sites/142/2025/07/%D7%A1%D7%9E%D7%9C-%D7%91%D7%99%D7%94%D7%A1.png" width="328" height="288" alt="school_logo"/>
 
 # תוכן עניינים
 
