@@ -21,7 +21,7 @@
   * [פונקציות שרת](#פונקציות-שרת)
   * [מחלקות הפרוייקט](#מחלקות-הפרוייקט)
     * [מחלקת אפליקציה](#מחלקת-אפליקציה)
-      * [BoggleApplication](#boggleapplication)
+      * [מחלקה: BoggleApplication](#boggleapplication)
     * [חבילה: data](#חבילה-data)
       * [מחלקה: Trie](#trie)
       * [מחלקה: Dictionary](#dictionary)
