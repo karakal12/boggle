@@ -96,7 +96,7 @@ afterEvaluate {
         }
 
         // We change the destination to a non-ignored folder so it can be committed to GitHub.
-        destinationDir = file("${project.rootDir}/docs/javadoc")
+        destinationDir = file("${project.rootDir}/docs")
 
         options {
             (this as StandardJavadocDocletOptions).apply {
