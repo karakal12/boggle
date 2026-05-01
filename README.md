@@ -1,12 +1,123 @@
-<h1 align=center>מבוא</h1>
+# תוכן עניינים
+
+* **[מבוא](#intro)**
+  * [רקע](#רקע)
+    * [שם הפרוייקט:](#שם-הפרוייקט)
+    * [תיאור הפרוייקט:](#תיאור-הפרוייקט)
+    * [קהל היעד:](#קהל-היעד)
+    * [מטרות האפליקציה:](#מטרות-האפליקציה)
+  * [מחקר וסקירת שוק](#מחקר-וסקירת-שוק)
+  * [ניהול נתונים בפרוייקט](#ניהול-נתונים-בפרוייקט)
+* **[מבנה / ארכיטקטורה](#architecture)**
+  * [קבצי הפרוייקט](#קבצי-הפרוייקט)
+  * [מסכי הפרוייקט](#מסכי-הפרוייקט)
+  * [תרשים זרימת מסכים](#תרשים-זרימת-מסכים)
+* **[מימוש הפרוייקט](#implementation)**
+  * [קבצי gradle, libs.versions.toml, וmanifest](#קבצי-gradle-libsversionstoml-וmanifest)
+  * [תיאור מחלקות UML](#תיאור-מחלקות-uml)
+    * [פירוק לחלקים:](#פירוק-לחלקים)
+  * [בסיס נתונים](#בסיס-נתונים)
+  * [פונקציות שרת](#פונקציות-שרת)
+  * [מחלקות הפרוייקט](#מחלקות-הפרוייקט)
+    * [מחלקת אפליקציה](#מחלקת-אפליקציה)
+      * [BoggleApplication](#boggleapplication)
+    * [חבילה: data](#חבילה-data)
+      * [Trie](#trie)
+      * [Dictionary](#dictionary)
+      * [PathTrie](#pathtrie)
+      * [FirebaseHandler](#firebasehandler)
+      * [GameMode](#gamemode)
+      * [PlayerRole](#playerrole)
+      * [User](#user)
+    * [חבילה: engine](#חבילה-engine)
+      * [BoggleGame](#bogglegame)
+      * [GameSolver](#gamesolver)
+        * [GameSolverTask](#gamesolvertask)
+      * [DonutRenderer](#donutrenderer)
+    * [חבילה: services](#חבילה-services)
+      * [InvitationService](#invitationservice)
+    * [חבילה: ui.mainmenu](#חבילה-uimainmenu)
+      * [MainActivity](#mainactivity)
+      * [LoginFragment](#loginfragment)
+      * [SignUpFragment](#signupfragment)
+      * [FriendListActivity](#friendlistactivity)
+      * [FriendAdapter](#friendadapter)
+    * [חבילה: ui.game.multiplayer](#חבילה-uigamemultiplayer)
+      * [MultiplayerActivity](#multiplayeractivity)
+      * [JoinOrCreateRoomFragment](#joinorcreateroomfragment)
+      * [LobbyFragment](#lobbyfragment)
+      * [MultiplayerGameFragment](#multiplayergamefragment)
+      * [MultiplayerOnGameEndFragment](#multiplayerongameendfragment)
+      * [PlayerAdapter](#playeradapter)
+      * [PlayersWordsAdapter](#playerswordsadapter)
+    * [חבילה: ui.game.singleplayer](#חבילה-uigamesingleplayer)
+      * [SingleplayerActivity](#singleplayeractivity)
+      * [SingleplayerOnGameEndFragment](#singleplayerongameendfragment)
+    * [חבילה: ui.shared](#חבילה-uishared)
+      * [WordsAdapter](#wordsadapter)
+    * [חבילה: ui](#חבילה-ui)
+      * [DonutActivity](#donutactivity)
+    * [חבילה: views](#חבילה-views)
+      * [BoggleView](#boggleview)
+      * [SquareTextView](#squaretextview)
+    * [חבילה: utils](#חבילה-utils)
+      * [ImageUtils](#imageutils)
+      * [Timer](#timer)
+      * [PointAndDepth](#pointanddepth)
+      * [Quad](#quad)
+
+
+<h1 align=center id="intro">מבוא</h1>
 
 ## רקע
 
-## מחקר
+### שם הפרוייקט: 
+Boggle (בוגל)
+
+### תיאור הפרוייקט:
+אפליקציית משחק מילים דיגיטלית המבוססת על משחק הקופסה הקלאסי "בוגל". המשחק מציג לוח בגודל 4x4 של קוביות עם אותיות באנגלית. על השחקן למצוא כמה שיותר מילים תקניות על ידי חיבור אותיות סמוכות (אופקית, אנכית ואלכסונית) בתוך מגבלת זמן של 3 דקות. האפליקציה תומכת בשני מצבי משחק:
+* **שחקן יחיד:** אתגר אישי למציאת כמה שיותר מילים וקבלת ניקוד בהתאם לאורך המילים שניחשו.
+* **מרובה משתתפים (Multiplayer):** משחק בזמן אמת מול חברים דרך רשת האינטרנט, המאפשר ליצור חדר משחק, לשלוח הזמנות לחברים דרך התראות, ולהתחרות מי מוצא הכי הרבה מילים ייחודיות.
+
+### קהל היעד:
+האפליקציה מיועדת לאוהבי משחקי מילים, חובבי פאזלים ואתגרי חשיבה, תלמידים, ולכל מי שמעוניין להעביר את הזמן בצורה חווייתית ומהנה תוך כדי תרגול ושיפור אוצר המילים שלו באנגלית. בנוסף, היא מיועדת לשחקנים שאוהבים אינטראקציה חברתית ותחרותיות מול חברים.
+
+### מטרות האפליקציה:
+* **בידור והנאה:** לספק חווית משחק אינטראקטיבית, חלקה ונוחה המדמה את המשחק המסורתי במכשיר הנייד.
+* **אתגר חברתי:** לאפשר לחברים להתחבר ולשחק יחד מרחוק בקלות, כולל מערכת הזמנות והתראות.
+* **למידה:** לשמש ככלי עזר לשיפור ואימון אוצר המילים והאיות בשפה האנגלית.
+* **יכולות טכנולוגיות:** להדגים בניית אפליקציית אנדרואיד המשלבת אלגוריתמיקה מורכבת (עצי Trie, פותרן לוחות ב-DFS, רינדור 3D) יחד עם שירותי ענן ואותנטיקציה מתקדמים (Firebase Auth, Realtime Database, Cloud Messaging).
+
+## מחקר וסקירת שוק
+
+שוק משחקי המילים במובייל הוא אחד הפעילים והרווחיים ביותר בקטגוריית משחקי הקז'ואל (Casual Games). שחקנים מחפשים חוויות קצרות (סשנים של 3-5 דקות, אידיאלי למשחק בוגל סטנדרטי), אתגר מחשבתי, ואלמנט תחרותי קליל מול חברים או שחקנים אקראיים מרחבי העולם. בעוד שיש מספר אפליקציות הדומות לבוגל בחנויות, האפליקציה שלי תוכננה עם דגשים ייחודיים בהשראת מודלים מוצלחים בשוק:
+
+* **Boggle With Friends: Word Game (Zynga):**
+האפליקציה הרשמית והמוכרת ביותר כיום בשוק למשחק בוגל. היא מציעה חוויה חברתית עשירה. עם זאת, קיים הבדל משמעותי במכניקת הליבה: ב-"Boggle With Friends", שיטת הניקוד מבוססת על ערך אינדיבידואלי לכל אות (בדומה למשחק "שבץ-נא" / Scrabble), בתוספת קוביות המעניקות מכפילים (Double/Triple Word/Letter). **בשונה מכך, האפליקציה שלי שומרת על נאמנות לחוקי משחק הקופסה המקוריים:** הניקוד נקבע אך ורק על פי אורך המילה (לדוגמה, מילה בת 3-4 אותיות שווה נקודה אחת, 5 אותיות = 2 נקודות, וכן הלאה). גישה זו מחזירה את המיקוד של השחקן למציאת מילים ארוכות ומורכבות, במקום חיפוש טקטי של אותיות נדירות על גבי מכפילים.
+
+* **Chess.com:**
+למרות שזהו משחק שחמט ולא משחק מילים, פלטפורמת המובייל של Chess.com משמשת כמודל השראה מצוין עבורי לניהול משחקים מרובי משתתפים (Multiplayer) בזמן אמת. האופן שבו שחקנים יכולים להזמין חברים למשחק בקליק, לנהל רשימת חברים (Friends List), ולחוות התאמה מהירה וחלקה בשרתים (Realtime Sync), מהווה את הסטנדרט אליו שאפתי. מודל הלובי (Lobby), מערכת ההזמנות ושירותי הרקע (Push Notifications) באפליקציה שלי נבנו מתוך רצון לספק חווית חיבור חלקה ומהירה בדומה לפלטפורמות מבוססות-תחרות כגון זו.
 
 ## ניהול נתונים בפרוייקט
 
-<h1 align=center>מבנה / ארכיטקטורה</h1>
+**אובייקטים נחוצים:**
+
+**במשחק:**
+* **לוח (Board)** - מיוצג על ידי מערך חד-ממדי של תווים (16 תווים) המייצגים את האותיות שהוגרלו בקוביות.
+* **קוביות/משבצות (Dice/Cells)** - רכיב ויזואלי מותאם אישית (`SquareTextView`) השומר על פרופורציה ריבועית (1:1), מכיל את האות ויכול לשנות את צבע הרקע שלו בהתאם למצב (נבחר, מילה נכונה, מילה שגויה, רמז).
+* **עץ תחיליות (Trie / Dictionary)** - מבנה נתונים רקורסיבי המשמש לאחסון וחיפוש יעיל של מילים. המילון הרשמי של המשחק נטען למבנה זה עם עליית האפליקציה. במהלך המשחק, מנוע המשחק משתמש בגרסה מורחבת שלו (`PathTrie`) אשר שומרת לא רק את המילים החוקיות שנמצאו על הלוח בעזרת אלגוריתם DFS, אלא גם את המסלול המדויק שלהן, מה שמאפשר אימות מהיר והצגת רמזים למשתמש.
+* **מנוע המשחק (BoggleGame)** - מחלקה המנהלת את מצב המשחק (State), כולל הניקוד הנוכחי, רשימת המילים שנמצאו, האינדקסים של הקוביות שנבחרו כרגע, מד הזמן, ועץ התחיליות (`PathTrie`) המכיל ומחשב מראש את כל הפתרונות האפשריים ללוח הנוכחי.
+* **חדר משחק (Multiplayer Room)** - מיוצג בבסיס הנתונים (Firebase) עם פרטים כמו: קוד החדר, רשימת השחקנים (מארח ואורחים), מחרוזת הלוח שהוגרל, מצב המשחק (פעיל/הסתיים), ורשימות המילים שכל שחקן מצא, המתעדכנות בזמן אמת.
+
+**מחוץ למשחק:**
+* **משתמש (User)** - המשתמש שמור בשני מקומות שונים. החלקים הקשורים לאימות והתחברות (דוא"ל וסיסמה) שמורים ב-`Firebase Authentication`. שאר הפרטים כמו: מזהה ייחודי (UID), שם תצוגה, תמונת פרופיל (מקודדת ב-Base64), אסימון התראות (FCM Token), רשימת חברים, והיסטוריית תוצאות משחקים ששוחקו, נשמרים ב-`Firebase Realtime Database`.
+* **הזמנות (Invitations)** - מיוצגות במסד הנתונים וכוללות את פרטי השולח, קוד החדר והודעה אישית.
+
+**אינטראקציה ועדכון אובייקטים מרובים:**
+הפעולות באפליקציה בדרך כלל משפיעות על יותר מאובייקט אחד. לדוגמה, כאשר שחקן מוצא מילה תקנית במשחק, המערכת חייבת להוסיף את המילה לרשימת המילים שנמצאו במנוע המשחק המקומי (`BoggleGame`), להגדיל את הניקוד, לעדכן את התצוגה הויזואלית (לצבוע את הקוביות הרלוונטיות בירוק ב-`BoggleView`), ואם מדובר במשחק מרובה משתתפים - לעדכן בזמן אמת את מסד הנתונים (`Firebase`) כדי שהשרת ישתף את המילה שנמצאה עם שאר השחקנים.
+דוגמה נוספת: שליחת הזמנה לחבר מעדכנת את רשומת ההזמנות ב-`Firebase Realtime Database`, מה שמפעיל פונקציית שרת (Cloud Function) הקוראת את אסימון ה-FCM של החבר ושולחת לו התראת דחיפה (Push Notification) למכשיר, דרכה הוא יכול להצטרף לחדר.
+
+<h1 align=center id="architecture">מבנה / ארכיטקטורה</h1>
 
 ## קבצי הפרוייקט
 
@@ -20,12 +131,12 @@
 
 ## תרשים זרימת מסכים
 
-<h1 align=center>מימוש הפרוייקט</h1>
+<h1 align=center id="implementation">מימוש הפרוייקט</h1>
 
 ## קבצי gradle, libs.versions.toml, וmanifest
 
 gradle:
-[] הסבר על gradle
+Gradle (גרדל) הוא כלי בניית הפרוייקט (Build System) הרשמי של אנדרואיד. הוא אחראי על תהליך ההידור (קומפילציה), אריזת הקוד, קבצי המשאבים (Resources) והספריות החיצוניות לקובץ התקנה סופי (APK או AAB). בנוסף, דרך קבצי ה-Gradle אני מנהל את הגדרות הפרוייקט, גרסאות ה-SDK, סוגי הבנייה (למשל Debug מול Release) והתלויות (Dependencies) של האפליקציה. הקבצים מחולקים לשתי רמות: רמת הפרוייקט (הגדרות כלליות) ורמת האפליקציה (הגדרות ספציפיות למודול).
 רמת אפליקציה:
 ``` gradle
 plugins {
@@ -161,7 +272,8 @@ plugins {
 }
 ```
 
-[] הסבר על toml
+libs.versions.toml:
+קובץ זה (Version Catalog) משמש לניהול מרוכז ומסודר של כל גרסאות הספריות, התוספים (Plugins) והתלויות בפרוייקט. במקום לכתוב את גרסת הספרייה בקובץ ה-Gradle של כל מודול בנפרד, מגדירים הכל כאן, מה שמקל על תחזוקה, מונע התנגשויות גרסאות, ושומר על סדר (במיוחד בפרוייקטים מרובי מודולים).
 ``` toml
 [versions]
 agp = "9.0.1"
@@ -205,7 +317,8 @@ google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ```
 
-[] הסבר על manifest
+manifest:
+קובץ ה-`AndroidManifest.xml` הוא קובץ הגדרות הליבה של האפליקציה, והוא "תעודת הזהות" שלה מול מערכת ההפעלה Android. בו מוצהרים כל רכיבי האפליקציה (כמו מסכים - Activities, ושירותי רקע - Services), ההרשאות הנדרשות (כמו גישה לאינטרנט או קבלת התראות), הגדרות הנושא (Theme), אייקון האפליקציה, ונקודת הכניסה הראשית (איזה מסך נפתח כשהאפליקציה עולה). בלעדיו, המערכת לא תדע כיצד להריץ את האפליקציה.
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -351,8 +464,22 @@ exports.sendInvitationNotification = onValueCreated(
 
 ## מחלקות הפרוייקט
 
+### מחלקת אפליקציה
+
+<a id="boggleapplication"></a>
+#### `public class BoggleApplication extends Application`
+תפקיד המחלקה: מחלקת האפליקציה המותאמת המשמשת לאתחולים גלובליים הדורשים הפעלה פעם אחת בלבד במהלך עליית האפליקציה.
+
+פעולות המחלקה:
+```java
+@Override
+public void onCreate()
+```
+מופעלת עם עליית האפליקציה לפני הפעלת המסכים. מאתחלת את המילון (Dictionary) מקובץ רשימת המילים כדי שיהיה מוכן ומסודר בזיכרון, ובנוסף מפעילה עדכון אסינכרוני לנתוני המשתמש ב-`FirebaseHandler`.
+
 ### חבילה: data
 
+<a id="trie"></a>
 #### `public abstract class Trie<T extends Trie<T>`
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
@@ -491,6 +618,7 @@ protected void _getWords(String word, Set<String> set) {
 ```
 זוג פונקציות, רקורסיבית ומעטפת, שאוספות את כל המילים בעץ ומחזירות אותר בקבוצה.
 
+<a id="dictionary"></a>
 #### `public final class Dictionary extends Trie<Dictionary>`
 שדות המחלקה:
 ``` java
@@ -531,6 +659,7 @@ public synchronized void init(InputStream file) {
 ממלא את המילון עם הקובץ שהועבר.
 זה synchronized כדי להגן מקריאה יותר מפעם אחת, גם אם הקריאות באותו הזמן.
 
+<a id="pathtrie"></a>
 #### `public class PathTrie extends Trie<PathTrie>`
 תפקיד המחלקה: להרחיב את Trie עם יכולת גם לשמור את המסלול על הלוח עליו הצירוף אותיות נמצא, יכול לשמור רק מסלול אחד לכל צירוף.
 
@@ -568,6 +697,7 @@ public HashMap<String, String> toMap() {
 ```
 יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
 
+<a id="firebasehandler"></a>
 #### `public class FirebaseHandler`
 תפקיד המחלקה: מחלקה יחידנית ששומרת אצלה את כל הדברים שקשורים לFirebase ולשחקן הנוכחי.
 
@@ -652,6 +782,7 @@ public void addFriend(String id) {
 מוסיף מתשתמש לרשימת החברים
 
 
+<a id="gamemode"></a>
 #### `public enum GameMode`
 שדות המחלקה:
 `singleplayer`
@@ -663,6 +794,7 @@ public void addFriend(String id) {
 ```
 פעולות המחלקה: הפעולות שהורשו מ <Enum<E
 
+<a id="playerrole"></a>
 #### `public enum PlayerRole`
 שדות המחלקה:
 `host`
@@ -674,6 +806,7 @@ public void addFriend(String id) {
 ```
 פעולות המחלקה: הפעולות שהורשו מ <Enum<E
 
+<a id="user"></a>
 #### `public class User`
 
 תפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
@@ -686,9 +819,9 @@ private String uid;
 /** The user's chosen display name. */
 private String displayName;
 /** The user's email address, used for authentication and identification. */
-private String email;
-/** A Base64 encoded string of the user's profile picture. */
 private String profileImageBase64;
+/** A Base64 encoded string of the user's profile picture. */
+private String fcmToken;
 /** The User's current device's Firebase Cloud Messaging (FCM) token. */
 private String fcmToken;
 ```
@@ -706,6 +839,7 @@ private String fcmToken;
 
 ### חבילה: engine
 
+<a id="bogglegame"></a>
 #### `public class BoggleGame`
 תפקיד המחלקה: מייצגת מופע של משחק בוגל, מנהלת את מצב המשחק, הקוביות, הניקוד ואימות המילים. היא מטפלת ביצירת הלוח, בחירת מילים על ידי השחקן, לוגיקת הניקוד וחישוב מראש של כל הפתרונות האפשריים.
 
@@ -912,6 +1046,7 @@ public void endGame() {
 ```
 מסיימת את המשחק, עוצרת את הטיימר ומעדכנת את המאזינים.
 
+<a id="gamesolver"></a>
 #### `public class GameSolver`
 תפקיד המחלקה: מספקת את לוגיקת הליבה לפתרון לוח בוגל בצורה יעילה ומקבילית. היא מזהה את כל המילים התקינות מהמילון שניתן ליצור על לוח 4x4 על ידי חיבור קוביות סמוכות, תוך שימוש באלגוריתם חיפוש לעומק (DFS) ומסגרת ה-ForkJoin לניצול מעבדים מרובי ליבות.
 
@@ -942,6 +1077,7 @@ public SolverResult solve(char[][] board, Dictionary dictionary)
 ```
 הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
 
+<a id="gamesolvertask"></a>
 ##### `class GameSolverTask extends RecursiveAction`
 מחלקה פנימית המבצעת את החיפוש הרקורסיבית. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
 
@@ -967,6 +1103,7 @@ private boolean isSafe(int i, int j, short visited)
 ```
 פעולת עזר הבודקת האם קואורדינטות `(i, j)` נמצאות בתוך גבולות הלוח והאם התא טרם בוקר במסלול הנוכחי (באמצעות בדיקת הביט המתאים ב-`visited`).
 
+<a id="donutrenderer"></a>
 #### `public class DonutRenderer`
 תפקיד המחלקה: ביצת הפתעה. מחלקה האחראית על רינדור תלת-ממדי בזמן אמת של צורת טורוס (דונאט) מסתובבת על גבי `SurfaceView`. המימוש הושרא מהקוד המפורסם [`Donut.c`](https://www.a1k0n.net/2011/07/20/donut-math.html) של `a1k0n`.
 
@@ -1201,6 +1338,7 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 
 ### חבילה: services
 
+<a id="invitationservice"></a>
 #### `public class InvitationService extends FirebaseMessagingService`
 תפקיד המחלקה: אחראית על קבלת הודעות דחיפה (Push Notifications) מ-Firebase, ניהול הזמנות למשחק בזמן אמת והצגת התראות למשתמש.
 
@@ -1313,6 +1451,7 @@ private void showNotification(String title, String body, Map<String, String> dat
 
 ### חבילה: ui.mainmenu
 
+<a id="mainactivity"></a>
 #### `public class MainActivity extends AppCompatActivity`
 
 מטרת מחלקה: המסך הראשי של האפליקציה. הוא משמש כנקודת הכניסה המרכזית, מנהל את התפריט הצידי (Navigation Drawer), את המעברים למצבי המשחק השונים (שחקן יחיד ומרובה שחקנים), את רשימת החברים, ואת הגישה למערכת ההזדהות (Login/Signup). בנוסף, הוא מטפל בקבלת הזמנות למשחק דרך Intent-ים.
@@ -1381,7 +1520,7 @@ protected void onCreate(Bundle savedInstanceState) {
     handleIntent(getIntent());
 }
 ```
-מאתחלת את ה-View Binding, מגדירה תצוגה מקצה לקצה (EdgeToEdge), מגדירה מאזינים למרווחים של מערכת ההפעלה (Insets), ומפעילה את פונקציות האתחול של המסך, ההרשאות ומצב המשתמש.
+מאתחלת את ה-View Binding, מגדירה תצוגה מקצה לקצה (EdgeToEdge), מגדירה מאזינים למרווחים של מערכת ההפעלה (Insets), ומפעילה פונקציות האתחול של המסך, ההרשאות ומצב המשתמש.
 
 ```java
 @Override
@@ -1555,6 +1694,7 @@ private void askNotificationPermission() {
 ```
 מבקשת מהמשתמש הרשאת התראות (עבור אנדרואיד 13 ומעלה) כדי שיוכל לקבל הזמנות למשחק.
 
+<a id="loginfragment"></a>
 #### `public class LoginFragment extends DialogFragment`
 תפקיד המחלקה: `DialogFragment` המספק ממשק התחברות למשתמשים קיימים. הוא מטפל באימות מול Firebase, דיווח על שגיאות ועדכון ה-FCM token של המשתמש לאחר כניסה מוצלחת.
 
@@ -1649,6 +1789,7 @@ private void updateFcmToken() {
 ```
 משיגה את ה-FCM token העדכני של המכשיר ושומרת אותו במסד הנתונים תחת המשתמש המחובר, מה שמאפשר לו לקבל הזמנות למשחק כהתראות.
 
+<a id="signupfragment"></a>
 #### `public class SignUpFragment extends DialogFragment`
 תפקיד המחלקה: `DialogFragment` המספק ממשק הרשמה למשתמשים חדשים. הוא מטפל ביצירת חשבון ב-Firebase Authentication, בחירת תמונת פרופיל מהגלריה, ושמירת כל נתוני המשתמש (כולל ה-FCM token) במסד הנתונים בזמן אמת.
 
@@ -1815,6 +1956,7 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
 ```
 יוצרת אובייקט `User` מלא ושומרת אותו במסד הנתונים של Firebase. בסיום מוצלח, היא מעדכנת את ממשק המשתמש במסך הראשי וסוגרת את הדיאלוג.
 
+<a id="friendlistactivity"></a>
 #### `public class FriendListActivity extends AppCompatActivity`
 
 תפקיד המחלקה: ניהול רשימת החברים של המשתמש. מאפשרת חיפוש משתמשים לפי אימייל, הוספת חברים חדשים, צפייה ברשימה הקיימת ושליחת הזמנות למשחקים מרובי משתתפים.
@@ -1981,6 +2123,7 @@ private void loadFriends() {
 ```
 טוענת את רשימת מזהי החברים של המשתמש הנוכחי ומפעילה שליפה של הנתונים המלאים עבור כל אחד מהם.
 
+<a id="friendadapter"></a>
 #### `public class FriendAdapter extends ListAdapter<User, FriendAdapter.FriendViewHolder>`
 
 תפקיד המחלקה: אדפטר ל-RecyclerView המציג את רשימת החברים. הוא אחראי על קישור נתוני המשתמשים (User objects) לתצוגה הגרפית ועל טיפול בלחיצות על כפתור ההזמנה. הוא משתמש ב-ListAdapter ו-DiffUtil לעדכונים יעילים.
@@ -2021,3 +2164,744 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
 
 מחלקה פנימית: `private static class UserDiffCallback extends DiffUtil.ItemCallback<User>`
 מחלקה פנימית המשמשת להשוואה יעילה בין רשימות חברים לצורך עדכון חלקי של ה-RecyclerView במקום ריענון של כל הרשימה. בודקת זהות לפי אימייל ותוכן לפי שם ותמונה.
+
+### חבילה: ui.game.multiplayer
+
+<a id="multiplayeractivity"></a>
+#### `public class MultiplayerActivity extends AppCompatActivity`
+תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק מרובת המשתתפים. היא מנהלת את המעבר בין הלובי למשחק הפעיל ומנקה את נתוני החדר ב-Firebase בסיום.
+
+שדות המחלקה:
+```java
+/** Tag used for logging. */
+public static final String TAG = "MultiplayerActivity";
+/** Intent extra key for the room code. */
+public static final String ARG_ROOM_CODE = "room_code";
+/** Intent extra key for the player's role (HOST or GUEST). */
+public static final String ARG_PLAYER_ROLE = "player_role";
+
+/** View binding for the activity layout. */
+private ActivityMultiplayerBinding binding;
+
+/** The code of the current multiplayer room. */
+private String roomCode;
+/** The role of the local player in this session. */
+private PlayerRole playerRole;
+```
+
+תכונות המחלקה:
+``` java
+- String roomCode
+- PlayerRole playerRole
+```
+
+פעולות המחלקה:
+```java
+@Override
+protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    // Enable edge-to-edge display
+    EdgeToEdge.enable(this);
+    
+    binding = ActivityMultiplayerBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
+
+    // Adjust layout for system bars
+    ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+        Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        return insets;
+    });
+    
+    // Retrieve room details from the starting Intent
+    if (getIntent() != null) {
+        playerRole = getIntent().getSerializableExtra(ARG_PLAYER_ROLE, PlayerRole.class);
+        roomCode = getIntent().getStringExtra(ARG_ROOM_CODE);
+    }
+
+    // Initialize by showing the LobbyFragment
+    if (savedInstanceState == null && roomCode != null && playerRole != null) {
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .add(binding.main.getId(), LobbyFragment.newInstance(roomCode, playerRole), LobbyFragment.TAG)
+                .commit();
+    }
+}
+```
+מאתחלת את ה-Activity ומציגה את ה-LobbyFragment.
+
+```java
+public void startGame(){
+    if (roomCode != null) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(binding.main.getId(), MultiplayerGameFragment.newInstance(playerRole, roomCode), MultiplayerGameFragment.TAG)
+                .commit();
+    }
+}
+```
+עוברת למסך המשחק הפעיל (MultiplayerGameFragment).
+
+```java
+public void showGameResults(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords) {
+    MultiplayerOnGameEndFragment fragment = MultiplayerOnGameEndFragment.newInstance(solutions, playersWords);
+    fragment.show(getSupportFragmentManager(), MultiplayerOnGameEndFragment.TAG);
+}
+```
+מציגה את תוצאות המשחק הסופיות בדיאלוג.
+
+```java
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    // Cleanup: remove the player from the room or delete the room if empty
+    if (roomCode != null) {
+        String userId = FirebaseHandler.getInstance().getCurrentUserId();
+        if (userId != null) {
+            DatabaseReference roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
+            // Remove local player from the Firebase list
+            roomRef.child("players").child(userId).removeValue().addOnCompleteListener(task -> {
+                // Check if any players remain; if not, remove the entire room node
+                roomRef.child("players").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                            // Housekeeping: remove empty room node
+                            roomRef.removeValue();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            });
+        }
+    }
+}
+```
+מסירה את השחקן מהחדר בשרת ומנקה חדרים ריקים.
+
+<a id="joinorcreateroomfragment"></a>
+#### `public class JoinOrCreateRoomFragment extends DialogFragment`
+תפקיד המחלקה: דיאלוג המאפשר למשתמש ליצור חדר משחק חדש או להצטרף לחדר קיים באמצעות קוד.
+
+שדות המחלקה:
+``` java
+/** Tag used for identifying this fragment in the FragmentManager. */
+public static final String TAG = "JoinOrCreateRoomFragment";
+/** Key for the initial room code passed in arguments. */
+private static final String ARG_INITIAL_ROOM_CODE = "initial_room_code";
+/** Key for the initial player role passed in arguments. */
+private static final String ARG_INITIAL_PLAYER_ROLE = "initial_player_role";
+
+/** View binding for fragment layout. */
+private FragmentJoinOrCreateRoomBinding binding;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+public static JoinOrCreateRoomFragment newInstance(String roomCode, PlayerRole playerRole)
+```
+יוצרת מופע עם נתונים התחלתיים.
+
+``` java
+public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+```
+מאתחלת את הממשק ומטפלת בבקשות הצטרפות ישירות.
+
+``` java
+private void createRoom(View view)
+```
+יוצרת חדר חדש ועוברת למסך המולטיפלייר כמארח.
+
+``` java
+private void joinRoom(View view)
+```
+בודקת קיום חדר בשרת ומצטרפת כאורח.
+
+``` java
+private Intent makeIntent(PlayerRole role)
+```
+פונקציית עזר לבניית Intent המעבר.
+
+<a id="lobbyfragment"></a>
+#### `public class LobbyFragment extends Fragment`
+תפקיד המחלקה: מציגה את חדר ההמתנה (Lobby), רשימת השחקנים המחוברים ומאפשרת למארח להתחיל את המשחק.
+
+שדות המחלקה:
+``` java
+/** Tag used for identifying this fragment. */
+public static final String TAG = "LobbyFragment";
+
+/** View binding for fragment layout. */
+private FragmentLobbyBinding binding;
+/** Adapter for the player list RecyclerView. */
+private PlayerAdapter playerAdapter;
+/** Local list of users currently in the lobby. */
+private final List<User> playerList = new ArrayList<>();
+
+/** The unique code for the current game room. */
+private String roomCode;
+/** The role of the local player (HOST or GUEST). */
+private PlayerRole playerRole;
+/** The local player's user data. */
+private User player;
+/** Reference to the room's node in Firebase Realtime Database. */
+private DatabaseReference roomRef;
+/** Listener for player list and game start updates in Firebase. */
+private ValueEventListener playerListener;
+```
+
+תכונות המחלקה:
+``` java
+- List<User> playerList
+- String roomCode
+```
+
+פעולות המחלקה:
+``` java
+public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+```
+רושמת את השחקן בחדר ומגדירה את התצוגה.
+
+``` java
+private void listenForPlayers()
+```
+מעדכנת את הרשימה ומזהה מתי המשחק מתחיל בשרת.
+
+``` java
+private void startGame(View view)
+```
+מעדכנת בשרת שהמשחק התחיל (למארח בלבד).
+
+<a id="multiplayergamefragment"></a>
+#### `public class MultiplayerGameFragment extends Fragment`
+תפקיד המחלקה: ניהול לוגיקת המשחק בזמן אמת במצב מרובה משתתפים, כולל סנכרון הלוח והמילים מול Firebase.
+
+שדות המחלקה:
+``` java
+/** Tag used for logging and fragment identification. */
+public static final String TAG = "MultiplayerGameFragment";
+
+/** View binding for the fragment layout. */
+private FragmentMultiplayerGameBinding binding;
+/** The code of the current multiplayer room. */
+private String roomCode;
+/** The role of the local player (HOST or GUEST). */
+private PlayerRole playerRole;
+
+/** Reference to the room node in Firebase Realtime Database. */
+private DatabaseReference roomRef;
+/** Listener for the game board string in Firebase. */
+private ValueEventListener boardListener;
+/** Listener for the game end flag in Firebase. */
+private ValueEventListener gameEndListener;
+/** Listener to detect if the room is deleted from outside. */
+private ChildEventListener gameDestroyedListener;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+```
+המארח מייצר לוח; האורחים ממתינים לסנכרון הלוח.
+
+``` java
+private void listenForGameEnd()
+```
+מפעילה איסוף תוצאות כשדגל הסיום מתעדכן.
+
+``` java
+private void setupGame(BoggleGame game)
+```
+מסנכרנת מילים שנמצאו לשרת ומעדכנת סיום זמן.
+
+``` java
+private void collectResultsAndFinish()
+```
+אוספת את כל המילים של כלל השחקנים מה-Database.
+
+<a id="multiplayerongameendfragment"></a>
+#### `public class MultiplayerOnGameEndFragment extends DialogFragment`
+תפקיד המחלקה: דיאלוג המציג את תוצאות המשחק הסופיות והשוואת המילים בין השחקנים.
+
+שדות המחלקה:
+``` java
+/** Tag for identifying the fragment. */
+public static final String TAG = "MultiplayerOnGameEndFragment";
+/** Argument key for the map of players to their found words. */
+public static final String ARG_PLAYERS_WORDS = "playersWords";
+/** Argument key for the map of solution words to their paths. */
+public static final String ARG_SOLUTIONS = "solutions";
+
+/** View binding for the fragment layout. */
+private FragmentMultiplayerOnGameEndBinding binding;
+/** Adapter for displaying players' words in a list. */
+private PlayersWordsAdapter playersWordsAdapter;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+public static MultiplayerOnGameEndFragment newInstance(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords)
+```
+מעבירה את מפות הפתרונות והמילים שנמצאו.
+
+``` java
+public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+```
+מאתחלת את רשימת התוצאות המורחבת.
+
+<a id="playeradapter"></a>
+#### `public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder>`
+תפקיד המחלקה: אדפטר להצגת פרטי השחקנים (שם ותמונה) בלובי ההמתנה.
+
+שדות המחלקה:
+``` java
+/** List of users currently in the lobby. */
+private final List<User> playerList;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
+```
+מבצעת Data Binding של נתוני השחקן לתצוגה.
+
+<a id="playerswordsadapter"></a>
+#### `public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapter.ViewHolder>`
+תפקיד המחלקה: אדפטר מורכב המציג את מילות השחקנים בסיום המשחק עם גלילה מסונכרנת.
+
+שדות המחלקה:
+``` java
+/** List of players whose words are being displayed. */
+private final List<User> players;
+/** Map of each user to their list of found words. */
+private final HashMap<User, ArrayList<String>> playersWords;
+/** Map of all valid words on the board to their paths. */
+private final HashMap<String, String> solutions;
+/** Set of words that were found by more than one player. */
+private final Set<String> commonWords;
+/** Inflater for creating item views. */
+private final LayoutInflater inflater;
+/** Listener for word click events. */
+private final WordsAdapter.OnWordClickListener onWordClickListener;
+
+/** Set of child RecyclerViews to synchronize scrolling across. */
+private final Set<RecyclerView> childRecyclerViews = Collections.newSetFromMap(new WeakHashMap<>());
+/** Current horizontal scroll position to maintain consistency. */
+private int currentScrollX = 0;
+
+/**
+ * Scroll listener attached to child RecyclerViews to synchronize their horizontal movement.
+ */
+private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView.OnScrollListener()
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+private Set<String> findCommonWords(HashMap<User, ArrayList<String>> playersWords)
+```
+מזהה כפילויות במילים בין השחקנים.
+
+``` java
+public void onBindViewHolder(@NonNull ViewHolder holder, int position)
+```
+בונה רשימת מילים פנימית לכל שחקן ומחברת אותה למנגנון סנכרון הגלילה.
+
+### חבילה: ui.game.singleplayer
+
+<a id="singleplayeractivity"></a>
+#### `public class SingleplayerActivity extends AppCompatActivity`
+תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק לשחקן יחיד. היא מנהלת את לוגיקת המשחק, תוצאות המשחק בסיום והעלאתן ל-Firebase.
+
+שדות המחלקה:
+```java
+/** Tag used for logging and debugging purposes. */
+private static final String TAG = "SingleplayerActivity";
+
+/** View binding instance for accessing layout components. */
+ActivitySingleplayerBinding binding;
+
+/** Key for passing the final score in an Intent result. */
+public static final String EXTRA_SCORE = "extra_score";
+
+/** The underlying game engine instance. */
+private BoggleGame game;
+/** Flag to track if the current game session has concluded. */
+private boolean isGameEnded = false;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+protected void onCreate(Bundle savedInstanceState) {
+    // ...
+    game.addOnGameEndListener(() ->
+            runOnUiThread(() -> {
+                if (isDestroyed()) return;
+                isGameEnded = true;
+
+                Intent data = new Intent();
+                data.putExtra(EXTRA_SCORE, game.getScore());
+                setResult(RESULT_OK, data);
+
+                showGameEndDialog();
+                uploadGameResults(game);
+            }));
+
+    game.addOnWordFoundListener(word -> {
+        if (word.equalsIgnoreCase("donut")){
+            game.stopTimer();
+            Intent intent = new Intent(this, DonutActivity.class);
+            startActivity(intent);
+        }
+    });
+    // ...
+}
+```
+מאתחלת את המשחק, מגדירה אירועים לסיום המשחק וגילוי מילות סתר (Easter Egg).
+
+``` java
+private void uploadGameResults(BoggleGame game) {
+    FirebaseHandler handler = FirebaseHandler.getInstance();
+    DatabaseReference userRef = handler.getUserRef();
+
+    if (userRef != null) {
+        GameResult result = new GameResult(
+                game.getScore(), game.getFoundWords().size(),
+                game.getSolutions().size(), game.getMaxScore(),
+                game.getFoundWords(), String.valueOf(game.getBoard())
+        );
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String timestamp = sdf.format(new Date());
+
+        userRef.child("games").child(timestamp).setValue(result);
+    }
+}
+```
+מעלה את תוצאות המשחק למסד הנתונים בענן עבור המשתמש הנוכחי.
+
+``` java
+private void showGameEndDialog() {
+    if (isDestroyed()) return;
+    try {
+        SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
+                game.getSolutions().toMap(), game.getFoundWords(), game.getScore()
+        );
+        fragment.setOnWordClickListener((word, path) -> binding.boggleView.showSolution(path));
+
+        getSupportFragmentManager().beginTransaction()
+                .add(fragment, SingleplayerOnGameEndFragment.TAG)
+                .commitAllowingStateLoss();
+    } catch (Exception e) {
+        Log.e(TAG, "Failed to show game end dialog", e);
+    }
+}
+```
+מציגה חלון סיכום עם המילים שנמצאו ואלו שפוספסו.
+
+<a id="singleplayerongameendfragment"></a>
+#### `public class SingleplayerOnGameEndFragment extends DialogFragment`
+תפקיד המחלקה: דיאלוג המוצג בסיום משחק יחיד. מציג את הניקוד, המילים שנמצאו וכל הפתרונות האפשריים.
+
+שדות המחלקה:
+```java
+/** Tag used for identifying the fragment. */
+public static final String TAG = "SingleplayerOnGameEndFragment";
+
+/** Key for the solutions argument. */
+private static final String ARG_SOLUTIONS = "solutions";
+/** Key for the found words argument. */
+private static final String ARG_FOUND_WORDS = "found_words";
+/** Key for the score argument. */
+private static final String ARG_SCORE = "score";
+
+/** View binding for the fragment layout. */
+private FragmentSingleplayerOnGameEndBinding binding;
+/** Callback listener for when a word is clicked in the list. */
+private OnWordClickListener listener;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+``` java
+public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
+    SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
+    Bundle args = new Bundle();
+    args.putSerializable(ARG_SOLUTIONS, new HashMap<>(solutions));
+    args.putStringArrayList(ARG_FOUND_WORDS, new ArrayList<>(foundWords));
+    args.putInt(ARG_SCORE, score);
+    fragment.setArguments(args);
+    return fragment;
+}
+```
+יוצרת מופע של הדיאלוג עם הנתונים של המשחק שהסתיים.
+
+``` java
+@NonNull
+@Override
+public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    // ...
+    if (solutions != null && foundWords != null) {
+        binding.wordsList.setAdapter(new WordsAdapter(solutions, foundWords, (word, path) -> {
+            if (listener != null) {
+                listener.onWordClick(word, path);
+            }
+            dismiss();
+        }));
+    }
+    // ...
+    return dialog;
+}
+```
+מאתחלת את רשימת המילים ומקשרת אותה ל-Adapter שיציג את הפתרונות. (הקוד ב-onCreateDialog מחליף את onViewCreated).
+
+``` java
+public void setOnWordClickListener(OnWordClickListener listener) {
+    this.listener = listener;
+}
+```
+מאפשרת להגדיר מאזין ללחיצות על מילים, כדי שניתן יהיה להציג את המסלול שלהן על הלוח.
+
+### חבילה: ui.shared
+
+<a id="wordsadapter"></a>
+#### `public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder>`
+תפקיד המחלקה: אדפטר המשמש להצגת רשימת מילים, בדרך כלל במסכי סיכום המשחק. הוא מדגיש מילים שנמצאו על ידי השחקן, ואופציונלית מילים משותפות (שנמצאו על ידי מספר שחקנים), ומאפשר לחיצה על מילה כדי להציג את המסלול שלה על הלוח.
+
+שדות המחלקה:
+```java
+/** Map of all valid words on the board to their hex-encoded paths. */
+private final Map<String, String> solutions;
+/** List of words found by the current player. */
+private final List<String> playerWords;
+/** Set of words found by more than one player (for multiplayer). */
+private final Set<String> commonWords;
+/** Callback listener for word click events. */
+private final OnWordClickListener listener;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+```java
+public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener)
+```
+בנאי מלא לאדפטר, מקבל את הפתרונות, המילים שנמצאו, מילים משותפות ומאזין ללחיצות. משמש לתוצאות משחק מרובה משתתפים.
+
+```java
+public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener)
+```
+בנאי פשוט ללא מילים משותפות. משמש לתוצאות משחק לשחקן יחיד.
+
+```java
+public void onBindViewHolder(@NonNull ViewHolder holder, int position)
+```
+מקשר את הנתונים לתצוגה של פריט בודד. ממיין את הפתרונות אלפביתית, וצובע את המילים בהתאם למצבן: אדום למילה שנמצאה על ידי אחרים (משותפת), ירוק למילה שנמצאה על ידי השחקן הנוכחי, ושחור למילה שפוספסה. מגדיר גם את מאזין הלחיצות על הפריט.
+
+### חבילה: ui
+
+<a id="donutactivity"></a>
+#### `public class DonutActivity extends AppCompatActivity`
+תפקיד המחלקה: מסך (Activity) המציג דונאט תלת-ממדי מסתובב (ביצת הפתעה). מנהל את אירועי המגע (Touch Events) לסיבוב הדונאט ומחוות צביטה (Pinch-to-zoom) לשינוי הגודל/מרחק.
+
+שדות המחלקה:
+```java
+/** The renderer responsible for drawing the 3D donut on the surface. */
+private DonutRenderer renderer;
+/** The SurfaceView where the donut is drawn. */
+private SurfaceView surfaceView;
+/** Detector for pinch-to-zoom gestures. */
+private ScaleGestureDetector scaleDetector;
+
+/** ID of the pointer currently being tracked for rotation. */
+private int activePointerId = INVALID_POINTER_ID;
+/** Last recorded X coordinate of the touch event. */
+private float lastTouchX = 0;
+/** Last recorded Y coordinate of the touch event. */
+private float lastTouchY = 0;
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+```java
+protected void onCreate(@Nullable Bundle savedInstanceState)
+```
+מאתחלת את ה-SurfaceView, את מזהה מחוות הצביטה, ורושמת Callback למחזור החיים של המשטח כדי להתחיל ולהפסיק את הרינדור מול `DonutRenderer`.
+
+```java
+public boolean onTouchEvent(MotionEvent event)
+```
+מטפלת באירועי מגע של המשתמש. מעבירה אירועים לזיהוי שינוי גודל (ScaleDetector), ומטפלת בסיבוב הדונאט על ידי חישוב ההפרש במיקום האצבע (dx, dy) לעדכון הזוויות ברנדרר. תומכת במספר אצבעות למניעת קפיצות כשמחליפים אצבע.
+
+מחלקה פנימית: `private class OnScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener`
+מאזינה לאירועי צביטה (זום).
+```java
+public boolean onScale(@NonNull ScaleGestureDetector detector)
+```
+מעדכנת את מרחק הדונאט (Zoom) ברנדרר בהתאם ליחס המתיחה (ScaleFactor).
+
+### חבילה: views
+
+<a id="boggleview"></a>
+#### `public class BoggleView extends LinearLayout`
+תפקיד המחלקה: רכיב UI מותאם אישית (Custom View) המייצג את לוח המשחק של בוגל ואת הממשק ההיקפי שלו (כפתור אישור, מד זמן, תצוגת ניקוד ומילה).
+
+תכונות המחלקה:
+``` java
+- BoggleGame game
+- TextView[] cells
+- TextView lastSelected
+- BadgeDrawable hintBadge
+- GameMode gameMode
+```
+
+פעולות המחלקה:
+```java
+private void initView()
+```
+מאתחלת את הרכיב הגרפי, מחברת אותו ל-XML המותאם אישית שלו, מגדירה את מערך הקוביות (16 תאים) ומשייכת לכל תא וכפתור את המאזין המתאים לו. בסביבת שחקן יחיד היא גם מתחילה את המשחק אוטומטית.
+
+```java
+private void setupUI()
+```
+מסנכרנת את מצב רכיב ה-UI עם ה-`BoggleGame`. פורסת את האותיות על הקוביות בלוח (תוך הצגת 'Qu' במידת הצורך), מעדכנת ניקוד ומפעילה את מד הזמן בהתאם לתקתוקי הטיימר של מנוע המשחק.
+
+```java
+private void onClickSubmit(View v)
+```
+מטפלת בלחיצה על כפתור 'אישור מילה'. מגישה את המילה לבדיקה מול ה-`BoggleGame`, מספקת משוב למשתמש (האם המילה חוקית, קצרה מדי, או כבר נמצאה), מעדכנת את הניקוד במידה ונמצאה ומנקה את הבחירה מהלוח.
+
+```java
+public void showSolution(String path)
+```
+מקבלת נתיב משחק (בפורמט מחרוזת של אינדקסים) ומאירה את המילה הספציפית על הלוח באמצעות צביעת התאים הרלוונטיים בצבע מתאים (עם צבע ייעודי לתא האחרון).
+
+```java
+public void showHint()
+```
+צורכת רמז מסך הרמזים שזמינים למשתמש, מחפשת מילה חוקית שעדיין לא נמצאה – תוך התחשבות במסלול שהשחקן התחיל לבנות (אם קיים) – ומאירה חלק ממנה על הלוח באמצעות קריאה ל-`showSolution`.
+
+
+<a id="squaretextview"></a>
+#### `public class SquareTextView extends androidx.appcompat.widget.AppCompatTextView`
+תפקיד המחלקה: רכיב UI של טקסט מותאם אישית השומר תמיד על יחס ממדים ריבועי (1:1). משמשת לייצוג קוביות המשחק ברשת של בוגל, כך שהן יהיו אחידות וריבועיות בכל מסך.
+
+פעולות המחלקה:
+```java
+@Override
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+```
+עוקפת את מתודת המדידה הסטנדרטית כדי לחשב את הגובה והרוחב של התצוגה, בודקת איזה ממד גדול יותר, ומחילה אותו על שני הצירים לקבלת ריבוע מושלם.
+
+
+### חבילה: utils
+
+<a id="imageutils"></a>
+#### `public class ImageUtils`
+תפקיד המחלקה: מחלקת עזר לטיפול בתמונות והמרת נתונים. היא מספקת מתודות סטטיות להמרה בין `Bitmap`, מחרוזות `Base64` (לצורך שמירה במסד נתונים), ו-`Uri`. בנוסף היא מכילה מתאם (Binding Adapter) עבור Data Binding.
+
+שדות המחלקה:
+```java
+/** Tag used for logging. */
+private final static String TAG = "ImageUtils";
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+```java
+@BindingAdapter("imageBitmap")
+static public void setImageBitmap(ImageView imageView, Bitmap bitmap)
+```
+מאפשרת להגדיר דרך ה-XML (Data Binding) אובייקט `Bitmap` שיוצג ב-`ImageView`. אם ה-`Bitmap` ריק (null), היא מציגה תמונת ברירת מחדל (אייקון של משתמש).
+
+```java
+static public String uriToBase64(Uri uri, Context context) throws IOException
+```
+מקבלת `Uri` (למשל מגלריית המכשיר), פותחת InputStream וקוראת אותו לתוך `Bitmap`, ואז קוראת לפעולת ההמרה ל-`Base64` כדי לאפשר שמירת תמונת משתמש בשרת.
+
+```java
+static public String bitmapToBase64(Bitmap bitmap)
+```
+ממירה אובייקט `Bitmap` למחרוזת `Base64` מקודדת בפורמט JPEG. הפונקציה משתמשת בדחיסה (70% איכות) כדי לאזן בין איכות התמונה לגודל שלה במסד הנתונים.
+
+```java
+static public Bitmap base64ToBitmap(String base64)
+```
+הפעולה ההפוכה: מקבלת מחרוזת `Base64` (למשל כזו שנמשכה מ-Firebase) וממירה אותה חזרה ל-`Bitmap` כדי להציג אותה בממשק המשתמש.
+
+<a id="timer"></a>
+#### `public class Timer implements Runnable`
+תפקיד המחלקה: מחלקת עזר המנהלת ספירה לאחור עבור זמן המשחק. היא משתמשת ב-`Handler` כדי לרוץ על ה-Main Thread ולתזמן קריאות תקופתיות שיעדכנו את ה-UI.
+
+שדות המחלקה:
+```java
+/** The total duration of the timer in milliseconds. */
+private final long millisTime;
+/** The system time when the timer was started or resumed. */
+private final long millisTimeBegan;
+/** Handler used to schedule the next periodic update on the main UI thread. */
+private final Handler handler = new Handler(Looper.getMainLooper());
+/** Listener to be notified when the timer reaches its duration. */
+private final OnTimerEndListener onTimerEnd;
+/** Listener to be notified on every tick (increment). */
+private final OnTickListener onTick;
+/** Flag to track if the timer has been stopped or paused. */
+private boolean isStopped = false;
+```
+
+ממשקי האזנה:
+```java
+public interface OnTimerEndListener {
+    void onTimerEnd();
+}
+public interface OnTickListener {
+    void onTick(long elapsedTime);
+}
+```
+
+תכונות המחלקה: אין
+
+פעולות המחלקה:
+```java
+public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd)
+```
+מאתחלת טיימר עם זמן מוגדר מראש, ומאזינים (Callbacks) לעדכוני תקתוק ולסיום הזמן.
+
+```java
+@Override
+public void run()
+```
+פעולת הליבה של הטיימר המופעלת על ידי ה-`Handler`. מחשבת את הזמן שעבר, קוראת ל-`onTick`, ואם הזמן תם קוראת ל-`onTimerEnd`. אם לא, היא מתזמנת את עצמה מחדש בצורה חכמה שמשלימה בדיוק לשנייה שלמה.
+
+```java
+public void start()
+```
+מתחילה (או ממשיכה) את הטיימר על ידי שליחת הקריאה ל-`Handler`.
+
+```java
+public void stop()
+```
+עוצרת את הטיימר באופן ידני ומנקה קריאות עתידיות הממתינות ב-`Handler`.
+
+<a id="pointanddepth"></a>
+#### `public record PointAndDepth(int screenX, int screenY, double ooz)`
+תפקיד המחלקה: נתון (Record) פשוט לאחסון נקודה במישור הדו-מימדי על המסך, יחד עם ערך עומק `ooz` (One Over Z) לשימוש בחישובי תלת-ממד (למשל למיון לפי עומק ברנדור הדונאט).
+
+<a id="quad"></a>
+#### `public record Quad(Path path, @ColorInt int color, double avgOoz)`
+תפקיד המחלקה: נתון (Record) פשוט המייצג פוליגון מרובע בודד (פאה של הדונאט התלת-ממדי), עם הנתיב (Path) לציירו על הקנבס, צבעו, והעומק הממוצע שלו לצורך המיון לפני הציור (Painter's Algorithm).
