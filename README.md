@@ -1,3 +1,5 @@
+<div align="right" dir="rtl">
+
 # תוכן עניינים
 
 * **[מבוא](#intro)**
@@ -65,6 +67,8 @@
       * [Timer](#timer)
       * [PointAndDepth](#pointanddepth)
       * [Quad](#quad)
+
+</div>
 
 
 <h1 align=center id="intro">מבוא</h1>
