@@ -40,7 +40,7 @@
       * [מחלקה: FirebaseHandler](#public-class-firebasehandler)
       * [מחלקה: GameMode](#public-enum-gamemode)
       * [מחלקה: PlayerRole](#public-enum-playerrole)
-      * [מחלקה: User](#public-class-user)
+      * [מחלקה: User](#public-class-user-implements-serializable)
     * [חבילה: engine](#חבילה-engine)
       * [מחלקה: BoggleGame](#public-class-bogglegame)
       * [מחלקה: GameSolver](#public-class-gamesolver)
@@ -515,7 +515,9 @@ exports.sendInvitationNotification = onValueCreated(
 פעולות המחלקה:
 ```java
 @Override
-public void onCreate()
+public void onCreate(){
+//...
+}
 ```
 מופעלת עם עליית האפליקציה לפני הפעלת המסכים. מאתחלת את המילון (Dictionary) מקובץ רשימת המילים כדי שיהיה מוכן ומסודר בזיכרון, ובנוסף מפעילה עדכון אסינכרוני לנתוני המשתמש ב-`FirebaseHandler`.
 
@@ -849,7 +851,7 @@ public void addFriend(String id) {
 פעולות המחלקה: הפעולות שהורשו מ <Enum<E
 
 
-#### `public class User`
+#### `public class User implements Serializable`
 
 תפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
 בגלל שכל מה שהמחלקה עושה היא לשמור מידע,והיא לא תלוייה בשום דבר אחר, היא גם נקראת POJO (Plain Old Java Object)
@@ -1414,7 +1416,7 @@ public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
     Log.d(TAG, "From: " + remoteMessage.getFrom());
 
     Map<String, String> data = remoteMessage.getData();
-    
+
     // Delete the invitation from the database now that it's received to avoid stale invites
     if (data.containsKey("invitationId")) {
         String invitationId = data.get("invitationId");
@@ -1428,8 +1430,8 @@ public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         showNotification(title, body, data);
     } else if (data.size() > 0) {
         // Handle data-only payload if notification block is missing
-        String title = "New Game Invitation";
-        String body = "Someone invited you to play Boggle!";
+        String title = data.containsKey("title") ? data.get("title") : "New Game Invitation";
+        String body = data.containsKey("body") ? data.get("body") : "Someone invited you to play Boggle!";
         showNotification(title, body, data);
     }
 }
@@ -1454,38 +1456,41 @@ private void deleteInvitation(String invitationId) {
 
 ```java
 private void showNotification(String title, String body, Map<String, String> data) {
-    Intent intent = new Intent(this, MainActivity.class);
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    
-    // Pass room code and action if present to allow joining directly from notification
-    if (data != null && data.containsKey("roomCode")) {
-        intent.putExtra("roomCode", data.get("roomCode"));
-        intent.putExtra("action", "join");
-    }
+Intent intent = new Intent(this, MainActivity.class);
+intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+// Pass room code and action if present to allow joining directly from notification
+if (data != null && data.containsKey("roomCode")) {
+    intent.putExtra("roomCode", data.get("roomCode"));
+    intent.putExtra("action", "join");
+}
+if (data != null && data.containsKey("invitationId")) {
+    intent.putExtra("invitationId", data.get("invitationId"));
+}
 
-    NotificationManager notificationManager =
-            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+        PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
-    // Create the NotificationChannel for Android O and above
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                "Game Invitations",
-                NotificationManager.IMPORTANCE_DEFAULT);
-        notificationManager.createNotificationChannel(channel);
-    }
+NotificationManager notificationManager =
+        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-    NotificationCompat.Builder notificationBuilder =
-            new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(title)
-                    .setContentText(body)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
+// Create the NotificationChannel for Android O and above
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+            "Game Invitations",
+            NotificationManager.IMPORTANCE_DEFAULT);
+    notificationManager.createNotificationChannel(channel);
+}
 
-    notificationManager.notify(0, notificationBuilder.build());
+NotificationCompat.Builder notificationBuilder =
+        new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+notificationManager.notify(0, notificationBuilder.build());
 }
 ```
 בונה ומציגה התראה במכשיר. היא מגדירה Intent שיוביל את המשתמש ישירות לחדר המשחק אם ההתראה מכילה קוד חדר, ומגדירה את ערוץ ההתראות עבור גרסאות אנדרואיד חדשות.
@@ -1578,10 +1583,23 @@ protected void onNewIntent(Intent intent) {
 private void handleIntent(Intent intent) {
     if (intent != null && intent.hasExtra("roomCode")) {
         String roomCode = intent.getStringExtra("roomCode");
+
+        if (intent.hasExtra("invitationId")) {
+            String invitationId = intent.getStringExtra("invitationId");
+            String currentUserId = FirebaseAuth.getInstance().getUid();
+            if (currentUserId != null && invitationId != null) {
+                FirebaseHandler.getInstance().getRootRef()
+                        .child("invitations")
+                        .child(currentUserId)
+                        .child(invitationId)
+                        .removeValue();
+            }
+        }
+
         if (roomCode != null && !roomCode.isEmpty()) {
-            PlayerRole role = PlayerRole.host;
-            if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){
-                role = PlayerRole.guest;
+            PlayerRole role = PlayerRole.guest; // Default to guest for invitations
+            if (intent.hasExtra("action") && "host".equals(intent.getStringExtra("action"))){
+                role = PlayerRole.host;
             }
             JoinOrCreateRoomFragment.newInstance(roomCode, role)
                     .show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
@@ -2296,7 +2314,8 @@ public void showGameResults(HashMap<String, String> solutions, HashMap<User, Arr
 protected void onDestroy() {
     super.onDestroy();
     // Cleanup: remove the player from the room or delete the room if empty
-    if (roomCode != null) {
+    // Only perform cleanup if the activity is actually finishing (not just rotating)
+    if (isFinishing() && roomCode != null) {
         String userId = FirebaseHandler.getInstance().getCurrentUserId();
         if (userId != null) {
             DatabaseReference roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
@@ -2406,6 +2425,7 @@ private ValueEventListener playerListener;
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
 רושמת את השחקן בחדר ומגדירה את התצוגה.
+שולחת את השחקן לתוך משחק אם הופעל דרך intent
 
 ``` java
 private void listenForPlayers()
@@ -2739,17 +2759,23 @@ private final OnWordClickListener listener;
 
 פעולות המחלקה:
 ```java
-public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener)
+public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener){
+//...
+}
 ```
 בנאי מלא לאדפטר, מקבל את הפתרונות, המילים שנמצאו, מילים משותפות ומאזין ללחיצות. משמש לתוצאות משחק מרובה משתתפים.
 
 ```java
-public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener)
+public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener){
+//...
+}
 ```
 בנאי פשוט ללא מילים משותפות. משמש לתוצאות משחק לשחקן יחיד.
 
 ```java
-public void onBindViewHolder(@NonNull ViewHolder holder, int position)
+public void onBindViewHolder(@NonNull ViewHolder holder, int position){
+//...
+}
 ```
 מקשר את הנתונים לתצוגה של פריט בודד. ממיין את הפתרונות אלפביתית, וצובע את המילים בהתאם למצבן: אדום למילה שנמצאה על ידי אחרים (משותפת), ירוק למילה שנמצאה על ידי השחקן הנוכחי, ושחור למילה שפוספסה. מגדיר גם את מאזין הלחיצות על הפריט.
 
@@ -2780,19 +2806,25 @@ private float lastTouchY = 0;
 
 פעולות המחלקה:
 ```java
-protected void onCreate(@Nullable Bundle savedInstanceState)
+protected void onCreate(@Nullable Bundle savedInstanceState){
+//...
+}
 ```
 מאתחלת את ה-SurfaceView, את מזהה מחוות הצביטה, ורושמת Callback למחזור החיים של המשטח כדי להתחיל ולהפסיק את הרינדור מול `DonutRenderer`.
 
 ```java
-public boolean onTouchEvent(MotionEvent event)
+public boolean onTouchEvent(MotionEvent event){
+//...
+}
 ```
 מטפלת באירועי מגע של המשתמש. מעבירה אירועים לזיהוי שינוי גודל (ScaleDetector), ומטפלת בסיבוב הדונאט על ידי חישוב ההפרש במיקום האצבע (dx, dy) לעדכון הזוויות ברנדרר. תומכת במספר אצבעות למניעת קפיצות כשמחליפים אצבע.
 
 מחלקה פנימית: `private class OnScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener`
 מאזינה לאירועי צביטה (זום).
 ```java
-public boolean onScale(@NonNull ScaleGestureDetector detector)
+public boolean onScale(@NonNull ScaleGestureDetector detector){
+//...
+}
 ```
 מעדכנת את מרחק הדונאט (Zoom) ברנדרר בהתאם ליחס המתיחה (ScaleFactor).
 
@@ -2813,27 +2845,37 @@ public boolean onScale(@NonNull ScaleGestureDetector detector)
 
 פעולות המחלקה:
 ```java
-private void initView()
+private void initView(){
+//...
+}
 ```
 מאתחלת את הרכיב הגרפי, מחברת אותו ל-XML המותאם אישית שלו, מגדירה את מערך הקוביות (16 תאים) ומשייכת לכל תא וכפתור את המאזין המתאים לו. בסביבת שחקן יחיד היא גם מתחילה את המשחק אוטומטית.
 
 ```java
-private void setupUI()
+private void setupUI(){
+//...
+}
 ```
 מסנכרנת את מצב רכיב ה-UI עם ה-`BoggleGame`. פורסת את האותיות על הקוביות בלוח (תוך הצגת 'Qu' במידת הצורך), מעדכנת ניקוד ומפעילה את מד הזמן בהתאם לתקתוקי הטיימר של מנוע המשחק.
 
 ```java
-private void onClickSubmit(View v)
+private void onClickSubmit(View v){
+//...
+}
 ```
 מטפלת בלחיצה על כפתור 'אישור מילה'. מגישה את המילה לבדיקה מול ה-`BoggleGame`, מספקת משוב למשתמש (האם המילה חוקית, קצרה מדי, או כבר נמצאה), מעדכנת את הניקוד במידה ונמצאה ומנקה את הבחירה מהלוח.
 
 ```java
-public void showSolution(String path)
+public void showSolution(String path){
+//...
+}
 ```
 מקבלת נתיב משחק (בפורמט מחרוזת של אינדקסים) ומאירה את המילה הספציפית על הלוח באמצעות צביעת התאים הרלוונטיים בצבע מתאים (עם צבע ייעודי לתא האחרון).
 
 ```java
-public void showHint()
+public void showHint(){
+//...
+}
 ```
 צורכת רמז מסך הרמזים שזמינים למשתמש, מחפשת מילה חוקית שעדיין לא נמצאה – תוך התחשבות במסלול שהשחקן התחיל לבנות (אם קיים) – ומאירה חלק ממנה על הלוח באמצעות קריאה ל-`showSolution`.
 
@@ -2845,7 +2887,9 @@ public void showHint()
 פעולות המחלקה:
 ```java
 @Override
-protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+//...
+}
 ```
 עוקפת את מתודת המדידה הסטנדרטית כדי לחשב את הגובה והרוחב של התצוגה, בודקת איזה ממד גדול יותר, ומחילה אותו על שני הצירים לקבלת ריבוע מושלם.
 
@@ -2867,22 +2911,30 @@ private final static String TAG = "ImageUtils";
 פעולות המחלקה:
 ```java
 @BindingAdapter("imageBitmap")
-static public void setImageBitmap(ImageView imageView, Bitmap bitmap)
+static public void setImageBitmap(ImageView imageView, Bitmap bitmap){
+//...
+}
 ```
 מאפשרת להגדיר דרך ה-XML (Data Binding) אובייקט `Bitmap` שיוצג ב-`ImageView`. אם ה-`Bitmap` ריק (null), היא מציגה תמונת ברירת מחדל (אייקון של משתמש).
 
 ```java
-static public String uriToBase64(Uri uri, Context context) throws IOException
+static public String uriToBase64(Uri uri, Context context) throws IOException{
+//...
+}
 ```
 מקבלת `Uri` (למשל מגלריית המכשיר), פותחת InputStream וקוראת אותו לתוך `Bitmap`, ואז קוראת לפעולת ההמרה ל-`Base64` כדי לאפשר שמירת תמונת משתמש בשרת.
 
 ```java
-static public String bitmapToBase64(Bitmap bitmap)
+static public String bitmapToBase64(Bitmap bitmap){
+//...
+}
 ```
 ממירה אובייקט `Bitmap` למחרוזת `Base64` מקודדת בפורמט JPEG. הפונקציה משתמשת בדחיסה (70% איכות) כדי לאזן בין איכות התמונה לגודל שלה במסד הנתונים.
 
 ```java
-static public Bitmap base64ToBitmap(String base64)
+static public Bitmap base64ToBitmap(String base64){
+//...
+}
 ```
 הפעולה ההפוכה: מקבלת מחרוזת `Base64` (למשל כזו שנמשכה מ-Firebase) וממירה אותה חזרה ל-`Bitmap` כדי להציג אותה בממשק המשתמש.
 
@@ -2920,23 +2972,29 @@ public interface OnTickListener {
 
 פעולות המחלקה:
 ```java
-public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd)
+public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd){
+//...
+}
 ```
 מאתחלת טיימר עם זמן מוגדר מראש, ומאזינים (Callbacks) לעדכוני תקתוק ולסיום הזמן.
 
 ```java
 @Override
-public void run()
+public void run(){}
 ```
 פעולת הליבה של הטיימר המופעלת על ידי ה-`Handler`. מחשבת את הזמן שעבר, קוראת ל-`onTick`, ואם הזמן תם קוראת ל-`onTimerEnd`. אם לא, היא מתזמנת את עצמה מחדש בצורה חכמה שמשלימה בדיוק לשנייה שלמה.
 
 ```java
-public void start()
+public void start(){
+//...
+}
 ```
 מתחילה (או ממשיכה) את הטיימר על ידי שליחת הקריאה ל-`Handler`.
 
 ```java
-public void stop()
+public void stop(){
+//...
+}
 ```
 עוצרת את הטיימר באופן ידני ומנקה קריאות עתידיות הממתינות ב-`Handler`.
 
