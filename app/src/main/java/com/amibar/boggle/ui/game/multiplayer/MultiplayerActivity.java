@@ -99,7 +99,8 @@ public class MultiplayerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // Cleanup: remove the player from the room or delete the room if empty
-        if (roomCode != null) {
+        // Only perform cleanup if the activity is actually finishing (not just rotating)
+        if (isFinishing() && roomCode != null) {
             String userId = FirebaseHandler.getInstance().getCurrentUserId();
             if (userId != null) {
                 DatabaseReference roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);

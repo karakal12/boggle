@@ -52,12 +52,9 @@ exports.sendInvitationNotification = onValueCreated(
             }
 
             const payload = {
-                notification: {
-                    title: `New Invite from ${invitationData.senderName}`,
-                    // eslint-disable-next-line max-len
-                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
-                },
                 data: {
+                    title: `New Invite from ${invitationData.senderName}`,
+                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
                     roomCode: String(invitationData.roomCode),
                     invitationId: String(event.params.invitationId)
                 },

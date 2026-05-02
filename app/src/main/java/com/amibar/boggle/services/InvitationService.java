@@ -68,8 +68,8 @@ public class InvitationService extends FirebaseMessagingService {
             showNotification(title, body, data);
         } else if (data.size() > 0) {
             // Handle data-only payload if notification block is missing
-            String title = "New Game Invitation";
-            String body = "Someone invited you to play Boggle!";
+            String title = data.containsKey("title") ? data.get("title") : "New Game Invitation";
+            String body = data.containsKey("body") ? data.get("body") : "Someone invited you to play Boggle!";
             showNotification(title, body, data);
         }
     }
@@ -106,6 +106,9 @@ public class InvitationService extends FirebaseMessagingService {
         if (data != null && data.containsKey("roomCode")) {
             intent.putExtra("roomCode", data.get("roomCode"));
             intent.putExtra("action", "join");
+        }
+        if (data != null && data.containsKey("invitationId")) {
+            intent.putExtra("invitationId", data.get("invitationId"));
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,

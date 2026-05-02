@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amibar.boggle.data.User;
 import com.amibar.boggle.databinding.ItemPlayerScoreBinding;
+import com.amibar.boggle.engine.BoggleGame;
 import com.amibar.boggle.ui.shared.WordsAdapter;
 
 import java.util.ArrayList;
@@ -123,10 +124,19 @@ public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapte
         holder.binding.setPlayerName(player.getDisplayName());
         
         ArrayList<String> playerWords = playersWords.get(player);
+        assert playerWords != null;
         holder.binding.wordsList.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         // Setup inner adapter for this player's words
         holder.binding.wordsList.setAdapter(new WordsAdapter(solutions, playerWords, commonWords, onWordClickListener));
         holder.binding.executePendingBindings();
+
+        List<String> uniqueWords = new ArrayList<>(playerWords);
+        uniqueWords.removeAll(commonWords);
+        int score = 0;
+        for (String word : uniqueWords) {
+            score += BoggleGame.wordScore(word);
+        }
+        holder.binding.setScore(score);
 
         // Manage synchronized scrolling for the horizontal list
         RecyclerView innerRv = holder.binding.wordsList;

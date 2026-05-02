@@ -209,6 +209,8 @@ public class MultiplayerGameFragment extends Fragment {
                     User u = playerSnap.getValue(User.class);
                     if (u != null) {
                         userIdToUser.put(playerSnap.getKey(), u);
+                        // Initialize an empty list for every player so they still show up even if they got no words
+                        playersWordsMap.put(u, new ArrayList<>());
                     }
                 }
                 
@@ -217,11 +219,12 @@ public class MultiplayerGameFragment extends Fragment {
                     String userId = userWordsSnap.getKey();
                     User u = userIdToUser.get(userId);
                     if (u != null) {
-                        ArrayList<String> words = new ArrayList<>();
-                        for (DataSnapshot wordSnap : userWordsSnap.getChildren()) {
-                            words.add(wordSnap.getKey());
+                        ArrayList<String> words = playersWordsMap.get(u);
+                        if (words != null) {
+                            for (DataSnapshot wordSnap : userWordsSnap.getChildren()) {
+                                words.add(wordSnap.getKey());
+                            }
                         }
-                        playersWordsMap.put(u, words);
                     }
                 }
                 
@@ -255,6 +258,9 @@ public class MultiplayerGameFragment extends Fragment {
         // Listen for game end (timer expire)
         game.addOnGameEndListener(() -> {
             if (playerRole == PlayerRole.host) {
+                // if room already deleted
+                if (roomRef.getParent() == null) return;
+
                 // Host marks the game as ended globally in Firebase
                 roomRef.child("gameEnded").setValue(true);
             }

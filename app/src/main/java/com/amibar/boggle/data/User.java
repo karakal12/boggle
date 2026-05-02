@@ -1,6 +1,7 @@
 package com.amibar.boggle.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Represents a user of the Boggle app.
@@ -8,7 +9,7 @@ import java.io.Serializable;
  * interacting with Firebase Realtime Database.
  */
 @SuppressWarnings("unused")
-public class User {
+public class User implements Serializable {
     /** The user's unique ID. */
     private String uid;
     /** The user's chosen display name. */
@@ -82,5 +83,18 @@ public class User {
      */
     public String getFcmToken() {
         return fcmToken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(uid, user.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid);
     }
 }

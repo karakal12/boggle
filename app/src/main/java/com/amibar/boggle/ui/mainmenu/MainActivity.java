@@ -111,10 +111,23 @@ public class MainActivity extends AppCompatActivity {
     private void handleIntent(Intent intent) {
         if (intent != null && intent.hasExtra("roomCode")) {
             String roomCode = intent.getStringExtra("roomCode");
+
+            if (intent.hasExtra("invitationId")) {
+                String invitationId = intent.getStringExtra("invitationId");
+                String currentUserId = FirebaseAuth.getInstance().getUid();
+                if (currentUserId != null && invitationId != null) {
+                    FirebaseHandler.getInstance().getRootRef()
+                            .child("invitations")
+                            .child(currentUserId)
+                            .child(invitationId)
+                            .removeValue();
+                }
+            }
+
             if (roomCode != null && !roomCode.isEmpty()) {
-                PlayerRole role = PlayerRole.host;
-                if (intent.hasExtra("action") && "join".equals(intent.getStringExtra("action"))){
-                    role = PlayerRole.guest;
+                PlayerRole role = PlayerRole.guest; // Default to guest for invitations
+                if (intent.hasExtra("action") && "host".equals(intent.getStringExtra("action"))){
+                    role = PlayerRole.host;
                 }
                 JoinOrCreateRoomFragment.newInstance(roomCode, role)
                         .show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);

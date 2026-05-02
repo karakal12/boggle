@@ -27,7 +27,7 @@ public class BoggleGame {
     /**
      * The total duration of a game in milliseconds.
      */
-    public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
+    public static final long GAME_TIME_MILLIS = 30000; // 180000 millis = 3 minutes
 
     /** The 1D array representation of the 4x4 board letters. */
     private final char[] board;
@@ -358,7 +358,7 @@ public class BoggleGame {
      * @param word The word to score.
      * @return The points awarded for the word.
      */
-    public int wordScore(String word) {
+    public static int wordScore(String word) {
         int wordLength = word.length();
         return switch (wordLength) {
             case 3, 4 -> 1;

@@ -90,11 +90,17 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
         binding.roomCodeTV.setText(initialRoomCode);
         binding.roomCodeTIL.setVisibility(View.VISIBLE);
         
-        // Toggle visibility based on the intended role
-        binding.createRoom.setVisibility(role == PlayerRole.host ? View.VISIBLE: View.GONE);
-        binding.createRoom.setOnClickListener(this::createRoom);
-        binding.joinRoom.setVisibility(role == PlayerRole.guest ? View.VISIBLE: View.GONE);
-        binding.joinRoom.setOnClickListener(this::joinRoom);
+//        // Toggle visibility based on the intended role
+//        binding.createRoom.setVisibility(role == PlayerRole.host ? View.VISIBLE: View.GONE);
+//        binding.createRoom.setOnClickListener(this::createRoom);
+//        binding.joinRoom.setVisibility(role == PlayerRole.guest ? View.VISIBLE: View.GONE);
+//        binding.joinRoom.setOnClickListener(this::joinRoom);
+
+        if (role == PlayerRole.host) {
+            createRoom(view);
+        } else {
+            joinRoom(view);
+        }
     }
 
     /**
