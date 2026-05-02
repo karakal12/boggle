@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
  * A real-time 3D renderer for a rotating torus (donut) shape.
  * This class handles the mathematical projections, lighting, and rendering
  * of a torus onto a {@link SurfaceView} using Android's {@link Canvas} API.
- * inspired by <a href=https://www.a1k0n.net/2011/07/20/donut-math.html">donut.c</a>
+ * inspired by <a href="https://www.a1k0n.net/2011/07/20/donut-math.html">donut.c</a>
  */
 public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder.Callback {
     /** Default rotation rate for angle A */
