@@ -9,11 +9,12 @@
 
 <img src="https://yifat.mashov.info/wp-content/uploads/sites/142/2025/07/%D7%A1%D7%9E%D7%9C-%D7%91%D7%99%D7%94%D7%A1.png" width="328" height="288" alt="school_logo"/>
 
-# תוכן עניינים
+<h1 align="center" id="index">תוכן עניינים</h1>
 
+* **[תוכן עניינים](#index)**
 * **[מבוא](#intro)**
   * [רקע](#רקע)
-    * [שם הפרוייקט:](#שם-הפרוייקט)
+    * [שם הפרוייקט:](#שם-הפרוייקט-)
     * [תיאור הפרוייקט:](#תיאור-הפרוייקט)
     * [קהל היעד:](#קהל-היעד)
     * [מטרות האפליקציה:](#מטרות-האפליקציה)
@@ -31,52 +32,81 @@
   * [פונקציות שרת](#פונקציות-שרת)
   * [מחלקות הפרוייקט](#מחלקות-הפרוייקט)
     * [מחלקת אפליקציה](#מחלקת-אפליקציה)
-      * [מחלקה: BoggleApplication](#boggleapplication)
+      * [מחלקה: BoggleApplication](#public-class-boggleapplication-extends-application)
     * [חבילה: data](#חבילה-data)
-      * [מחלקה: Trie](#trie)
-      * [מחלקה: Dictionary](#dictionary)
-      * [מחלקה: PathTrie](#pathtrie)
-      * [מחלקה: FirebaseHandler](#firebasehandler)
-      * [מחלקה: GameMode](#gamemode)
-      * [מחלקה: PlayerRole](#playerrole)
-      * [מחלקה: User](#user)
+      * [מחלקה: Trie](#public-abstract-class-triet-extends-triet)
+      * [מחלקה: Dictionary](#public-final-class-dictionary-extends-triedictionary)
+      * [מחלקה: PathTrie](#public-class-pathtrie-extends-triepathtrie)
+      * [מחלקה: FirebaseHandler](#public-class-firebasehandler)
+      * [מחלקה: GameMode](#public-enum-gamemode)
+      * [מחלקה: PlayerRole](#public-enum-playerrole)
+      * [מחלקה: User](#public-class-user)
     * [חבילה: engine](#חבילה-engine)
-      * [מחלקה: BoggleGame](#bogglegame)
-      * [מחלקה: GameSolver](#gamesolver)
-        * [מחלקה: GameSolverTask](#gamesolvertask)
-      * [מחלקה: DonutRenderer](#donutrenderer)
+      * [מחלקה: BoggleGame](#public-class-bogglegame)
+      * [מחלקה: GameSolver](#public-class-gamesolver)
+        * [מחלקה: GameSolverTask](#class-gamesolvertask-extends-recursiveaction)
+      * [מחלקה: DonutRenderer](#public-class-donutrenderer)
     * [חבילה: services](#חבילה-services)
-      * [מחלקה: InvitationService](#invitationservice)
+      * [מחלקה: InvitationService](#public-class-invitationservice-extends-firebasemessagingservice)
     * [חבילה: ui.mainmenu](#חבילה-uimainmenu)
-      * [מחלקה: MainActivity](#mainactivity)
-      * [מחלקה: LoginFragment](#loginfragment)
-      * [מחלקה: SignUpFragment](#signupfragment)
-      * [מחלקה: FriendListActivity](#friendlistactivity)
-      * [מחלקה: FriendAdapter](#friendadapter)
+      * [מחלקה: MainActivity](#public-class-mainactivity-extends-appcompatactivity)
+      * [מחלקה: LoginFragment](#public-class-loginfragment-extends-dialogfragment)
+      * [מחלקה: SignUpFragment](#public-class-signupfragment-extends-dialogfragment)
+      * [מחלקה: FriendListActivity](#public-class-friendlistactivity-extends-appcompatactivity)
+      * [מחלקה: FriendAdapter](#public-class-friendadapter-extends-listadapteruser-friendadapterfriendviewholder)
     * [חבילה: ui.game.multiplayer](#חבילה-uigamemultiplayer)
-      * [מחלקה: MultiplayerActivity](#multiplayeractivity)
-      * [מחלקה: JoinOrCreateRoomFragment](#joinorcreateroomfragment)
-      * [מחלקה: LobbyFragment](#lobbyfragment)
-      * [מחלקה: MultiplayerGameFragment](#multiplayergamefragment)
-      * [מחלקה: MultiplayerOnGameEndFragment](#multiplayerongameendfragment)
-      * [מחלקה: PlayerAdapter](#playeradapter)
-      * [מחלקה: PlayersWordsAdapter](#playerswordsadapter)
+      * [מחלקה: MultiplayerActivity](#public-class-multiplayeractivity-extends-appcompatactivity)
+      * [מחלקה: JoinOrCreateRoomFragment](#public-class-joinorcreateroomfragment-extends-dialogfragment)
+      * [מחלקה: LobbyFragment](#public-class-lobbyfragment-extends-fragment)
+      * [מחלקה: MultiplayerGameFragment](#public-class-multiplayergamefragment-extends-fragment)
+      * [מחלקה: MultiplayerOnGameEndFragment](#public-class-multiplayerongameendfragment-extends-dialogfragment)
+      * [מחלקה: PlayerAdapter](#public-class-playeradapter-extends-recyclerviewadapterplayeradapterplayerviewholder)
+      * [מחלקה: PlayersWordsAdapter](#public-class-playerswordsadapter-extends-recyclerviewadapterplayerswordsadapterviewholder)
     * [חבילה: ui.game.singleplayer](#חבילה-uigamesingleplayer)
-      * [מחלקה: SingleplayerActivity](#singleplayeractivity)
-      * [מחלקה: SingleplayerOnGameEndFragment](#singleplayerongameendfragment)
+      * [מחלקה: SingleplayerActivity](#public-class-singleplayeractivity-extends-appcompatactivity)
+      * [מחלקה: SingleplayerOnGameEndFragment](#public-class-singleplayerongameendfragment-extends-dialogfragment)
     * [חבילה: ui.shared](#חבילה-uishared)
-      * [מחלקה: WordsAdapter](#wordsadapter)
+      * [מחלקה: WordsAdapter](#public-class-wordsadapter-extends-recyclerviewadapterwordsadapterviewholder)
     * [חבילה: ui](#חבילה-ui)
-      * [מחלקה: DonutActivity](#donutactivity)
+      * [מחלקה: DonutActivity](#public-class-donutactivity-extends-appcompatactivity)
     * [חבילה: views](#חבילה-views)
-      * [מחלקה: BoggleView](#boggleview)
-      * [מחלקה: SquareTextView](#squaretextview)
+      * [מחלקה: BoggleView](#public-class-boggleview-extends-linearlayout)
+      * [מחלקה: SquareTextView](#public-class-squaretextview-extends-androidxappcompatwidgetappcompattextview)
     * [חבילה: utils](#חבילה-utils)
-      * [מחלקה: ImageUtils](#imageutils)
-      * [מחלקה: Timer](#timer)
-      * [מחלקה: PointAndDepth](#pointanddepth)
-      * [מחלקה: Quad](#quad)
-
+      * [מחלקה: ImageUtils](#public-class-imageutils)
+      * [מחלקה: Timer](#public-class-timer-implements-runnable)
+      * [מחלקה: PointAndDepth](#public-record-pointanddepthint-screenx-int-screeny-double-ooz)
+      * [מחלקה: Quad](#public-record-quadpath-path-colorint-int-color-double-avgooz)
+* **[רפלקציה / סיכום אישי](#reflection)**
+* **[ביבליוגרפיה](#bibliography)**
+* **[נספחים](#appendices)**
+  * [קבצי-layout:](#קבצי-layout)
+    * [activity_main:](#activity_mainxml)
+    * [fragment_sign_up:](#fragment_sign_upxml)
+    * [fragment_login:](#fragment_loginxml)
+    * [activity_friendlist:](#activity_friendlistxml)
+    * [nav_header:](#nav_headerxml)
+    * [activity_singleplayer:](#activity_singleplayerxml)
+    * [fragment_singleplayer_on_game_end:](#fragment_singleplayer_on_game_endxml)
+    * [activity_multiplayer:](#activity_multiplayerxml)
+    * [fragment_join_or_create_room:](#fragment_join_or_create_roomxml)
+    * [fragment_lobby:](#fragment_lobbyxml)
+    * [fragment_multiplayer_game:](#fragment_multiplayer_gamexml)
+    * [fragment_multiplayer_on_game_end:](#fragment_multiplayer_on_game_endxml)
+    * [item_player:](#item_playerxml)
+    * [item_player_score:](#item_player_scorexml)
+    * [view_boggle:](#view_bogglexml)
+    * [item_word:](#item_wordxml)
+  * [קבצי-value:](#קבצי-value)
+    * [attrs:](#attrsxml)
+    * [colors:](#colorsxml)
+    * [values-night/colors:](#values-nightcolorsxml)
+    * [dimens:](#dimensxml)
+    * [strings:](#stringsxml)
+    * [styles:](#stylesxml)
+    * [themes:](#themesxml)
+    * [values-night/themes:](#values-nightthemesxml)
+  
 
 
 <h1 align=center id="intro">מבוא</h1>
@@ -478,7 +508,7 @@ exports.sendInvitationNotification = onValueCreated(
 
 ### מחלקת אפליקציה
 
-<a id="boggleapplication"></a>
+
 #### `public class BoggleApplication extends Application`
 תפקיד המחלקה: מחלקת האפליקציה המותאמת המשמשת לאתחולים גלובליים הדורשים הפעלה פעם אחת בלבד במהלך עליית האפליקציה.
 
@@ -491,7 +521,7 @@ public void onCreate()
 
 ### חבילה: data
 
-<a id="trie"></a>
+
 #### `public abstract class Trie<T extends Trie<T>`
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
@@ -630,7 +660,7 @@ protected void _getWords(String word, Set<String> set) {
 ```
 זוג פונקציות, רקורסיבית ומעטפת, שאוספות את כל המילים בעץ ומחזירות אותר בקבוצה.
 
-<a id="dictionary"></a>
+
 #### `public final class Dictionary extends Trie<Dictionary>`
 שדות המחלקה:
 ``` java
@@ -671,7 +701,7 @@ public synchronized void init(InputStream file) {
 ממלא את המילון עם הקובץ שהועבר.
 זה synchronized כדי להגן מקריאה יותר מפעם אחת, גם אם הקריאות באותו הזמן.
 
-<a id="pathtrie"></a>
+
 #### `public class PathTrie extends Trie<PathTrie>`
 תפקיד המחלקה: להרחיב את Trie עם יכולת גם לשמור את המסלול על הלוח עליו הצירוף אותיות נמצא, יכול לשמור רק מסלול אחד לכל צירוף.
 
@@ -709,7 +739,7 @@ public HashMap<String, String> toMap() {
 ```
 יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
 
-<a id="firebasehandler"></a>
+
 #### `public class FirebaseHandler`
 תפקיד המחלקה: מחלקה יחידנית ששומרת אצלה את כל הדברים שקשורים לFirebase ולשחקן הנוכחי.
 
@@ -794,7 +824,7 @@ public void addFriend(String id) {
 מוסיף מתשתמש לרשימת החברים
 
 
-<a id="gamemode"></a>
+
 #### `public enum GameMode`
 שדות המחלקה:
 `singleplayer`
@@ -806,7 +836,7 @@ public void addFriend(String id) {
 ```
 פעולות המחלקה: הפעולות שהורשו מ <Enum<E
 
-<a id="playerrole"></a>
+
 #### `public enum PlayerRole`
 שדות המחלקה:
 `host`
@@ -818,7 +848,7 @@ public void addFriend(String id) {
 ```
 פעולות המחלקה: הפעולות שהורשו מ <Enum<E
 
-<a id="user"></a>
+
 #### `public class User`
 
 תפקיד המחלקה: לשמור את המידע של המשתמש מקומית, ולבסס את הצורה שהמידע של משתמשים נשמר, במיוחד באינראקציה עם המסד נתונים. 
@@ -851,7 +881,7 @@ private String fcmToken;
 
 ### חבילה: engine
 
-<a id="bogglegame"></a>
+
 #### `public class BoggleGame`
 תפקיד המחלקה: מייצגת מופע של משחק בוגל, מנהלת את מצב המשחק, הקוביות, הניקוד ואימות המילים. היא מטפלת ביצירת הלוח, בחירת מילים על ידי השחקן, לוגיקת הניקוד וחישוב מראש של כל הפתרונות האפשריים.
 
@@ -1058,7 +1088,7 @@ public void endGame() {
 ```
 מסיימת את המשחק, עוצרת את הטיימר ומעדכנת את המאזינים.
 
-<a id="gamesolver"></a>
+
 #### `public class GameSolver`
 תפקיד המחלקה: מספקת את לוגיקת הליבה לפתרון לוח בוגל בצורה יעילה ומקבילית. היא מזהה את כל המילים התקינות מהמילון שניתן ליצור על לוח 4x4 על ידי חיבור קוביות סמוכות, תוך שימוש באלגוריתם חיפוש לעומק (DFS) ומסגרת ה-ForkJoin לניצול מעבדים מרובי ליבות.
 
@@ -1089,7 +1119,7 @@ public SolverResult solve(char[][] board, Dictionary dictionary)
 ```
 הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
 
-<a id="gamesolvertask"></a>
+
 ##### `class GameSolverTask extends RecursiveAction`
 מחלקה פנימית המבצעת את החיפוש הרקורסיבית. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
 
@@ -1115,7 +1145,7 @@ private boolean isSafe(int i, int j, short visited)
 ```
 פעולת עזר הבודקת האם קואורדינטות `(i, j)` נמצאות בתוך גבולות הלוח והאם התא טרם בוקר במסלול הנוכחי (באמצעות בדיקת הביט המתאים ב-`visited`).
 
-<a id="donutrenderer"></a>
+
 #### `public class DonutRenderer`
 תפקיד המחלקה: ביצת הפתעה. מחלקה האחראית על רינדור תלת-ממדי בזמן אמת של צורת טורוס (דונאט) מסתובבת על גבי `SurfaceView`. המימוש הושרא מהקוד המפורסם [`Donut.c`](https://www.a1k0n.net/2011/07/20/donut-math.html) של `a1k0n`.
 
@@ -1350,7 +1380,7 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 
 ### חבילה: services
 
-<a id="invitationservice"></a>
+
 #### `public class InvitationService extends FirebaseMessagingService`
 תפקיד המחלקה: אחראית על קבלת הודעות דחיפה (Push Notifications) מ-Firebase, ניהול הזמנות למשחק בזמן אמת והצגת התראות למשתמש.
 
@@ -1463,7 +1493,7 @@ private void showNotification(String title, String body, Map<String, String> dat
 
 ### חבילה: ui.mainmenu
 
-<a id="mainactivity"></a>
+
 #### `public class MainActivity extends AppCompatActivity`
 
 מטרת מחלקה: המסך הראשי של האפליקציה. הוא משמש כנקודת הכניסה המרכזית, מנהל את התפריט הצידי (Navigation Drawer), את המעברים למצבי המשחק השונים (שחקן יחיד ומרובה שחקנים), את רשימת החברים, ואת הגישה למערכת ההזדהות (Login/Signup). בנוסף, הוא מטפל בקבלת הזמנות למשחק דרך Intent-ים.
@@ -1706,7 +1736,7 @@ private void askNotificationPermission() {
 ```
 מבקשת מהמשתמש הרשאת התראות (עבור אנדרואיד 13 ומעלה) כדי שיוכל לקבל הזמנות למשחק.
 
-<a id="loginfragment"></a>
+
 #### `public class LoginFragment extends DialogFragment`
 תפקיד המחלקה: `DialogFragment` המספק ממשק התחברות למשתמשים קיימים. הוא מטפל באימות מול Firebase, דיווח על שגיאות ועדכון ה-FCM token של המשתמש לאחר כניסה מוצלחת.
 
@@ -1801,7 +1831,7 @@ private void updateFcmToken() {
 ```
 משיגה את ה-FCM token העדכני של המכשיר ושומרת אותו במסד הנתונים תחת המשתמש המחובר, מה שמאפשר לו לקבל הזמנות למשחק כהתראות.
 
-<a id="signupfragment"></a>
+
 #### `public class SignUpFragment extends DialogFragment`
 תפקיד המחלקה: `DialogFragment` המספק ממשק הרשמה למשתמשים חדשים. הוא מטפל ביצירת חשבון ב-Firebase Authentication, בחירת תמונת פרופיל מהגלריה, ושמירת כל נתוני המשתמש (כולל ה-FCM token) במסד הנתונים בזמן אמת.
 
@@ -1968,7 +1998,7 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
 ```
 יוצרת אובייקט `User` מלא ושומרת אותו במסד הנתונים של Firebase. בסיום מוצלח, היא מעדכנת את ממשק המשתמש במסך הראשי וסוגרת את הדיאלוג.
 
-<a id="friendlistactivity"></a>
+
 #### `public class FriendListActivity extends AppCompatActivity`
 
 תפקיד המחלקה: ניהול רשימת החברים של המשתמש. מאפשרת חיפוש משתמשים לפי אימייל, הוספת חברים חדשים, צפייה ברשימה הקיימת ושליחת הזמנות למשחקים מרובי משתתפים.
@@ -2135,7 +2165,7 @@ private void loadFriends() {
 ```
 טוענת את רשימת מזהי החברים של המשתמש הנוכחי ומפעילה שליפה של הנתונים המלאים עבור כל אחד מהם.
 
-<a id="friendadapter"></a>
+
 #### `public class FriendAdapter extends ListAdapter<User, FriendAdapter.FriendViewHolder>`
 
 תפקיד המחלקה: אדפטר ל-RecyclerView המציג את רשימת החברים. הוא אחראי על קישור נתוני המשתמשים (User objects) לתצוגה הגרפית ועל טיפול בלחיצות על כפתור ההזמנה. הוא משתמש ב-ListAdapter ו-DiffUtil לעדכונים יעילים.
@@ -2179,7 +2209,7 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
 
 ### חבילה: ui.game.multiplayer
 
-<a id="multiplayeractivity"></a>
+
 #### `public class MultiplayerActivity extends AppCompatActivity`
 תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק מרובת המשתתפים. היא מנהלת את המעבר בין הלובי למשחק הפעיל ומנקה את נתוני החדר ב-Firebase בסיום.
 
@@ -2292,7 +2322,7 @@ protected void onDestroy() {
 ```
 מסירה את השחקן מהחדר בשרת ומנקה חדרים ריקים.
 
-<a id="joinorcreateroomfragment"></a>
+
 #### `public class JoinOrCreateRoomFragment extends DialogFragment`
 תפקיד המחלקה: דיאלוג המאפשר למשתמש ליצור חדר משחק חדש או להצטרף לחדר קיים באמצעות קוד.
 
@@ -2337,7 +2367,7 @@ private Intent makeIntent(PlayerRole role)
 ```
 פונקציית עזר לבניית Intent המעבר.
 
-<a id="lobbyfragment"></a>
+
 #### `public class LobbyFragment extends Fragment`
 תפקיד המחלקה: מציגה את חדר ההמתנה (Lobby), רשימת השחקנים המחוברים ומאפשרת למארח להתחיל את המשחק.
 
@@ -2387,7 +2417,7 @@ private void startGame(View view)
 ```
 מעדכנת בשרת שהמשחק התחיל (למארח בלבד).
 
-<a id="multiplayergamefragment"></a>
+
 #### `public class MultiplayerGameFragment extends Fragment`
 תפקיד המחלקה: ניהול לוגיקת המשחק בזמן אמת במצב מרובה משתתפים, כולל סנכרון הלוח והמילים מול Firebase.
 
@@ -2436,7 +2466,7 @@ private void collectResultsAndFinish()
 ```
 אוספת את כל המילים של כלל השחקנים מה-Database.
 
-<a id="multiplayerongameendfragment"></a>
+
 #### `public class MultiplayerOnGameEndFragment extends DialogFragment`
 תפקיד המחלקה: דיאלוג המציג את תוצאות המשחק הסופיות והשוואת המילים בין השחקנים.
 
@@ -2468,7 +2498,7 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 ```
 מאתחלת את רשימת התוצאות המורחבת.
 
-<a id="playeradapter"></a>
+
 #### `public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder>`
 תפקיד המחלקה: אדפטר להצגת פרטי השחקנים (שם ותמונה) בלובי ההמתנה.
 
@@ -2486,7 +2516,7 @@ public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
 ```
 מבצעת Data Binding של נתוני השחקן לתצוגה.
 
-<a id="playerswordsadapter"></a>
+
 #### `public class PlayersWordsAdapter extends RecyclerView.Adapter<PlayersWordsAdapter.ViewHolder>`
 תפקיד המחלקה: אדפטר מורכב המציג את מילות השחקנים בסיום המשחק עם גלילה מסונכרנת.
 
@@ -2531,7 +2561,7 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 
 ### חבילה: ui.game.singleplayer
 
-<a id="singleplayeractivity"></a>
+
 #### `public class SingleplayerActivity extends AppCompatActivity`
 תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק לשחקן יחיד. היא מנהלת את לוגיקת המשחק, תוצאות המשחק בסיום והעלאתן ל-Firebase.
 
@@ -2623,7 +2653,7 @@ private void showGameEndDialog() {
 ```
 מציגה חלון סיכום עם המילים שנמצאו ואלו שפוספסו.
 
-<a id="singleplayerongameendfragment"></a>
+
 #### `public class SingleplayerOnGameEndFragment extends DialogFragment`
 תפקיד המחלקה: דיאלוג המוצג בסיום משחק יחיד. מציג את הניקוד, המילים שנמצאו וכל הפתרונות האפשריים.
 
@@ -2689,7 +2719,7 @@ public void setOnWordClickListener(OnWordClickListener listener) {
 
 ### חבילה: ui.shared
 
-<a id="wordsadapter"></a>
+
 #### `public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder>`
 תפקיד המחלקה: אדפטר המשמש להצגת רשימת מילים, בדרך כלל במסכי סיכום המשחק. הוא מדגיש מילים שנמצאו על ידי השחקן, ואופציונלית מילים משותפות (שנמצאו על ידי מספר שחקנים), ומאפשר לחיצה על מילה כדי להציג את המסלול שלה על הלוח.
 
@@ -2725,7 +2755,7 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 
 ### חבילה: ui
 
-<a id="donutactivity"></a>
+
 #### `public class DonutActivity extends AppCompatActivity`
 תפקיד המחלקה: מסך (Activity) המציג דונאט תלת-ממדי מסתובב (ביצת הפתעה). מנהל את אירועי המגע (Touch Events) לסיבוב הדונאט ומחוות צביטה (Pinch-to-zoom) לשינוי הגודל/מרחק.
 
@@ -2768,7 +2798,7 @@ public boolean onScale(@NonNull ScaleGestureDetector detector)
 
 ### חבילה: views
 
-<a id="boggleview"></a>
+
 #### `public class BoggleView extends LinearLayout`
 תפקיד המחלקה: רכיב UI מותאם אישית (Custom View) המייצג את לוח המשחק של בוגל ואת הממשק ההיקפי שלו (כפתור אישור, מד זמן, תצוגת ניקוד ומילה).
 
@@ -2808,7 +2838,7 @@ public void showHint()
 צורכת רמז מסך הרמזים שזמינים למשתמש, מחפשת מילה חוקית שעדיין לא נמצאה – תוך התחשבות במסלול שהשחקן התחיל לבנות (אם קיים) – ומאירה חלק ממנה על הלוח באמצעות קריאה ל-`showSolution`.
 
 
-<a id="squaretextview"></a>
+
 #### `public class SquareTextView extends androidx.appcompat.widget.AppCompatTextView`
 תפקיד המחלקה: רכיב UI של טקסט מותאם אישית השומר תמיד על יחס ממדים ריבועי (1:1). משמשת לייצוג קוביות המשחק ברשת של בוגל, כך שהן יהיו אחידות וריבועיות בכל מסך.
 
@@ -2822,7 +2852,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 
 ### חבילה: utils
 
-<a id="imageutils"></a>
+
 #### `public class ImageUtils`
 תפקיד המחלקה: מחלקת עזר לטיפול בתמונות והמרת נתונים. היא מספקת מתודות סטטיות להמרה בין `Bitmap`, מחרוזות `Base64` (לצורך שמירה במסד נתונים), ו-`Uri`. בנוסף היא מכילה מתאם (Binding Adapter) עבור Data Binding.
 
@@ -2856,7 +2886,7 @@ static public Bitmap base64ToBitmap(String base64)
 ```
 הפעולה ההפוכה: מקבלת מחרוזת `Base64` (למשל כזו שנמשכה מ-Firebase) וממירה אותה חזרה ל-`Bitmap` כדי להציג אותה בממשק המשתמש.
 
-<a id="timer"></a>
+
 #### `public class Timer implements Runnable`
 תפקיד המחלקה: מחלקת עזר המנהלת ספירה לאחור עבור זמן המשחק. היא משתמשת ב-`Handler` כדי לרוץ על ה-Main Thread ולתזמן קריאות תקופתיות שיעדכנו את ה-UI.
 
@@ -2910,10 +2940,1239 @@ public void stop()
 ```
 עוצרת את הטיימר באופן ידני ומנקה קריאות עתידיות הממתינות ב-`Handler`.
 
-<a id="pointanddepth"></a>
+
 #### `public record PointAndDepth(int screenX, int screenY, double ooz)`
 תפקיד המחלקה: נתון (Record) פשוט לאחסון נקודה במישור הדו-מימדי על המסך, יחד עם ערך עומק `ooz` (One Over Z) לשימוש בחישובי תלת-ממד (למשל למיון לפי עומק ברנדור הדונאט).
 
-<a id="quad"></a>
+
 #### `public record Quad(Path path, @ColorInt int color, double avgOoz)`
 תפקיד המחלקה: נתון (Record) פשוט המייצג פוליגון מרובע בודד (פאה של הדונאט התלת-ממדי), עם הנתיב (Path) לציירו על הקנבס, צבעו, והעומק הממוצע שלו לצורך המיון לפני הציור (Painter's Algorithm).
+
+
+<h1 align="center" id="reflection">רפלקציה</h1>
+
+<h1 align="center" id="bibliography">יבליוגרפיה</h1>
+
+<h1 align="center" id="appendices">נספחים</h1>
+
+[javadoc](https://karakal12.github.io/boggle/)
+
+## קבצי layout
+
+
+### `activity_main.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.mainmenu.MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?android:attr/colorPrimary"
+            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/mainTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/boggle_welcome_message"
+            android:textSize="50sp"
+            app:layout_constraintBottom_toTopOf="@+id/singleplayer_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <Button
+            android:id="@+id/singleplayer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/single_player_button"
+            app:layout_constraintBottom_toTopOf="@+id/multiplayer_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mainTitle" />
+
+        <Button
+            android:id="@+id/multiplayer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/multiplayer_button"
+            app:layout_constraintBottom_toTopOf="@+id/friendsListButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/singleplayer_button" />
+
+        <Button
+            android:id="@+id/friendsListButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/friends_list_button"
+            app:layout_constraintBottom_toTopOf="@+id/leaderboardsButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/multiplayer_button" />
+
+        <Button
+            android:id="@+id/leaderboardsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/leaderboards_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/friendsListButton" />
+
+        <ImageView
+            android:id="@+id/donutButton"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_donut"
+            app:layout_constraintBottom_toBottomOf="@id/main_content"
+            app:layout_constraintEnd_toEndOf="@id/main_content" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_menu" />
+</androidx.drawerlayout.widget.DrawerLayout>
+```
+
+
+### `fragment_sign_up.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    tools:context=".ui.mainmenu.SignUpFragment">
+
+    <ImageView
+        android:id="@+id/IVProfileImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_person"
+        android:contentDescription="Profile Image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorPrimary"/>
+
+    <Button
+        android:id="@+id/btnSelectImage"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Image"
+        app:layout_constraintEnd_toEndOf="@+id/IVProfileImage"
+        app:layout_constraintStart_toStartOf="@+id/IVProfileImage"
+        app:layout_constraintTop_toBottomOf="@+id/IVProfileImage" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/TILDisplayName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSelectImage">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ETDisplayName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_display_name"
+            android:inputType="textPersonName" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/TILEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TILDisplayName">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ETEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/TILPassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TILEmail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ETPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_password"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/signup_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/sign_up"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TILPassword" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+
+### `fragment_login.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.mainmenu.LoginFragment">
+
+    <ImageView
+        android:id="@+id/IVLoginImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/ic_login"
+        android:contentDescription="Login Image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorPrimary"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/TILEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/IVLoginImage"
+        app:layout_constraintWidth_max="488dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ETEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/TILPassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TILEmail"
+        app:layout_constraintWidth_max="488dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ETPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_password"
+            android:inputType="textPassword"
+            android:autofillHints="password" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/login"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TILPassword" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+
+### `activity_friendlist.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="searchedUser"
+            type="com.amibar.boggle.data.User"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/prompt_email">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/friend_email_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/add_friend_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Add" />
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="50sp">
+
+            <include
+                android:id="@+id/searched_friend_view"
+                layout="@layout/item_player"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{searchedUser == null ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:player="@{searchedUser}" />
+
+            <Button
+                android:id="@+id/refresh_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:text="Refresh"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/friends_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_friend" />
+
+    </LinearLayout>
+</layout>
+```
+
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="friend"
+            type="com.amibar.boggle.data.User" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <include layout="@layout/item_player"
+            bind:player="@{friend}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Invite"
+            android:id="@+id/invite_button"/>
+    </LinearLayout>
+</layout>
+```
+
+
+### `nav_header.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="176dp"
+    android:background="?attr/colorPrimary"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <ImageView
+        android:id="@+id/nav_header_imageView"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Profile Image"
+        android:src="@drawable/ic_person"/>
+
+    <TextView
+        android:id="@+id/nav_header_textView_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="Not Logged In"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/nav_header_textView_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+</LinearLayout>
+```
+
+
+### `activity_singleplayer.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.game.singleplayer.SingleplayerActivity">
+
+    <com.amibar.boggle.views.BoggleView
+        android:id="@+id/boggle_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:gameMode="singleplayer"/>
+
+</FrameLayout>
+```
+
+
+### `fragment_singleplayer_on_game_end.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="score"
+            type="int" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Score: ` + score, default = `Score: 0`}"
+                app:layout_constraintBottom_toTopOf="@+id/click_hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/click_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_click_on_the_words_for_solution"
+                android:layout_marginTop="4dp"
+                app:layout_constraintBottom_toTopOf="@id/words_list"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvScore"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/words_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/click_hint"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_word" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
+```
+
+
+
+### `activity_multiplayer.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.game.multiplayer.MultiplayerActivity"
+    tools:layout="@layout/fragment_lobby" />
+```
+
+
+### `fragment_join_or_create_room.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/joinRoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Join Room"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@+id/create_room"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/create_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Room"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/room_code_TIL"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/joinRoom" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/room_code_TIL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/create_room"
+        android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/room_code_TV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Enter room code"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+
+### `fragment_lobby.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="room_code"
+            type="String"/>
+    </data>
+
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/main"
+        android:orientation="vertical"
+        android:gravity="center">
+        <Button
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="start"
+            android:id="@+id/start_button"
+            android:textAllCaps="false"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Room Code: ` + room_code, default=`Room Code: ******`}"
+            android:textSize="48sp"
+            android:id="@+id/room_code_TV"
+            android:gravity="center"
+            android:textColor="?android:attr/textColorPrimaryNoDisable"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/player_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/item_player" />
+    </LinearLayout>
+</layout>
+```
+
+
+### `fragment_multiplayer_game.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.game.multiplayer.MultiplayerGameFragment">
+
+    <com.amibar.boggle.views.BoggleView
+        android:id="@+id/boggle_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:gameMode="multiplayer"/>
+
+</FrameLayout>
+```
+
+
+### `fragment_multiplayer_on_game_end.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/game_over_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Game Over"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/players_words_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/game_over_title"
+            app:layout_constraintVertical_bias="0.0"
+            app:spanCount="3"
+            tools:listitem="@layout/item_player_score" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+```
+
+
+### `item_player.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="com.amibar.boggle.utils.ImageUtils"/>
+        <variable
+            name="player"
+            type="com.amibar.boggle.data.User" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/player_icon"
+            android:contentDescription="@string/profile_picture"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:imageBitmap="@{ImageUtils.base64ToBitmap(player.profileImageBase64)}"/>
+
+        <TextView
+            android:id="@+id/player_name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@{player.displayName, default=`John Doe`}"
+            android:autoSizeTextType="uniform"
+            android:textColor="?android:attr/textColorPrimaryNoDisable"
+            android:gravity="center"/>
+
+    </LinearLayout>
+</layout>
+```
+
+
+### `item_player_score.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="playerName"
+            type="String" />
+        <variable
+            name="score"
+            type="int" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/player_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{playerName}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintBottom_toTopOf="@id/tvScore"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="spread"
+                tools:text="Player Name" />
+
+            <TextView
+                android:id="@+id/tvScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{`Score: ` + score, default = `Score: 0`}"
+                app:layout_constraintBottom_toTopOf="@+id/words_list"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/player_name_text" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/words_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tvScore"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:listitem="@layout/item_word"
+                tools:itemCount="5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
+```
+
+
+### `item_word.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="word"
+            type="String" />
+    </data>
+
+    <TextView
+        android:id="@+id/word_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@{word}"
+        android:padding="4dp"
+        tools:text="Word"
+        android:gravity="center"
+        android:maxLines="1"/>
+</layout>
+```
+
+
+### `view_boggle.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="score"
+            type="int" />
+        <variable
+            name="word"
+            type="String" />
+        <variable
+            name="time"
+            type="String"/>
+        <variable
+            name="error"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layoutDirection="ltr">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_margin="8dp"
+                android:layout_height="wrap_content"  android:layout_width="wrap_content"
+                android:textColor="?android:attr/textColorPrimaryNoDisable"
+                android:text="@{time, default=`00:00`}"/>
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:indeterminate="false"
+                android:max="60"
+                android:progress="60"
+                android:layout_marginEnd="8dp"
+                app:indicatorColor="?android:attr/colorSecondary"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvBoggleMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/boggle"
+            android:textSize="50sp"
+            android:textColor="?android:attr/textColorPrimaryNoDisable"/>
+
+        <TextView
+            android:id="@+id/tvScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{`Score: ` + score, default=`Score: 0`}"/>
+
+        <GridLayout
+            android:rowCount="4"
+            android:columnCount="4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/colorForeground"
+            android:id="@+id/glGameLayout">
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginEnd="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell" />
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginEnd="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginEnd="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginBottom="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginBottom="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginBottom="@dimen/cellMargin"/>
+            <com.amibar.boggle.views.SquareTextView
+                style="@style/BoggleCell"
+                android:layout_marginBottom="@dimen/cellMargin"
+                android:layout_marginEnd="@dimen/cellMargin"/>
+        </GridLayout>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{`Word: "` + word + `"`, default=`Word: ""`}'
+            android:id="@+id/tvWord"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/bSubmit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/submit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivHint"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_hint"
+                app:layout_constraintBottom_toBottomOf="@+id/bSubmit"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toEndOf="@+id/bSubmit"
+                app:layout_constraintTop_toTopOf="@+id/bSubmit"
+                app:tint="?android:attr/textColorPrimary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tvErrors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="?android:attr/textColorPrimary"
+            android:text="@{error}"/>
+
+    </LinearLayout>
+</layout>
+```
+
+## קבצי value:
+
+
+### `attrs.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="theme">
+        <attr name="colorUnselected" format="color"/>
+        <attr name="colorSelected" format="color"/>
+        <attr name="colorLastSelected" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="BoggleView">
+        <attr name="gameMode" format="enum">
+            <enum name="singleplayer" value="0"/>
+            <enum name="multiplayer" value="1"/>
+        </attr>
+    </declare-styleable>
+
+</resources>
+```
+
+
+### `colors.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#2196F3</color>
+    <color name="primary_variant">#1976D2</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <color name="secondary">#FFE082</color>
+    <color name="secondary_variant">#FFD54F</color>
+    <color name="on_secondary">#000000</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="background">#F5F5F5</color>
+
+    <!-- Game colors -->
+
+    <color name="selected">#FFE082</color>
+    <color name="last_selected">#FFBA39</color>
+
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+</resources>
+```
+
+
+### `values-night/colors.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#90CAF9</color>
+    <color name="primary_variant">#1976D2</color>
+    <color name="on_primary">#000000</color>
+
+    <color name="secondary">#FFE082</color>
+    <color name="secondary_variant">#FFD54F</color>
+    <color name="on_secondary">#000000</color>
+
+    <color name="background">#121212</color>
+
+    <color name="selected">#FFE491</color>
+    <color name="last_selected">#FFD54F</color>
+
+    <!-- Game colors for Dark Mode -->
+<!--    <color name="unselected">#1E1E1E</color>-->
+<!--    <color name="selected">#1976D2</color>-->
+<!--    <color name="lastSelected">#90CAF9</color>-->
+</resources>
+```
+
+
+
+### `dimens.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cellMargin">2dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+</resources>
+```
+
+
+### `strings.xml`
+```xml
+<resources>
+    <string name="app_name">Boggle</string>
+    <string name="word">Word:\"%1$s\"</string>
+    <string name="score">Score: %1$d\n</string>
+    <string name="invalid_word">%1$s is not a valid word</string>
+    <string name="word_valid" />
+    <string name="word_invalid">\'%s\' is an invalid word</string>
+    <string name="word_already_found">\'%s\' was already found</string>
+    <string name="word_too_short"><![CDATA[\'%s\' is too short (<3)]]></string>
+    <string name="word_null" />
+    <string name="boggle">Boggle!</string>
+    <string name="submit">Submit</string>
+    <string name="single_player_button">Single Player</string>
+    <string name="boggle_welcome_message">Welcome to Boggle!</string>
+    <string name="multiplayer_button">Multiplayer</string>
+    <string name="friends_list_button">Friends List</string>
+    <string name="leaderboards_button">Leaderboards</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_display_name">Display Name</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="open_nav">open hamburger menu</string>
+    <string name="close_nav">close hamburger menu</string>
+    <string name="join_room">Join Room</string>
+    <string name="enter_room_code">Enter Room Code</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="hint_click_on_the_words_for_solution"><small><small>hint: click on the words for solution</small></small></string>
+</resources>
+```
+
+
+### `styles.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BoggleCell">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_marginStart">@dimen/cellMargin</item>
+        <item name="android:layout_marginTop">@dimen/cellMargin</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:background">?android:attr/colorBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryNoDisable</item>
+        <item name="android:layout_rowWeight">1</item>
+        <item name="android:layout_columnWeight">1</item>
+    </style>
+</resources>
+```
+
+
+
+### `themes.xml`
+```xml
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.Boggle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Background and surface colors -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">#FFFFFF</item>
+
+        <item name="colorUnselected">@color/background</item>
+        <item name="colorSelected">@color/selected</item>
+        <item name="colorLastSelected">@color/last_selected</item>
+    </style>
+</resources>
+```
+
+
+### `values-night/themes.xml`
+```xml
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.Boggle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#000000</item>
+
+        <!-- Background and surface colors -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">#1E1E1E</item>
+
+        <item name="colorUnselected">@color/background</item>
+        <item name="colorSelected">@color/selected</item>
+        <item name="colorLastSelected">@color/last_selected</item>
+        <!--        <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>-->
+
+    </style>
+</resources>
+```

@@ -132,7 +132,12 @@ public class BoggleView extends LinearLayout {
 
         // Initialize the badge for hints
         hintBadge = BadgeDrawable.create(getContext());
-        hintBadge.setNumber(game.getHints());
+        if (game != null) {
+            hintBadge.setNumber(game.getHints());
+            hintBadge.setVisible(game.getHints() > 0);
+        } else {
+            hintBadge.setVisible(false);
+        }
 
         // Attach it to the icon (must be done after view is laid out)
         binding.ivHint.post(() -> BadgeUtils.attachBadgeDrawable(hintBadge, binding.ivHint, null));
@@ -204,6 +209,11 @@ public class BoggleView extends LinearLayout {
 
         // Ensure timer displays zero exactly when game ends
         game.addOnGameEndListener(() -> binding.setTime("00:00"));
+
+        if (hintBadge != null) {
+            hintBadge.setNumber(game.getHints());
+            hintBadge.setVisible(game.getHints() > 0);
+        }
     }
 
     /**
@@ -244,7 +254,7 @@ public class BoggleView extends LinearLayout {
      * @param v The button view.
      */
     private void onClickSubmit(View v) {
-        if (game.isEnded()) return;
+        if (game == null || game.isEnded()) return;
 
         // Capture the word and result BEFORE clearing the selection/UI
         String lastWord = game.getWord();
@@ -277,7 +287,7 @@ public class BoggleView extends LinearLayout {
      */
     private OnClickListener cellOnClickListener(int cellId) {
         return (view) -> {
-            if (game.isEnded())
+            if (game == null || game.isEnded())
                 return;
             
             // Attempt to select the die. This validates adjacency and re-selection rules.
@@ -358,7 +368,7 @@ public class BoggleView extends LinearLayout {
      * Subtracts a hint from the player's total.
      */
     public void showHint(){
-        if (game.isEnded()) return;
+        if (game == null || game.isEnded()) return;
         if (game.getHints() <= 0) return;
 
         // Get current path as hex string

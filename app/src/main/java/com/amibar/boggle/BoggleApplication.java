@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.amibar.boggle.data.Dictionary;
 import com.amibar.boggle.data.FirebaseHandler;
 
+import java.util.concurrent.Executors;
 
 /**
  * Custom Application class for the Boggle app.
@@ -23,7 +24,9 @@ public class BoggleApplication extends Application {
         // Global Initialization
         // Load the dictionary from raw resources into memory (Trie structure)
         // This ensures the word list is ready before any game activities are launched.
-        Dictionary.ROOT.init(getResources().openRawResource(R.raw.word_list));
+        Executors.newSingleThreadExecutor().execute(() -> {
+            Dictionary.ROOT.init(getResources().openRawResource(R.raw.word_list));
+        });
         FirebaseHandler.getInstance().updateUserData();
 
     }

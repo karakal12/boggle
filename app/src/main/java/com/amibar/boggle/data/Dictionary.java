@@ -1,16 +1,22 @@
 package com.amibar.boggle.data;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Scanner;
+import java.io.InputStreamReader;
 
 /**
  * Trie (Prefix Tree) implementation representing the game dictionary.
  * Inherits from {@link Trie} to store words efficiently and allow for fast lookups.
  */
 public final class Dictionary extends Trie<Dictionary>{
+    private static final String TAG = "Dictionary";
+
     /**
      * Static root instance of the dictionary.
      */
@@ -47,14 +53,17 @@ public final class Dictionary extends Trie<Dictionary>{
     public synchronized void init(InputStream file) {
         if (isInitialized) return;
         
-        Scanner sc = new Scanner(file);
-        while (sc.hasNextLine()) {
-            String word = sc.nextLine().trim().toLowerCase();
-            if (!word.isEmpty()) {
-                put(word);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String word = line.trim().toLowerCase();
+                if (!word.isEmpty()) {
+                    put(word);
+                }
             }
+            isInitialized = true;
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading dictionary file", e);
         }
-        sc.close();
-        isInitialized = true;
     }
 }
