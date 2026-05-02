@@ -183,7 +183,8 @@ Gradle (גרדל) הוא כלי בניית הפרוייקט (Build System) הר�
 רמת אפליקציה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```gradle
 plugins {
@@ -311,13 +312,11 @@ afterEvaluate {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 רמת פרוייקט:
 
 </div>
-<div dir="ltr" align="left">
 ```gradle
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
@@ -326,14 +325,14 @@ plugins {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 libs.versions.toml:
 קובץ זה (Version Catalog) משמש לניהול מרוכז ומסודר של כל גרסאות הספריות, התוספים (Plugins) והתלויות בפרוייקט. במקום לכתוב את גרסת הספרייה בקובץ ה-Gradle של כל מודול בנפרד, מגדירים הכל כאן, מה שמקל על תחזוקה, מונע התנגשויות גרסאות, ושומר על סדר (במיוחד בפרוייקטים מרובי מודולים).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```toml
 [versions]
 agp = "9.0.1"
@@ -377,14 +376,14 @@ google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 manifest:
 קובץ ה-`AndroidManifest.xml` הוא קובץ הגדרות הליבה של האפליקציה, והוא "תעודת הזהות" שלה מול מערכת ההפעלה Android. בו מוצהרים כל רכיבי האפליקציה (כמו מסכים - Activities, ושירותי רקע - Services), ההרשאות הנדרשות (כמו גישה לאינטרנט או קבלת התראות), הגדרות הנושא (Theme), אייקון האפליקציה, ונקודת הכניסה הראשית (איזה מסך נפתח כשהאפליקציה עולה). בלעדיו, המערכת לא תדע כיצד להריץ את האפליקציה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
@@ -440,7 +439,6 @@ manifest:
 </manifest>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ## תיאור מחלקות UML
@@ -474,7 +472,8 @@ manifest:
 ## פונקציות שרת
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```javascript
 const {setGlobalOptions} = require("firebase-functions");
 
@@ -533,7 +532,6 @@ exports.sendInvitationNotification = onValueCreated(
 );
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מטרה: כאשר נכתבת הזמנה למסד הנתונים, תשלח הודעה לשחקן שהוזמן כדי שתקפוץ לו בטלפון התרעה
@@ -549,7 +547,8 @@ exports.sendInvitationNotification = onValueCreated(
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void onCreate(){
@@ -557,7 +556,6 @@ public void onCreate(){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מופעלת עם עליית האפליקציה לפני הפעלת המסכים. מאתחלת את המילון (Dictionary) מקובץ רשימת המילים כדי שיהיה מוכן ומסודר בזיכרון, ובנוסף מפעילה עדכון אסינכרוני לנתוני המשתמש ב-`FirebaseHandler`.
@@ -571,7 +569,8 @@ public void onCreate(){
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** The number of letters in the English alphabet ('a' through 'z'). */
 protected static final int ALPHABET_SIZE = 26;
@@ -586,13 +585,13 @@ protected volatile boolean isEndOfWord;
 protected volatile boolean isLeaf;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - boolean isEndOfWord
 - boolean isLeaf
@@ -601,13 +600,13 @@ protected volatile boolean isLeaf;
 - toString()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public boolean containsKey(char ch) {
     int index = ch - 'a';
@@ -615,13 +614,13 @@ public boolean containsKey(char ch) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודק ומחזיר האם יש ילד ב"כיוון" של האות
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public T get(char ch) {
     int index = ch - 'a';
@@ -630,13 +629,13 @@ public T get(char ch) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחזיר את הילד בכיוון של אות, או null אם לא קיים, או אם מחוץ לתחום.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public T get(String s){
     T node = (T) this;
@@ -652,13 +651,13 @@ public T get(String s){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחפש איטרטיבית את הצומת של השרשרת המדוברת, או null אם לא קיים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public T putIfAbsent(char ch){
     if (ch > 'z' || ch < 'a') return null;
@@ -683,7 +682,6 @@ public T putIfAbsent(char ch){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מוסיף את הילד בכיוון האות אם הוא חסר, ומחזיר את מה שהוסיף אם לא היה או את מה שהיה.
@@ -691,7 +689,8 @@ public T putIfAbsent(char ch){
 משתמש בפעולות מוגנות לתהליכונים בשביל שימוש במקביל.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public T put(String str){
     T node = (T) this;
@@ -705,14 +704,14 @@ public T put(String str){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מוסיף את כל השרשרת מהצומת והלאה, ומסמן את הצומת האחרונה כסוף המילה.
 מחזיר את הצומת האחרונה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public int size() {
     int toAdd = isEndOfWord ? 1: 0;
@@ -726,13 +725,13 @@ public int size() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחשב את כמות המילים שנמצאות בעץ מהצומת הנוכחית והלאה בצורה רקורסיבית.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public Set<String> getWords(){
     Set<String> words = new ArraySet<>(size());
@@ -754,7 +753,6 @@ protected void _getWords(String word, Set<String> set) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 זוג פונקציות, רקורסיבית ומעטפת, שאוספות את כל המילים בעץ ומחזירות אותר בקבוצה.
@@ -764,7 +762,8 @@ protected void _getWords(String word, Set<String> set) {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /**
  * Static root instance of the dictionary.
@@ -775,7 +774,6 @@ public static final Dictionary ROOT = new Dictionary();
 private boolean isInitialized = false;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תגונות המחלקה: אין ייחודיות
@@ -783,7 +781,8 @@ private boolean isInitialized = false;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public static boolean contains(@NonNull String word) {
     Trie<?> node = ROOT.get(word);
@@ -791,13 +790,13 @@ public static boolean contains(@NonNull String word) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודק אם המילה קיימת במילון, תמיד בודק מהשורש.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public synchronized void init(InputStream file) {
     if (isInitialized) return;
@@ -814,7 +813,6 @@ public synchronized void init(InputStream file) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ממלא את המילון עם הקובץ שהועבר.
@@ -827,30 +825,31 @@ public synchronized void init(InputStream file) {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
     /** The path (sequence of board indices) associated with the word ending at this node. */
     private String path;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - String path
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public PathTrie put(String str, String path){
     PathTrie node = super.put(str);
@@ -861,13 +860,13 @@ public PathTrie put(String str, String path){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מוסיף גם את המסלול לצומת האחרונה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public HashMap<String, String> toMap() {
     HashMap<String, String> map = new HashMap<>();
@@ -878,7 +877,6 @@ public HashMap<String, String> toMap() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
@@ -890,7 +888,8 @@ public HashMap<String, String> toMap() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for logging. */
 private static final String TAG = "FirebaseHandler";
@@ -907,13 +906,13 @@ private final FirebaseMessaging mMessaging;
 private User user;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - FirebaseHandler instance
 - FirebaseAuth auth
@@ -926,13 +925,13 @@ private User user;
 - DatabaseReference userRef
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void updateUserData() {
     FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -959,13 +958,13 @@ public void updateUserData() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודק אם המשתמש עדיין ואלידי (אם לא נמחק או הוקפא) ומעדכן את הפרטים שלו מהמוסד נתונים
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void signOut() {
     mAuth.signOut();
@@ -973,13 +972,13 @@ public void signOut() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מנתק את המשתמש ומנקה את המידע השמור מקומית.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void addFriend(String id) {
     DatabaseReference usersRef = mDatabase.getReference("users");
@@ -993,7 +992,6 @@ public void addFriend(String id) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מוסיף מתשתמש לרשימת החברים
@@ -1007,13 +1005,13 @@ public void addFriend(String id) {
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - GameMode singleplayer
 - GameMode multiplayer
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה: הפעולות שהורשו מ `<Enum<E>`
@@ -1026,13 +1024,13 @@ public void addFriend(String id) {
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - PlayerRole host
 - PlayerRole guest
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה: הפעולות שהורשו מ `<Enum<E>`
@@ -1046,7 +1044,8 @@ public void addFriend(String id) {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** The user's unique ID. */
 private String uid;
@@ -1060,13 +1059,13 @@ private String fcmToken;
 private String fcmToken;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - String uid;
 - String displayName;
@@ -1075,7 +1074,6 @@ private String fcmToken;
 - String fcmToken;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה: אין
@@ -1089,7 +1087,8 @@ private String fcmToken;
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** The total duration of a game in milliseconds. */
 public static final long GAME_TIME_MILLIS = 180000;
@@ -1120,13 +1119,13 @@ private final List<String> allPaths;
 private final Timer gameTimer;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ממשקי המאזינים (Listeners):
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public interface OnGameEndListener {
     /** Called when the game timer expires or the game is manually ended. */
@@ -1144,13 +1143,13 @@ public interface OnTickListener {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - int score
 - int hints
@@ -1167,26 +1166,26 @@ public interface OnTickListener {
 - List<OnTickListener> onTickListeners
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public BoggleGame() {
     this(generateBoard());
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי המאתחל משחק חדש עם לוח שנוצר אקראית.
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 public BoggleGame(char[] board) {
@@ -1212,13 +1211,13 @@ public BoggleGame(char[] board) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי המאתחל משחק עם לוח ספציפי. הוא פותר את הלוח מראש ומגדיר את הטיימר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private static char[] generateBoard() {
     ArrayList<Die> diceList = Die.generateDice();
@@ -1233,13 +1232,13 @@ private static char[] generateBoard() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מייצר לוח אקראי של 16 אותיות על בסיס קוביות הבוגל הסטנדרטיות.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void addOnGameEndListener(OnGameEndListener listener) {
     this.onGameEndListeners.add(listener);
@@ -1254,13 +1253,13 @@ public void addOnTickListener(OnTickListener listener) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות להוספת מאזינים לאירועי סיום משחק, מציאת מילה ותקתוק של הטיימר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public WordCheckResult submitWord() {
     String formedWord = formWord(); // Note: this clears the selection indices
@@ -1281,13 +1280,13 @@ public WordCheckResult submitWord() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודק את המילה שנבחרה, מעדכן את הניקוד ומודיע למאזינים אם המילה תקינה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public int wordScore(String word) {
     int wordLength = word.length();
@@ -1301,13 +1300,13 @@ public int wordScore(String word) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחשב ניקוד למילה לפי חוקי המשחק הסטנדרטיים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 public boolean selectDie(int index) {
@@ -1324,13 +1323,13 @@ public boolean selectDie(int index) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מנסה לבחור קובייה בלוח. הבחירה תצליח אם זו הקובייה הראשונה או שהיא סמוכה לקובייה האחרונה שנבחרה וטרם נעשה בה שימוש במילה הנוכחית.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public int getMaxScore() {
     int maxScore = 0;
@@ -1341,13 +1340,13 @@ public int getMaxScore() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחשב את הניקוד המקסימלי האפשרי ללוח הנוכחי.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void endGame() {
     if (gameEnded) return;
@@ -1359,7 +1358,6 @@ public void endGame() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מסיימת את המשחק, עוצרת את הטיימר ומעדכנת את המאזינים.
@@ -1371,7 +1369,8 @@ public void endGame() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /**
  * A Trie to store all unique words found on the board.
@@ -1386,30 +1385,29 @@ private PathTrie solutions;
 private ConcurrentLinkedQueue<String> allPaths;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - PathTrie solutions
 - List<String> allPaths
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public SolverResult solve(char[][] board, Dictionary dictionary)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
@@ -1421,24 +1419,24 @@ public SolverResult solve(char[][] board, Dictionary dictionary)
 פעולות המחלקה הפנימית:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public GameSolverTask(Dictionary root, char[][] board, int i, int j, short visited, String path, String string)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי המאתחל משימת חיפוש עבור מיקום ספציפי בלוח, תוך שמירה על מצב החיפוש (הצומת הנוכחי במילון, תאים שבוקרו, והמילה שנוצרה עד כה).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void compute()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מבצעת את לוגיקת החיפוש המקבילית:
@@ -1449,12 +1447,12 @@ protected void compute()
 5. מפעילה את כל משימות המשנה במקביל באמצעות `invokeAll`.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private boolean isSafe(int i, int j, short visited)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולת עזר הבודקת האם קואורדינטות `(i, j)` נמצאות בתוך גבולות הלוח והאם התא טרם בוקר במסלול הנוכחי (באמצעות בדיקת הביט המתאים ב-`visited`).
@@ -1466,7 +1464,8 @@ private boolean isSafe(int i, int j, short visited)
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 /** Default rotation rates for angles A and B */
@@ -1518,26 +1517,26 @@ private boolean isSurfaceReady = false;
 
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - double A_RATE
 - double B_RATE
 - float MIN_LIGHT
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public DonutRenderer(SurfaceView surfaceView) {
     this.surfaceView = surfaceView;
@@ -1554,13 +1553,13 @@ public DonutRenderer(SurfaceView surfaceView) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי המאתחל את הרנדרר ומקשר אותו ל-`SurfaceView`.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void doFrame(long frameTimeNanos) {
@@ -1589,13 +1588,13 @@ public void doFrame(long frameTimeNanos) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מתודה המופעלת בכל פריים על ידי ה-`Choreographer` לניהול האנימציה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void drawDonut() {
     if (bitmap == null) return;
@@ -1679,13 +1678,13 @@ private void drawDonut() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 הלוגיקה המרכזית של הרינדור: ביצוע טרנספורמציות גיאומטריות, חישובי תאורה, מיון לפי עומק וציור בפועל.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, double sinB) {
     PointAndDepth[][] grid = new PointAndDepth[thetaSteps][phiSteps];
@@ -1724,7 +1723,6 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מחשבת את המיקומים של כל הנקודות על הטורוס במרחב התלת-ממדי ומטילה אותן לקואורדינטות מסך.
@@ -1738,7 +1736,8 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 /** Tag used for logging. */
@@ -1747,7 +1746,6 @@ private static final String TAG = "InvitationService";
 private static final String CHANNEL_ID = "invitation_channel";
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -1755,7 +1753,8 @@ private static final String CHANNEL_ID = "invitation_channel";
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void onNewToken(@NonNull String token) {
@@ -1766,13 +1765,13 @@ public void onNewToken(@NonNull String token) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מתעדכנת כאשר נוצר אסימון (Token) חדש עבור ה-FCM של המכשיר. היא מעדכנת את האסימון החדש במסד הנתונים תחת פרטי המשתמש הנוכחי כדי לאפשר שליחת הודעות אליו.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -1800,13 +1799,13 @@ public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מתודה המופעלת כאשר מתקבלת הודעת FCM. היא מחלצת את נתוני ההזמנה, מוחקת את ההזמנה ממסד הנתונים (כדי שלא תישאר כ"פתוחה" לאחר שכבר הגיעה ליעד) ומציגה התראה למשתמש.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void deleteInvitation(String invitationId) {
     String currentUserId = FirebaseAuth.getInstance().getUid();
@@ -1822,13 +1821,13 @@ private void deleteInvitation(String invitationId) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולת עזר המוחקת את ההזמנה הספציפית ממסד הנתונים של Firebase.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void showNotification(String title, String body, Map<String, String> data) {
 Intent intent = new Intent(this, MainActivity.class);
@@ -1869,7 +1868,6 @@ notificationManager.notify(0, notificationBuilder.build());
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בונה ומציגה התראה במכשיר. היא מגדירה Intent שיוביל את המשתמש ישירות לחדר המשחק אם ההתראה מכילה קוד חדר, ומגדירה את ערוץ ההתראות עבור גרסאות אנדרואיד חדשות.
@@ -1885,7 +1883,8 @@ notificationManager.notify(0, notificationBuilder.build());
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** View binding for the activity layout. */
 private ActivityMainBinding binding;
@@ -1917,7 +1916,6 @@ private final ActivityResultLauncher<String> requestPermissionLauncher =
         });
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -1925,7 +1923,8 @@ private final ActivityResultLauncher<String> requestPermissionLauncher =
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -1955,13 +1954,13 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את ה-View Binding, מגדירה תצוגה מקצה לקצה (EdgeToEdge), מגדירה מאזינים למרווחים של מערכת ההפעלה (Insets), ומפעילה פונקציות האתחול של המסך, ההרשאות ומצב המשתמש.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onNewIntent(Intent intent) {
@@ -1971,13 +1970,13 @@ protected void onNewIntent(Intent intent) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 נקראת כאשר האקטיביטי כבר פתוחה ומקבלת Intent חדש (למשל מלחיצה על התראה). היא מעדכנת את ה-Intent של האקטיביטי ומפעילה את הטיפול בו.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void handleIntent(Intent intent) {
     if (intent != null && intent.hasExtra("roomCode")) {
@@ -2007,13 +2006,13 @@ private void handleIntent(Intent intent) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודקת אם ה-Intent מכיל קוד חדר (roomCode). אם כן, היא קובעת את תפקיד השחקן (מארח או אורח) ופותחת את הדיאלוג להצטרפות או יצירת חדר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void init(){
     setSupportActionBar(binding.toolbar);
@@ -2056,13 +2055,13 @@ private void init(){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מגדירה את סרגל הכלים (Toolbar), את המאזינים לכפתורי הניווט (שחקן יחיד, מרובה שחקנים, רשימת חברים, וביצת ההפתעה), ואת התפריט הצידי.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void setupAuthStateListener() {
     authStateListener = firebaseAuth -> {
@@ -2086,13 +2085,13 @@ protected void onStop() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מגדירה, רושמת ומסירה את המאזין לשינויים במצב ההתחברות של Firebase בהתאם למחזור החיים של האקטיביטי.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 void updateUI() {
     boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
@@ -2140,13 +2139,13 @@ void updateUI() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעדכנת את הניראות של פריטי התפריט (כניסה/הרשמה מול התנתקות) ואת פרטי המשתמש (שם, אימייל ותמונה) בראש התפריט הצידי על סמך המשתמש המחובר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private boolean onNavigationItemSelected(MenuItem item) {
     int id = item.getItemId();
@@ -2165,13 +2164,13 @@ private boolean onNavigationItemSelected(MenuItem item) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מטפלת בלחיצות על פריטים בתפריט הצידי, כמו התנתקות או פתיחת דיאלוגים של התחברות והרשמה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void askNotificationPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -2182,7 +2181,6 @@ private void askNotificationPermission() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מבקשת מהמשתמש הרשאת התראות (עבור אנדרואיד 13 ומעלה) כדי שיוכל לקבל הזמנות למשחק.
@@ -2194,7 +2192,8 @@ private void askNotificationPermission() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** View binding for the fragment layout. */
 private FragmentLoginBinding binding;
@@ -2208,7 +2207,6 @@ private EditText ETEmail;
 private EditText ETPassword;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -2216,7 +2214,8 @@ private EditText ETPassword;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void init(){
     Button loginButton = binding.loginButton;
@@ -2227,13 +2226,13 @@ private void init(){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את רכיבי ה-UI ומגדירה מאזין לכפתור ההתחברות.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void loginUser(View view){
     String email = ETEmail.getText().toString();
@@ -2276,13 +2275,13 @@ private void loginUser(View view){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מנסה לבצע כניסה באמצעות Firebase Auth. היא מאמתת שכל השדות מלאים, מציגה תיבת התקדמות, ומטפלת בשגיאות אימות נפוצות (כמו משתמש לא קיים או סיסמה שגויה) עם הודעות ידידותיות למשתמש.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void updateFcmToken() {
     FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
@@ -2301,7 +2300,6 @@ private void updateFcmToken() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 משיגה את ה-FCM token העדכני של המכשיר ושומרת אותו במסד הנתונים תחת המשתמש המחובר, מה שמאפשר לו לקבל הזמנות למשחק כהתראות.
@@ -2313,7 +2311,8 @@ private void updateFcmToken() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** View binding for the fragment layout. */
 private FragmentSignUpBinding binding;
@@ -2344,7 +2343,6 @@ private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
         });
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -2352,7 +2350,8 @@ private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void init() {
     IVProfileImage = binding.IVProfileImage;
@@ -2370,13 +2369,13 @@ private void init() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את רכיבי המסך ומגדירה מאזינים לבחירת תמונה (באמצעות Photo Picker) ולתהליך ההרשמה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void createUser() {
     String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
@@ -2427,13 +2426,13 @@ private void createUser() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מנהלת את תהליך יצירת המשתמש: אימות קלטים, יצירת החשבון ב-Firebase Auth, המרת התמונה הנבחרת לפורמט Base64 לשמירה יעילה, וטיפול בשגיאות נפוצות.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void updateProfile(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
     pd.setMessage("Updating Profile...");
@@ -2453,13 +2452,13 @@ private void updateProfile(FirebaseUser user, String displayName, String base64I
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעדכנת את הפרופיל של המשתמש ב-Firebase Authentication עם שם התצוגה שנבחר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
     pd.setMessage("Fetching FCM Token...");
@@ -2475,13 +2474,13 @@ private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, Str
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 משיגה את ה-FCM token של המכשיר לפני שמירת רשומת המשתמש המלאה, כדי להבטיח שהמשתמש מוכן לקבל התראות מיד עם סיום ההרשמה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
     pd.setMessage("Saving User Data...");
@@ -2504,7 +2503,6 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצרת אובייקט `User` מלא ושומרת אותו במסד הנתונים של Firebase. בסיום מוצלח, היא מעדכנת את ממשק המשתמש במסך הראשי וסוגרת את הדיאלוג.
@@ -2517,7 +2515,8 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 /** Tag used for logging. */
@@ -2534,25 +2533,25 @@ private FirebaseHandler firebaseHandler;
 private DataSnapshot usersSnapshot;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - List<User> friendsList
 - FriendAdapter adapter
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -2568,13 +2567,13 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את ה-Data Binding, את המאזינים לרכיבי ה-UI (חיפוש, כפתורים), ומפעילה את טעינת המשתמשים והחברים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void loadUsers() {
     firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
@@ -2584,13 +2583,13 @@ private void loadUsers() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 טוענת את רשימת כל המשתמשים הרשומים (לצורך חיפוש) ולאחר מכן טוענת את רשימת החברים הספציפית של המשתמש.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void showInviteDialog(User friend) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -2620,13 +2619,13 @@ private void showInviteDialog(User friend) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מציגה דיאלוג המאפשר למשתמש להזין קוד חדר ולהזמין חבר למשחק. לאחר השליחה, המשתמש מועבר למסך הראשי במצב מארח.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void sendInvitation(User friend, String roomCode) {
     String currentUserId = firebaseHandler.getCurrentUserId();
@@ -2655,13 +2654,13 @@ private void sendInvitation(User friend, String roomCode) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצרת רשומת הזמנה חדשה ב-Firebase תחת המזהה של החבר המוזמן. זה יפעיל את ה-Cloud Function שישלח הודעת דחיפה לחבר.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void setupSearchInput() {
     binding.friendEmailInput.addTextChangedListener(new TextWatcher() {
@@ -2687,13 +2686,13 @@ private void setupSearchInput() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מגדירה מאזין לשינויי טקסט בשדה החיפוש שמסנן את רשימת המשתמשים בזמן אמת ומציגה את התוצאה הראשונה המתאימה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void loadFriends() {
     DatabaseReference userRef = firebaseHandler.getUserRef();
@@ -2720,7 +2719,6 @@ private void loadFriends() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 טוענת את רשימת מזהי החברים של המשתמש הנוכחי ומפעילה שליפה של הנתונים המלאים עבור כל אחד מהם.
@@ -2733,26 +2731,26 @@ private void loadFriends() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Callback for when the invite button is clicked for a specific friend. */
 private final OnInviteClickListener inviteClickListener;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ממשק האזנה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public interface OnInviteClickListener {
     void onInviteClick(User friend);
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -2760,7 +2758,8 @@ public interface OnInviteClickListener {
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
@@ -2777,7 +2776,6 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מקשרת בין אובייקט המשתמש ל-ViewHolder, מגדירה את המאזין לכפתור ההזמנה ומבצעת את הקישור (Binding) באופן מיידי למניעת ריצודים.
@@ -2794,7 +2792,8 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for logging. */
 public static final String TAG = "MultiplayerActivity";
@@ -2812,25 +2811,25 @@ private String roomCode;
 private PlayerRole playerRole;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - String roomCode
 - PlayerRole playerRole
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -2864,13 +2863,13 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את ה-Activity ומציגה את ה-LobbyFragment.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void startGame(){
     if (roomCode != null) {
@@ -2881,13 +2880,13 @@ public void startGame(){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 עוברת למסך המשחק הפעיל (MultiplayerGameFragment).
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 public void showGameResults(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords) {
@@ -2896,13 +2895,13 @@ public void showGameResults(HashMap<String, String> solutions, HashMap<User, Arr
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מציגה את תוצאות המשחק הסופיות בדיאלוג.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onDestroy() {
@@ -2934,7 +2933,6 @@ protected void onDestroy() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מסירה את השחקן מהחדר בשרת ומנקה חדרים ריקים.
@@ -2946,7 +2944,8 @@ protected void onDestroy() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for identifying this fragment in the FragmentManager. */
 public static final String TAG = "JoinOrCreateRoomFragment";
@@ -2959,7 +2958,6 @@ private static final String ARG_INITIAL_PLAYER_ROLE = "initial_player_role";
 private FragmentJoinOrCreateRoomBinding binding;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -2967,57 +2965,57 @@ private FragmentJoinOrCreateRoomBinding binding;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public static JoinOrCreateRoomFragment newInstance(String roomCode, PlayerRole playerRole)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצרת מופע עם נתונים התחלתיים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את הממשק ומטפלת בבקשות הצטרפות ישירות.
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 private void createRoom(View view)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצרת חדר חדש ועוברת למסך המולטיפלייר כמארח.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void joinRoom(View view)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בודקת קיום חדר בשרת ומצטרפת כאורח.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private Intent makeIntent(PlayerRole role)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פונקציית עזר לבניית Intent המעבר.
@@ -3029,7 +3027,8 @@ private Intent makeIntent(PlayerRole role)
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for identifying this fragment. */
 public static final String TAG = "LobbyFragment";
@@ -3053,53 +3052,52 @@ private DatabaseReference roomRef;
 private ValueEventListener playerListener;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - List<User> playerList
 - String roomCode
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 רושמת את השחקן בחדר ומגדירה את התצוגה.
 שולחת את השחקן לתוך משחק אם הופעל דרך intent
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void listenForPlayers()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעדכנת את הרשימה ומזהה מתי המשחק מתחיל בשרת.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void startGame(View view)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעדכנת בשרת שהמשחק התחיל (למארח בלבד).
@@ -3111,7 +3109,8 @@ private void startGame(View view)
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for logging and fragment identification. */
 public static final String TAG = "MultiplayerGameFragment";
@@ -3133,7 +3132,6 @@ private ValueEventListener gameEndListener;
 private ChildEventListener gameDestroyedListener;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3141,46 +3139,46 @@ private ChildEventListener gameDestroyedListener;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 המארח מייצר לוח; האורחים ממתינים לסנכרון הלוח.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void listenForGameEnd()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מפעילה איסוף תוצאות כשדגל הסיום מתעדכן.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void setupGame(BoggleGame game)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מסנכרנת מילים שנמצאו לשרת ומעדכנת סיום זמן.
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 private void collectResultsAndFinish()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 אוספת את כל המילים של כלל השחקנים מה-Database.
@@ -3192,7 +3190,8 @@ private void collectResultsAndFinish()
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag for identifying the fragment. */
 public static final String TAG = "MultiplayerOnGameEndFragment";
@@ -3207,7 +3206,6 @@ private FragmentMultiplayerOnGameEndBinding binding;
 private PlayersWordsAdapter playersWordsAdapter;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3215,23 +3213,23 @@ private PlayersWordsAdapter playersWordsAdapter;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public static MultiplayerOnGameEndFragment newInstance(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעבירה את מפות הפתרונות והמילים שנמצאו.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את רשימת התוצאות המורחבת.
@@ -3243,13 +3241,13 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** List of users currently in the lobby. */
 private final List<User> playerList;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3257,12 +3255,12 @@ private final List<User> playerList;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מבצעת Data Binding של נתוני השחקן לתצוגה.
@@ -3274,7 +3272,8 @@ public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** List of players whose words are being displayed. */
 private final List<User> players;
@@ -3300,7 +3299,6 @@ private int currentScrollX = 0;
 private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView.OnScrollListener()
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3308,23 +3306,23 @@ private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private Set<String> findCommonWords(HashMap<User, ArrayList<String>> playersWords)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מזהה כפילויות במילים בין השחקנים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בונה רשימת מילים פנימית לכל שחקן ומחברת אותה למנגנון סנכרון הגלילה.
@@ -3338,7 +3336,8 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for logging and debugging purposes. */
 private static final String TAG = "SingleplayerActivity";
@@ -3355,7 +3354,6 @@ private BoggleGame game;
 private boolean isGameEnded = false;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3363,7 +3361,8 @@ private boolean isGameEnded = false;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 protected void onCreate(Bundle savedInstanceState) {
     // ...
@@ -3391,13 +3390,13 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את המשחק, מגדירה אירועים לסיום המשחק וגילוי מילות סתר (Easter Egg).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void uploadGameResults(BoggleGame game) {
     FirebaseHandler handler = FirebaseHandler.getInstance();
@@ -3418,13 +3417,13 @@ private void uploadGameResults(BoggleGame game) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעלה את תוצאות המשחק למסד הנתונים בענן עבור המשתמש הנוכחי.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void showGameEndDialog() {
     if (isDestroyed()) return;
@@ -3443,7 +3442,6 @@ private void showGameEndDialog() {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מציגה חלון סיכום עם המילים שנמצאו ואלו שפוספסו.
@@ -3455,7 +3453,8 @@ private void showGameEndDialog() {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for identifying the fragment. */
 public static final String TAG = "SingleplayerOnGameEndFragment";
@@ -3473,7 +3472,6 @@ private FragmentSingleplayerOnGameEndBinding binding;
 private OnWordClickListener listener;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3481,7 +3479,8 @@ private OnWordClickListener listener;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
     SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
@@ -3494,13 +3493,13 @@ public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solu
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 יוצרת מופע של הדיאלוג עם הנתונים של המשחק שהסתיים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @NonNull
 @Override
@@ -3519,20 +3518,19 @@ public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את רשימת המילים ומקשרת אותה ל-Adapter שיציג את הפתרונות. (הקוד ב-onCreateDialog מחליף את onViewCreated).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void setOnWordClickListener(OnWordClickListener listener) {
     this.listener = listener;
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאפשרת להגדיר מאזין ללחיצות על מילים, כדי שניתן יהיה להציג את המסלול שלהן על הלוח.
@@ -3546,7 +3544,8 @@ public void setOnWordClickListener(OnWordClickListener listener) {
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Map of all valid words on the board to their hex-encoded paths. */
 private final Map<String, String> solutions;
@@ -3558,7 +3557,6 @@ private final Set<String> commonWords;
 private final OnWordClickListener listener;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3566,33 +3564,34 @@ private final OnWordClickListener listener;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי מלא לאדפטר, מקבל את הפתרונות, המילים שנמצאו, מילים משותפות ומאזין ללחיצות. משמש לתוצאות משחק מרובה משתתפים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 בנאי פשוט ללא מילים משותפות. משמש לתוצאות משחק לשחקן יחיד.
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```java
 public void onBindViewHolder(@NonNull ViewHolder holder, int position){
@@ -3600,7 +3599,6 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מקשר את הנתונים לתצוגה של פריט בודד. ממיין את הפתרונות אלפביתית, וצובע את המילים בהתאם למצבן: אדום למילה שנמצאה על ידי אחרים (משותפת), ירוק למילה שנמצאה על ידי השחקן הנוכחי, ושחור למילה שפוספסה. מגדיר גם את מאזין הלחיצות על הפריט.
@@ -3614,7 +3612,8 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position){
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** The renderer responsible for drawing the 3D donut on the surface. */
 private DonutRenderer renderer;
@@ -3631,7 +3630,6 @@ private float lastTouchX = 0;
 private float lastTouchY = 0;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3639,27 +3637,27 @@ private float lastTouchY = 0;
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 protected void onCreate(@Nullable Bundle savedInstanceState){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את ה-SurfaceView, את מזהה מחוות הצביטה, ורושמת Callback למחזור החיים של המשטח כדי להתחיל ולהפסיק את הרינדור מול `DonutRenderer`.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public boolean onTouchEvent(MotionEvent event){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מטפלת באירועי מגע של המשתמש. מעבירה אירועים לזיהוי שינוי גודל (ScaleDetector), ומטפלת בסיבוב הדונאט על ידי חישוב ההפרש במיקום האצבע (dx, dy) לעדכון הזוויות ברנדרר. תומכת במספר אצבעות למניעת קפיצות כשמחליפים אצבע.
@@ -3668,14 +3666,14 @@ public boolean onTouchEvent(MotionEvent event){
 מאזינה לאירועי צביטה (זום).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public boolean onScale(@NonNull ScaleGestureDetector detector){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מעדכנת את מרחק הדונאט (Zoom) ברנדרר בהתאם ליחס המתיחה (ScaleFactor).
@@ -3689,7 +3687,8 @@ public boolean onScale(@NonNull ScaleGestureDetector detector){
 תכונות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 - BoggleGame game
 - TextView[] cells
@@ -3698,72 +3697,71 @@ public boolean onScale(@NonNull ScaleGestureDetector detector){
 - GameMode gameMode
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void initView(){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת את הרכיב הגרפי, מחברת אותו ל-XML המותאם אישית שלו, מגדירה את מערך הקוביות (16 תאים) ומשייכת לכל תא וכפתור את המאזין המתאים לו. בסביבת שחקן יחיד היא גם מתחילה את המשחק אוטומטית.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void setupUI(){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מסנכרנת את מצב רכיב ה-UI עם ה-`BoggleGame`. פורסת את האותיות על הקוביות בלוח (תוך הצגת 'Qu' במידת הצורך), מעדכנת ניקוד ומפעילה את מד הזמן בהתאם לתקתוקי הטיימר של מנוע המשחק.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 private void onClickSubmit(View v){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מטפלת בלחיצה על כפתור 'אישור מילה'. מגישה את המילה לבדיקה מול ה-`BoggleGame`, מספקת משוב למשתמש (האם המילה חוקית, קצרה מדי, או כבר נמצאה), מעדכנת את הניקוד במידה ונמצאה ומנקה את הבחירה מהלוח.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void showSolution(String path){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מקבלת נתיב משחק (בפורמט מחרוזת של אינדקסים) ומאירה את המילה הספציפית על הלוח באמצעות צביעת התאים הרלוונטיים בצבע מתאים (עם צבע ייעודי לתא האחרון).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void showHint(){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 צורכת רמז מסך הרמזים שזמינים למשתמש, מחפשת מילה חוקית שעדיין לא נמצאה – תוך התחשבות במסלול שהשחקן התחיל לבנות (אם קיים) – ומאירה חלק ממנה על הלוח באמצעות קריאה ל-`showSolution`.
@@ -3776,7 +3774,8 @@ public void showHint(){
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
@@ -3784,7 +3783,6 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 עוקפת את מתודת המדידה הסטנדרטית כדי לחשב את הגובה והרוחב של התצוגה, בודקת איזה ממד גדול יותר, ומחילה אותו על שני הצירים לקבלת ריבוע מושלם.
@@ -3799,13 +3797,13 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** Tag used for logging. */
 private final static String TAG = "ImageUtils";
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3813,7 +3811,8 @@ private final static String TAG = "ImageUtils";
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @BindingAdapter("imageBitmap")
 static public void setImageBitmap(ImageView imageView, Bitmap bitmap){
@@ -3821,46 +3820,45 @@ static public void setImageBitmap(ImageView imageView, Bitmap bitmap){
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאפשרת להגדיר דרך ה-XML (Data Binding) אובייקט `Bitmap` שיוצג ב-`ImageView`. אם ה-`Bitmap` ריק (null), היא מציגה תמונת ברירת מחדל (אייקון של משתמש).
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 static public String uriToBase64(Uri uri, Context context) throws IOException{
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מקבלת `Uri` (למשל מגלריית המכשיר), פותחת InputStream וקוראת אותו לתוך `Bitmap`, ואז קוראת לפעולת ההמרה ל-`Base64` כדי לאפשר שמירת תמונת משתמש בשרת.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 static public String bitmapToBase64(Bitmap bitmap){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ממירה אובייקט `Bitmap` למחרוזת `Base64` מקודדת בפורמט JPEG. הפונקציה משתמשת בדחיסה (70% איכות) כדי לאזן בין איכות התמונה לגודל שלה במסד הנתונים.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 static public Bitmap base64ToBitmap(String base64){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 הפעולה ההפוכה: מקבלת מחרוזת `Base64` (למשל כזו שנמשכה מ-Firebase) וממירה אותה חזרה ל-`Bitmap` כדי להציג אותה בממשק המשתמש.
@@ -3872,7 +3870,8 @@ static public Bitmap base64ToBitmap(String base64){
 שדות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 /** The total duration of the timer in milliseconds. */
 private final long millisTime;
@@ -3888,13 +3887,13 @@ private final OnTickListener onTick;
 private boolean isStopped = false;
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ממשקי האזנה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public interface OnTimerEndListener {
     void onTimerEnd();
@@ -3904,7 +3903,6 @@ public interface OnTickListener {
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 תכונות המחלקה: אין
@@ -3912,52 +3910,52 @@ public interface OnTickListener {
 פעולות המחלקה:
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מאתחלת טיימר עם זמן מוגדר מראש, ומאזינים (Callbacks) לעדכוני תקתוק ולסיום הזמן.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 @Override
 public void run(){}
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 פעולת הליבה של הטיימר המופעלת על ידי ה-`Handler`. מחשבת את הזמן שעבר, קוראת ל-`onTick`, ואם הזמן תם קוראת ל-`onTimerEnd`. אם לא, היא מתזמנת את עצמה מחדש בצורה חכמה שמשלימה בדיוק לשנייה שלמה.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void start(){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 מתחילה (או ממשיכה) את הטיימר על ידי שליחת הקריאה ל-`Handler`.
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```java
 public void stop(){
 //...
 }
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 עוצרת את הטיימר באופן ידני ומנקה קריאות עתידיות הממתינות ב-`Handler`.
@@ -3996,7 +3994,8 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 ### `activity_main.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4050,13 +4049,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.drawerlayout.widget.DrawerLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_sign_up.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4127,13 +4126,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_login.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4191,13 +4190,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `activity_friendlist.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4265,7 +4264,8 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 ```
 
 </div>
-<div dir="ltr" align="left">
+
+
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -4290,13 +4290,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `nav_header.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" android:layout_width="match_parent" android:layout_height="176dp" android:background="?attr/colorPrimary" android:gravity="bottom" android:orientation="vertical" android:padding="16dp" android:theme="@style/ThemeOverlay.AppCompat.Dark">
@@ -4310,13 +4310,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </LinearLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `activity_singleplayer.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)" xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)" android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent" tools:context=".ui.game.singleplayer.SingleplayerActivity">
@@ -4330,13 +4330,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </FrameLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_singleplayer_on_game_end.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4385,14 +4385,14 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 
 ### `activity_multiplayer.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.fragment.app.FragmentContainerView xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4404,13 +4404,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
     tools:layout="@layout/fragment_lobby" />
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_join_or_create_room.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4446,13 +4446,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_lobby.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
@@ -4477,13 +4477,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_multiplayer_game.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)" xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)" android:layout_width="match_parent" android:layout_height="match_parent" tools:context=".ui.game.multiplayer.MultiplayerGameFragment">
@@ -4497,13 +4497,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </FrameLayout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `fragment_multiplayer_on_game_end.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4539,13 +4539,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `item_player.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4568,13 +4568,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `item_player_score.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4622,13 +4622,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `item_word.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
@@ -4644,13 +4644,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `view_boggle.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
@@ -4742,7 +4742,6 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ## קבצי value:
@@ -4751,7 +4750,8 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 ### `attrs.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4771,13 +4771,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `colors.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4808,13 +4808,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `values-night/colors.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4838,14 +4838,14 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 
 ### `dimens.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4857,13 +4857,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `strings.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <resources>
     <string name="app_name">Boggle</string>
@@ -4896,13 +4896,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `styles.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4922,14 +4922,14 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 
 ### `themes.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <resources>
     <!-- Base application theme. -->
@@ -4956,13 +4956,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
-</div>
 <div dir="rtl" align="right">
 
 ### `values-night/themes.xml`
 
 </div>
-<div dir="ltr" align="left">
+
+
 ```xml
 <resources>
     <!-- Base application theme. -->
@@ -4992,4 +4992,3 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 ```
 
 </div>
-````</String></String,></String></String></String,></String></String></String,></String></String,></User,></String></RecyclerView></String></String,></User,></User></User></User,></String,></User></User></User,></String,></User></String,></User></User></PickVisualMediaRequest></String></Intent></String,></String,></Quad></String></String></Die></OnTickListener></OnWordFoundListener></OnGameEndListener></String></String></String></OnTickListener></OnWordFoundListener></OnGameEndListener></String></Integer></String,></String,></String></String></String></T></T></String></T></Javadoc>
