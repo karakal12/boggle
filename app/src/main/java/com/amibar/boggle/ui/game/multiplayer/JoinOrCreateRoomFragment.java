@@ -83,6 +83,7 @@ public class JoinOrCreateRoomFragment extends DialogFragment {
         // Handle arguments if they exist (e.g. when opening from a notification)
         if (getArguments() == null) return;
         if (!getArguments().containsKey(ARG_INITIAL_ROOM_CODE)) return;
+
         
         PlayerRole role = PlayerRole.valueOf(getArguments().getString(ARG_INITIAL_PLAYER_ROLE, PlayerRole.host.toString()));
         String initialRoomCode = getArguments().getString(ARG_INITIAL_ROOM_CODE);

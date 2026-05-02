@@ -3009,7 +3009,18 @@ public void stop(){
 
 <h1 align="center" id="reflection">רפלקציה</h1>
 
-<h1 align="center" id="bibliography">יבליוגרפיה</h1>
+פרוייקט זה היה הפרוייקט הכי מהנה מהפרוייקטים של בית ספר שאי פעם עשיתי. הגעתי מלא לדעת כלום על אנדרואיד ללפתח אפליקציה שלמה. למדתי הרבה על תכנות א-סינכרוני (זה המשיך להופיע בכל מני מקומות!) ואפילו קצת node.js בשביל הפקודות צד שרת. אני כל כך נהניתי בזמן הפרוייקט, שכשרציתי להוסיף איזה ביצת הפתעה (כי כל משחק טוב צריך ביצי הפתעה) אני למדתי על יצירת מנוע תלת מימדי בשביל ליצור דונאט יותר מגניב, ואפילו על מתמטיקה של קווטרניונים, למרות שבסוף זה לא נכנס לקוד הסופי.
+
+<h1 align="center" id="bibliography">ביבליוגרפיה</h1>
+
+Google. (n.d.). _Get started with Firebase Authentication on Android_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/auth/android/start  
+Google. (n.d.). _Get started with Firebase Cloud Messaging in Android apps_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/cloud-messaging/android/get-started  
+Google. (n.d.). _Get started: write, test, and deploy your first functions_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/functions/get-started  
+Google. (n.d.). _Realtime Database triggers_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/functions/database-events  
+Google. (n.d.). _Android API reference_. Android Developers. Retrieved May 2, 2026, from https://developer.android.com/reference  
+Sloane, A. (2011, July 20). _Donut math: how donut.c works_. a1k0n.net. Retrieved May 2, 2026, from https://www.a1k0n.net/2011/07/20/donut-math.html  
+Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square cells in Android_ [Post]. StackOverflow. Retrieved May 2, 2026, from https://stackoverflow.com/questions/24416847/how-to-force-gridview-to-generate-square-cells-in-android  
+
 
 <h1 align="center" id="appendices">נספחים</h1>
 
