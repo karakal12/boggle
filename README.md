@@ -4263,8 +4263,6 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
-</div>
-
 
 
 ```xml
@@ -4725,7 +4723,7 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 
 
 
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{`Word: "` + word + `"`, default=`Word: ""`}" android:id="@+id/tvWord"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{`Word: ", + word + `"`, default=`Word: ""`}" android:id="@+id/tvWord"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -4990,5 +4988,3 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
     </style>
 </resources>
 ```
-
-</div>
