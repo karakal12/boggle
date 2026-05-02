@@ -7,7 +7,7 @@
 חלופה: טלפונים חכמים  
 תאריך הגשה:  
 
-<img src="https://yifat.mashov.info/wp-content/uploads/sites/142/2025/07/%D7%A1%D7%9E%D7%9C-%D7%91%D7%99%D7%94%D7%A1.png" width="328" height="288" alt="school_logo"/>
+<img src="https://github.com/user-attachments/assets/3c2a485b-c628-41ba-b1b3-83cb5e89d72c" width="328" height="288" alt="school_logo"/>
 
 <h1 align="center" id="index">תוכן עניינים</h1>
 
