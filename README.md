@@ -1,3 +1,5 @@
+<div dir="rtl" align="right">
+
 <img width="384" height="384" alt="ic_launcher" id="image" src="https://github.com/user-attachments/assets/5d371bfc-9165-4fc2-a521-64d310c6e3a5" />
 
 מגיש: יותם עמיבר  
@@ -9,10 +11,10 @@
 
 <img src="https://github.com/user-attachments/assets/3c2a485b-c628-41ba-b1b3-83cb5e89d72c" width="328" height="288" alt="school_logo"/>
 
-<h1 align="center" id="index">תוכן עניינים</h1>
+# תוכן עניינים
 
-* **[תוכן עניינים](#index)**
-* **[מבוא](#intro)**
+* **[תוכן עניינים](#תוכן-עניינים)**
+* **[מבוא](#מבוא)**
   * [רקע](#רקע)
     * [שם הפרוייקט:](#שם-הפרוייקט-)
     * [תיאור הפרוייקט:](#תיאור-הפרוייקט)
@@ -20,11 +22,11 @@
     * [מטרות האפליקציה:](#מטרות-האפליקציה)
   * [מחקר וסקירת שוק](#מחקר-וסקירת-שוק)
   * [ניהול נתונים בפרוייקט](#ניהול-נתונים-בפרוייקט)
-* **[מבנה / ארכיטקטורה](#architecture)**
+* **[מבנה / ארכיטקטורה](#מבנה--ארכיטקטורה)**
   * [קבצי הפרוייקט](#קבצי-הפרוייקט)
   * [מסכי הפרוייקט](#מסכי-הפרוייקט)
   * [תרשים זרימת מסכים](#תרשים-זרימת-מסכים)
-* **[מימוש הפרוייקט](#implementation)**
+* **[מימוש הפרוייקט](#מימוש-הפרוייקט)**
   * [קבצי gradle, libs.versions.toml, וmanifest](#קבצי-gradle-libsversionstoml-וmanifest)
   * [תיאור מחלקות UML](#תיאור-מחלקות-uml)
     * [פירוק לחלקים:](#פירוק-לחלקים)
@@ -77,9 +79,9 @@
       * [מחלקה: Timer](#public-class-timer-implements-runnable)
       * [מחלקה: PointAndDepth](#public-record-pointanddepthint-screenx-int-screeny-double-ooz)
       * [מחלקה: Quad](#public-record-quadpath-path-colorint-int-color-double-avgooz)
-* **[רפלקציה / סיכום אישי](#reflection)**
-* **[ביבליוגרפיה](#bibliography)**
-* **[נספחים](#appendices)**
+* **[רפלקציה / סיכום אישי](#רפלקציה)**
+* **[ביבליוגרפיה](#ביבליוגרפיה)**
+* **[נספחים](#נספחים)**
   * [קבצי-layout:](#קבצי-layout)
     * [activity_main:](#activity_mainxml)
     * [fragment_sign_up:](#fragment_sign_upxml)
@@ -108,8 +110,7 @@
     * [values-night/themes:](#values-nightthemesxml)
   
 
-
-<h1 align=center id="intro">מבוא</h1>
+# מבוא
 
 ## רקע
 
@@ -146,7 +147,7 @@ Boggle (בוגל)
 
 **במשחק:**
 * **לוח (Board)** - מיוצג על ידי מערך חד-ממדי של תווים (16 תווים) המייצגים את האותיות שהוגרלו בקוביות.
-* **קוביות/משבצות (Dice/Cells)** - רכיב ויזואלי מותאם אישית (`SquareTextView`) השומר על פרופורציה ריבועית (1:1), מכיל את האות ויכול לשנות את צבע הרקע שלו בהתאם למצב (נבחר, מילה נכונה, מילה שגויה, רמז).
+* **קוביות/משבצות (Dice/Cells)** - רכיב ויזואלי מותאם אישית (`SquareTextView`) השומר על פרופורציה ריבועית (1:1), מכיל את האות ויכול לשנות צבע רקע שלו בהתאם למצב (נבחר, מילה נכונה, מילה שגויה, רמז).
 * **עץ תחיליות (Trie / Dictionary)** - מבנה נתונים רקורסיבי המשמש לאחסון וחיפוש יעיל של מילים. המילון הרשמי של המשחק נטען למבנה זה עם עליית האפליקציה. במהלך המשחק, מנוע המשחק משתמש בגרסה מורחבת שלו (`PathTrie`) אשר שומרת לא רק את המילים החוקיות שנמצאו על הלוח בעזרת אלגוריתם DFS, אלא גם את המסלול המדויק שלהן, מה שמאפשר אימות מהיר והצגת רמזים למשתמש.
 * **מנוע המשחק (BoggleGame)** - מחלקה המנהלת את מצב המשחק (State), כולל הניקוד הנוכחי, רשימת המילים שנמצאו, האינדקסים של הקוביות שנבחרו כרגע, מד הזמן, ועץ התחיליות (`PathTrie`) המכיל ומחשב מראש את כל הפתרונות האפשריים ללוח הנוכחי.
 * **חדר משחק (Multiplayer Room)** - מיוצג בבסיס הנתונים (Firebase) עם פרטים כמו: קוד החדר, רשימת השחקנים (מארח ואורחים), מחרוזת הלוח שהוגרל, מצב המשחק (פעיל/הסתיים), ורשימות המילים שכל שחקן מצא, המתעדכנות בזמן אמת.
@@ -159,7 +160,7 @@ Boggle (בוגל)
 הפעולות באפליקציה בדרך כלל משפיעות על יותר מאובייקט אחד. לדוגמה, כאשר שחקן מוצא מילה תקנית במשחק, המערכת חייבת להוסיף את המילה לרשימת המילים שנמצאו במנוע המשחק המקומי (`BoggleGame`), להגדיל את הניקוד, לעדכן את התצוגה הויזואלית (לצבוע את הקוביות הרלוונטיות בירוק ב-`BoggleView`), ואם מדובר במשחק מרובה משתתפים - לעדכן בזמן אמת את מסד הנתונים (`Firebase`) כדי שהשרת ישתף את המילה שנמצאה עם שאר השחקנים.
 דוגמה נוספת: שליחת הזמנה לחבר מעדכנת את רשומת ההזמנות ב-`Firebase Realtime Database`, מה שמפעיל פונקציית שרת (Cloud Function) הקוראת את אסימון ה-FCM של החבר ושולחת לו התראת דחיפה (Push Notification) למכשיר, דרכה הוא יכול להצטרף לחדר.
 
-<h1 align=center id="architecture">מבנה / ארכיטקטורה</h1>
+# מבנה / ארכיטקטורה
 
 ## קבצי הפרוייקט
 
@@ -173,14 +174,18 @@ Boggle (בוגל)
 
 ## תרשים זרימת מסכים
 
-<h1 align=center id="implementation">מימוש הפרוייקט</h1>
+# מימוש הפרוייקט
 
 ## קבצי gradle, libs.versions.toml, וmanifest
 
 gradle:
 Gradle (גרדל) הוא כלי בניית הפרוייקט (Build System) הרשמי של אנדרואיד. הוא אחראי על תהליך ההידור (קומפילציה), אריזת הקוד, קבצי המשאבים (Resources) והספריות החיצוניות לקובץ התקנה סופי (APK או AAB). בנוסף, דרך קבצי ה-Gradle אני מנהל את הגדרות הפרוייקט, גרסאות ה-SDK, סוגי הבנייה (למשל Debug מול Release) והתלויות (Dependencies) של האפליקציה. הקבצים מחולקים לשתי רמות: רמת הפרוייקט (הגדרות כלליות) ורמת האפליקציה (הגדרות ספציפיות למודול).
 רמת אפליקציה:
-``` gradle
+
+</div>
+<div dir="ltr" align="left">
+
+```gradle
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
@@ -286,7 +291,7 @@ afterEvaluate {
                 encoding = "UTF-8"
                 // Link to online Android documentation.
                 // Added a trailing slash to ensure Javadoc tool resolves it correctly.
-                links("https://developer.android.com/reference/")
+                links("[https://developer.android.com/reference/](https://developer.android.com/reference/)")
                 
                 // Removed the problematic Firebase link as it lacks a valid package-list/element-list 
                 // at the expected location, which was causing the FileNotFoundException.
@@ -305,8 +310,15 @@ afterEvaluate {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 רמת פרוייקט:
-``` gradle
+
+</div>
+<div dir="ltr" align="left">
+```gradle
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -314,9 +326,15 @@ plugins {
 }
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 libs.versions.toml:
 קובץ זה (Version Catalog) משמש לניהול מרוכז ומסודר של כל גרסאות הספריות, התוספים (Plugins) והתלויות בפרוייקט. במקום לכתוב את גרסת הספרייה בקובץ ה-Gradle של כל מודול בנפרד, מגדירים הכל כאן, מה שמקל על תחזוקה, מונע התנגשויות גרסאות, ושומר על סדר (במיוחד בפרוייקטים מרובי מודולים).
-``` toml
+
+</div>
+<div dir="ltr" align="left">
+```toml
 [versions]
 agp = "9.0.1"
 junit = "4.13.2"
@@ -359,11 +377,17 @@ google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 manifest:
 קובץ ה-`AndroidManifest.xml` הוא קובץ הגדרות הליבה של האפליקציה, והוא "תעודת הזהות" שלה מול מערכת ההפעלה Android. בו מוצהרים כל רכיבי האפליקציה (כמו מסכים - Activities, ושירותי רקע - Services), ההרשאות הנדרשות (כמו גישה לאינטרנט או קבלת התראות), הגדרות הנושא (Theme), אייקון האפליקציה, ונקודת הכניסה הראשית (איזה מסך נפתח כשהאפליקציה עולה). בלעדיו, המערכת לא תדע כיצד להריץ את האפליקציה.
-``` xml
+
+</div>
+<div dir="ltr" align="left">
+```xml
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
     
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -415,6 +439,10 @@ manifest:
 
 </manifest>
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 ## תיאור מחלקות UML
 <img width="7160" height="2386" alt="UML Chart" src="https://github.com/user-attachments/assets/4e7f9871-8ec7-4ce1-a1c3-4314dffc1ff8" />
 
@@ -445,7 +473,9 @@ manifest:
 
 ## פונקציות שרת
 
-``` node.js
+</div>
+<div dir="ltr" align="left">
+```javascript
 const {setGlobalOptions} = require("firebase-functions");
 
 setGlobalOptions({maxInstances: 10});
@@ -502,6 +532,10 @@ exports.sendInvitationNotification = onValueCreated(
     }
 );
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מטרה: כאשר נכתבת הזמנה למסד הנתונים, תשלח הודעה לשחקן שהוזמן כדי שתקפוץ לו בטלפון התרעה
 
 ## מחלקות הפרוייקט
@@ -513,22 +547,32 @@ exports.sendInvitationNotification = onValueCreated(
 תפקיד המחלקה: מחלקת האפליקציה המותאמת המשמשת לאתחולים גלובליים הדורשים הפעלה פעם אחת בלבד במהלך עליית האפליקציה.
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 public void onCreate(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מופעלת עם עליית האפליקציה לפני הפעלת המסכים. מאתחלת את המילון (Dictionary) מקובץ רשימת המילים כדי שיהיה מוכן ומסודר בזיכרון, ובנוסף מפעילה עדכון אסינכרוני לנתוני המשתמש ב-`FirebaseHandler`.
 
 ### חבילה: data
 
 
-#### `public abstract class Trie<T extends Trie<T>`
+#### `public abstract class Trie<T extends Trie<T>>`
 תפקיד המחלקה: מחלקת בסיס לעץ תחיליות ששומר על עצמו מתהליכונים שפועלים במקביל. המחלקה היא ג'נרית רקורסיבית כדי שהמחלקות שממשות אותם לא יצטרכו לעשות את העבודה הקשה.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** The number of letters in the English alphabet ('a' through 'z'). */
 protected static final int ALPHABET_SIZE = 26;
 
@@ -541,8 +585,15 @@ protected volatile boolean isEndOfWord;
 /** Flag indicating if this node has no children. */
 protected volatile boolean isLeaf;
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - boolean isEndOfWord
 - boolean isLeaf
 - Set<String> words
@@ -550,25 +601,43 @@ protected volatile boolean isLeaf;
 - toString()
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public boolean containsKey(char ch) {
     int index = ch - 'a';
     return index >= 0 && index < ALPHABET_SIZE && children.get(index) != null;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודק ומחזיר האם יש ילד ב"כיוון" של האות
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public T get(char ch) {
     int index = ch - 'a';
     if (index < 0 || index >= ALPHABET_SIZE) return null;
     return children.get(index);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחזיר את הילד בכיוון של אות, או null אם לא קיים, או אם מחוץ לתחום.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public T get(String s){
     T node = (T) this;
     for (int i = 0; i < s.length(); i++) {
@@ -582,9 +651,15 @@ public T get(String s){
     return node;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחפש איטרטיבית את הצומת של השרשרת המדוברת, או null אם לא קיים.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public T putIfAbsent(char ch){
     if (ch > 'z' || ch < 'a') return null;
     if (containsKey(ch)) return get(ch);
@@ -607,11 +682,17 @@ public T putIfAbsent(char ch){
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מוסיף את הילד בכיוון האות אם הוא חסר, ומחזיר את מה שהוסיף אם לא היה או את מה שהיה.
 משתמש בשיקוף (reflection) כדי להשיג את הבנאי הנכון למחלקה גם למחלקות בנות.
 משתמש בפעולות מוגנות לתהליכונים בשביל שימוש במקביל.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public T put(String str){
     T node = (T) this;
     for (int i = 0; i < str.length(); i++) {
@@ -623,10 +704,16 @@ public T put(String str){
     return node;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מוסיף את כל השרשרת מהצומת והלאה, ומסמן את הצומת האחרונה כסוף המילה.
 מחזיר את הצומת האחרונה.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public int size() {
     int toAdd = isEndOfWord ? 1: 0;
     for (int i = 0; i < ALPHABET_SIZE; i++) {
@@ -638,9 +725,15 @@ public int size() {
     return toAdd;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחשב את כמות המילים שנמצאות בעץ מהצומת הנוכחית והלאה בצורה רקורסיבית.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public Set<String> getWords(){
     Set<String> words = new ArraySet<>(size());
     _getWords("", words);
@@ -660,12 +753,19 @@ protected void _getWords(String word, Set<String> set) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 זוג פונקציות, רקורסיבית ומעטפת, שאוספות את כל המילים בעץ ומחזירות אותר בקבוצה.
 
 
 #### `public final class Dictionary extends Trie<Dictionary>`
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /**
  * Static root instance of the dictionary.
  */
@@ -674,18 +774,31 @@ public static final Dictionary ROOT = new Dictionary();
 /** Flag indicating if the dictionary has been loaded with words. */
 private boolean isInitialized = false;
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 תגונות המחלקה: אין ייחודיות
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public static boolean contains(@NonNull String word) {
     Trie<?> node = ROOT.get(word);
     return node != null && node.isEndOfWord();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודק אם המילה קיימת במילון, תמיד בודק מהשורש.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public synchronized void init(InputStream file) {
     if (isInitialized) return;
     
@@ -700,6 +813,10 @@ public synchronized void init(InputStream file) {
     isInitialized = true;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 ממלא את המילון עם הקובץ שהועבר.
 זה synchronized כדי להגן מקריאה יותר מפעם אחת, גם אם הקריאות באותו הזמן.
 
@@ -708,18 +825,33 @@ public synchronized void init(InputStream file) {
 תפקיד המחלקה: להרחיב את Trie עם יכולת גם לשמור את המסלול על הלוח עליו הצירוף אותיות נמצא, יכול לשמור רק מסלול אחד לכל צירוף.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
     /** The path (sequence of board indices) associated with the word ending at this node. */
     private String path;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - String path
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public PathTrie put(String str, String path){
     PathTrie node = super.put(str);
     if (path != null) {
@@ -728,9 +860,15 @@ public PathTrie put(String str, String path){
     return node;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מוסיף גם את המסלול לצומת האחרונה.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public HashMap<String, String> toMap() {
     HashMap<String, String> map = new HashMap<>();
     for (String s : getWords()) {
@@ -739,6 +877,10 @@ public HashMap<String, String> toMap() {
     return map;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצר מפה מהמחלקה כאשר המפתחות הן המילים, והערכים הם המסלולים.
 
 
@@ -746,7 +888,10 @@ public HashMap<String, String> toMap() {
 תפקיד המחלקה: מחלקה יחידנית ששומרת אצלה את כל הדברים שקשורים לFirebase ולשחקן הנוכחי.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** Tag used for logging. */
 private static final String TAG = "FirebaseHandler";
 /** Singleton instance. */
@@ -762,8 +907,14 @@ private final FirebaseMessaging mMessaging;
 private User user;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - FirebaseHandler instance
 - FirebaseAuth auth
 - FirebaseDatabase database
@@ -775,8 +926,14 @@ private User user;
 - DatabaseReference userRef
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public void updateUserData() {
     FirebaseUser currentUser = mAuth.getCurrentUser();
     if (currentUser != null) {
@@ -801,17 +958,29 @@ public void updateUserData() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודק אם המשתמש עדיין ואלידי (אם לא נמחק או הוקפא) ומעדכן את הפרטים שלו מהמוסד נתונים
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void signOut() {
     mAuth.signOut();
     user = null;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מנתק את המשתמש ומנקה את המידע השמור מקומית.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void addFriend(String id) {
     DatabaseReference usersRef = mDatabase.getReference("users");
     DatabaseReference myFriendRef = getUserRef();
@@ -823,6 +992,10 @@ public void addFriend(String id) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מוסיף מתשתמש לרשימת החברים
 
 
@@ -832,11 +1005,18 @@ public void addFriend(String id) {
 `singleplayer`
 `multiplayer`
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - GameMode singleplayer
 - GameMode multiplayer
 ```
-פעולות המחלקה: הפעולות שהורשו מ <Enum<E
+
+</div>
+<div dir="rtl" align="right">
+
+פעולות המחלקה: הפעולות שהורשו מ `<Enum<E>`
 
 
 #### `public enum PlayerRole`
@@ -844,11 +1024,18 @@ public void addFriend(String id) {
 `host`
 `guest`
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - PlayerRole host
 - PlayerRole guest
 ```
-פעולות המחלקה: הפעולות שהורשו מ <Enum<E
+
+</div>
+<div dir="rtl" align="right">
+
+פעולות המחלקה: הפעולות שהורשו מ `<Enum<E>`
 
 
 #### `public class User implements Serializable`
@@ -857,7 +1044,10 @@ public void addFriend(String id) {
 בגלל שכל מה שהמחלקה עושה היא לשמור מידע,והיא לא תלוייה בשום דבר אחר, היא גם נקראת POJO (Plain Old Java Object)
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** The user's unique ID. */
 private String uid;
 /** The user's chosen display name. */
@@ -870,14 +1060,23 @@ private String fcmToken;
 private String fcmToken;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - String uid;
 - String displayName;
 - String email;
 - String profileImageBase64;
 - String fcmToken;
 ```
+
+</div>
+<div dir="rtl" align="right">
 
 פעולות המחלקה: אין
 
@@ -888,6 +1087,9 @@ private String fcmToken;
 תפקיד המחלקה: מייצגת מופע של משחק בוגל, מנהלת את מצב המשחק, הקוביות, הניקוד ואימות המילים. היא מטפלת ביצירת הלוח, בחירת מילים על ידי השחקן, לוגיקת הניקוד וחישוב מראש של כל הפתרונות האפשריים.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** The total duration of a game in milliseconds. */
 public static final long GAME_TIME_MILLIS = 180000;
@@ -918,7 +1120,13 @@ private final List<String> allPaths;
 private final Timer gameTimer;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 ממשקי המאזינים (Listeners):
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public interface OnGameEndListener {
     /** Called when the game timer expires or the game is manually ended. */
@@ -936,8 +1144,14 @@ public interface OnTickListener {
 }
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - int score
 - int hints
 - ArrayList<String> foundWords
@@ -953,15 +1167,28 @@ public interface OnTickListener {
 - List<OnTickListener> onTickListeners
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public BoggleGame() {
     this(generateBoard());
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי המאתחל משחק חדש עם לוח שנוצר אקראית.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+
+```java
 public BoggleGame(char[] board) {
     this.board = board;
     this.foundWords = new ArrayList<>();
@@ -984,9 +1211,15 @@ public BoggleGame(char[] board) {
             this::endGame);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי המאתחל משחק עם לוח ספציפי. הוא פותר את הלוח מראש ומגדיר את הטיימר.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private static char[] generateBoard() {
     ArrayList<Die> diceList = Die.generateDice();
     Collections.shuffle(diceList);
@@ -999,9 +1232,15 @@ private static char[] generateBoard() {
     return board;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מייצר לוח אקראי של 16 אותיות על בסיס קוביות הבוגל הסטנדרטיות.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void addOnGameEndListener(OnGameEndListener listener) {
     this.onGameEndListeners.add(listener);
 }
@@ -1014,9 +1253,15 @@ public void addOnTickListener(OnTickListener listener) {
     this.onTickListeners.add(listener);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 פעולות להוספת מאזינים לאירועי סיום משחק, מציאת מילה ותקתוק של הטיימר.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public WordCheckResult submitWord() {
     String formedWord = formWord(); // Note: this clears the selection indices
     if (formedWord.isBlank()) return NULL_WORD;
@@ -1035,9 +1280,15 @@ public WordCheckResult submitWord() {
     return INVALID;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודק את המילה שנבחרה, מעדכן את הניקוד ומודיע למאזינים אם המילה תקינה.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public int wordScore(String word) {
     int wordLength = word.length();
     return switch (wordLength) {
@@ -1049,9 +1300,16 @@ public int wordScore(String word) {
     };
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחשב ניקוד למילה לפי חוקי המשחק הסטנדרטיים.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+
+```java
 public boolean selectDie(int index) {
     if (selectedIndices.isEmpty()) {
         selectedIndices.add(index);
@@ -1065,9 +1323,15 @@ public boolean selectDie(int index) {
     return false;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מנסה לבחור קובייה בלוח. הבחירה תצליח אם זו הקובייה הראשונה או שהיא סמוכה לקובייה האחרונה שנבחרה וטרם נעשה בה שימוש במילה הנוכחית.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public int getMaxScore() {
     int maxScore = 0;
     for (String s : solutions.getWords()) {
@@ -1076,9 +1340,15 @@ public int getMaxScore() {
     return maxScore;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחשב את הניקוד המקסימלי האפשרי ללוח הנוכחי.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void endGame() {
     if (gameEnded) return;
     gameEnded = true;
@@ -1088,6 +1358,10 @@ public void endGame() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מסיימת את המשחק, עוצרת את הטיימר ומעדכנת את המאזינים.
 
 
@@ -1095,6 +1369,9 @@ public void endGame() {
 תפקיד המחלקה: מספקת את לוגיקת הליבה לפתרון לוח בוגל בצורה יעילה ומקבילית. היא מזהה את כל המילים התקינות מהמילון שניתן ליצור על לוח 4x4 על ידי חיבור קוביות סמוכות, תוך שימוש באלגוריתם חיפוש לעומק (DFS) ומסגרת ה-ForkJoin לניצול מעבדים מרובי ליבות.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /**
  * A Trie to store all unique words found on the board.
@@ -1109,16 +1386,32 @@ private PathTrie solutions;
 private ConcurrentLinkedQueue<String> allPaths;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - PathTrie solutions
 - List<String> allPaths
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public SolverResult solve(char[][] board, Dictionary dictionary)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 הפעולה המרכזית שמתחילה את תהליך הפתרון. היא מייצרת משימת חיפוש לכל תא בלוח ומפעילה אותן במקביל.
 
 
@@ -1126,15 +1419,28 @@ public SolverResult solve(char[][] board, Dictionary dictionary)
 מחלקה פנימית המבצעת את החיפוש הרקורסיבית. היא משתמשת ב-`RecursiveAction` כדי להתחלק למשימות משנה המבוצעות במקביל.
 
 פעולות המחלקה הפנימית:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public GameSolverTask(Dictionary root, char[][] board, int i, int j, short visited, String path, String string)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי המאתחל משימת חיפוש עבור מיקום ספציפי בלוח, תוך שמירה על מצב החיפוש (הצומת הנוכחי במילון, תאים שבוקרו, והמילה שנוצרה עד כה).
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 @Override
 protected void compute()
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מבצעת את לוגיקת החיפוש המקבילית:
 1. בודקת אם הצומת הנוכחי במילון הוא עלה (אין מילים ארוכות יותר). אם כן, מוסיפה את המילה לפתרונות ומפסיקה.
 2. בודקת אם הצומת הוא סוף מילה (מילה תקנית). אם כן, מוסיפה לפתרונות וממשיכה לחפש מילים ארוכות יותר.
@@ -1142,9 +1448,15 @@ protected void compute()
 4. סורקת את כל 8 השכנים בלוח. עבור כל שכן שתואם לאות אפשרית במילון ולא בוקר בעבר, יוצרת משימת משנה (`GameSolverTask`) חדשה.
 5. מפעילה את כל משימות המשנה במקביל באמצעות `invokeAll`.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private boolean isSafe(int i, int j, short visited)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 פעולת עזר הבודקת האם קואורדינטות `(i, j)` נמצאות בתוך גבולות הלוח והאם התא טרם בוקר במסלול הנוכחי (באמצעות בדיקת הביט המתאים ב-`visited`).
 
 
@@ -1152,6 +1464,10 @@ private boolean isSafe(int i, int j, short visited)
 תפקיד המחלקה: ביצת הפתעה. מחלקה האחראית על רינדור תלת-ממדי בזמן אמת של צורת טורוס (דונאט) מסתובבת על גבי `SurfaceView`. המימוש הושרא מהקוד המפורסם [`Donut.c`](https://www.a1k0n.net/2011/07/20/donut-math.html) של `a1k0n`.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
+
 ```java
 /** Default rotation rates for angles A and B */
 public static final double A_RATE = 0.005;
@@ -1202,15 +1518,27 @@ private boolean isSurfaceReady = false;
 
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - double A_RATE
 - double B_RATE
 - float MIN_LIGHT
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public DonutRenderer(SurfaceView surfaceView) {
     this.surfaceView = surfaceView;
     scalingPaint.setFilterBitmap(false);
@@ -1225,9 +1553,15 @@ public DonutRenderer(SurfaceView surfaceView) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי המאתחל את הרנדרר ומקשר אותו ל-`SurfaceView`.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 @Override
 public void doFrame(long frameTimeNanos) {
     if (choreographer == null) return;
@@ -1254,9 +1588,15 @@ public void doFrame(long frameTimeNanos) {
     choreographer.postFrameCallback(this);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מתודה המופעלת בכל פריים על ידי ה-`Choreographer` לניהול האנימציה.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void drawDonut() {
     if (bitmap == null) return;
 
@@ -1337,11 +1677,16 @@ private void drawDonut() {
         bitmapCanvas.drawPath(quad.path(), shapePaint);
     }
 }
-}
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 הלוגיקה המרכזית של הרינדור: ביצוע טרנספורמציות גיאומטריות, חישובי תאורה, מיון לפי עומק וציור בפועל.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, double sinB) {
     PointAndDepth[][] grid = new PointAndDepth[thetaSteps][phiSteps];
 
@@ -1378,6 +1723,10 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
     return grid;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מחשבת את המיקומים של כל הנקודות על הטורוס במרחב התלת-ממדי ומטילה אותן לקואורדינטות מסך.
 
 ### חבילה: services
@@ -1388,6 +1737,9 @@ public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, d
 
 שדות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
+
 ```java
 /** Tag used for logging. */
 private static final String TAG = "InvitationService";
@@ -1395,10 +1747,15 @@ private static final String TAG = "InvitationService";
 private static final String CHANNEL_ID = "invitation_channel";
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 public void onNewToken(@NonNull String token) {
@@ -1408,8 +1765,14 @@ public void onNewToken(@NonNull String token) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מתעדכנת כאשר נוצר אסימון (Token) חדש עבור ה-FCM של המכשיר. היא מעדכנת את האסימון החדש במסד הנתונים תחת פרטי המשתמש הנוכחי כדי לאפשר שליחת הודעות אליו.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -1436,8 +1799,14 @@ public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מתודה המופעלת כאשר מתקבלת הודעת FCM. היא מחלצת את נתוני ההזמנה, מוחקת את ההזמנה ממסד הנתונים (כדי שלא תישאר כ"פתוחה" לאחר שכבר הגיעה ליעד) ומציגה התראה למשתמש.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void deleteInvitation(String invitationId) {
     String currentUserId = FirebaseAuth.getInstance().getUid();
@@ -1452,8 +1821,14 @@ private void deleteInvitation(String invitationId) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 פעולת עזר המוחקת את ההזמנה הספציפית ממסד הנתונים של Firebase.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void showNotification(String title, String body, Map<String, String> data) {
 Intent intent = new Intent(this, MainActivity.class);
@@ -1493,6 +1868,10 @@ NotificationCompat.Builder notificationBuilder =
 notificationManager.notify(0, notificationBuilder.build());
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בונה ומציגה התראה במכשיר. היא מגדירה Intent שיוביל את המשתמש ישירות לחדר המשחק אם ההתראה מכילה קוד חדר, ומגדירה את ערוץ ההתראות עבור גרסאות אנדרואיד חדשות.
 
 
@@ -1504,6 +1883,9 @@ notificationManager.notify(0, notificationBuilder.build());
 מטרת מחלקה: המסך הראשי של האפליקציה. הוא משמש כנקודת הכניסה המרכזית, מנהל את התפריט הצידי (Navigation Drawer), את המעברים למצבי המשחק השונים (שחקן יחיד ומרובה שחקנים), את רשימת החברים, ואת הגישה למערכת ההזדהות (Login/Signup). בנוסף, הוא מטפל בקבלת הזמנות למשחק דרך Intent-ים.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** View binding for the activity layout. */
 private ActivityMainBinding binding;
@@ -1535,10 +1917,15 @@ private final ActivityResultLauncher<String> requestPermissionLauncher =
         });
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -1567,8 +1954,14 @@ protected void onCreate(Bundle savedInstanceState) {
     handleIntent(getIntent());
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את ה-View Binding, מגדירה תצוגה מקצה לקצה (EdgeToEdge), מגדירה מאזינים למרווחים של מערכת ההפעלה (Insets), ומפעילה פונקציות האתחול של המסך, ההרשאות ומצב המשתמש.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onNewIntent(Intent intent) {
@@ -1577,8 +1970,14 @@ protected void onNewIntent(Intent intent) {
     handleIntent(intent);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 נקראת כאשר האקטיביטי כבר פתוחה ומקבלת Intent חדש (למשל מלחיצה על התראה). היא מעדכנת את ה-Intent של האקטיביטי ומפעילה את הטיפול בו.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void handleIntent(Intent intent) {
     if (intent != null && intent.hasExtra("roomCode")) {
@@ -1607,8 +2006,14 @@ private void handleIntent(Intent intent) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודקת אם ה-Intent מכיל קוד חדר (roomCode). אם כן, היא קובעת את תפקיד השחקן (מארח או אורח) ופותחת את הדיאלוג להצטרפות או יצירת חדר.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void init(){
     setSupportActionBar(binding.toolbar);
@@ -1650,8 +2055,14 @@ private void init(){
     toggle.syncState();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מגדירה את סרגל הכלים (Toolbar), את המאזינים לכפתורי הניווט (שחקן יחיד, מרובה שחקנים, רשימת חברים, וביצת ההפתעה), ואת התפריט הצידי.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void setupAuthStateListener() {
     authStateListener = firebaseAuth -> {
@@ -1674,8 +2085,14 @@ protected void onStop() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מגדירה, רושמת ומסירה את המאזין לשינויים במצב ההתחברות של Firebase בהתאם למחזור החיים של האקטיביטי.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 void updateUI() {
     boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
@@ -1722,8 +2139,14 @@ void updateUI() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעדכנת את הניראות של פריטי התפריט (כניסה/הרשמה מול התנתקות) ואת פרטי המשתמש (שם, אימייל ותמונה) בראש התפריט הצידי על סמך המשתמש המחובר.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private boolean onNavigationItemSelected(MenuItem item) {
     int id = item.getItemId();
@@ -1741,8 +2164,14 @@ private boolean onNavigationItemSelected(MenuItem item) {
     return true;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מטפלת בלחיצות על פריטים בתפריט הצידי, כמו התנתקות או פתיחת דיאלוגים של התחברות והרשמה.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void askNotificationPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1752,6 +2181,10 @@ private void askNotificationPermission() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מבקשת מהמשתמש הרשאת התראות (עבור אנדרואיד 13 ומעלה) כדי שיוכל לקבל הזמנות למשחק.
 
 
@@ -1759,6 +2192,9 @@ private void askNotificationPermission() {
 תפקיד המחלקה: `DialogFragment` המספק ממשק התחברות למשתמשים קיימים. הוא מטפל באימות מול Firebase, דיווח על שגיאות ועדכון ה-FCM token של המשתמש לאחר כניסה מוצלחת.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** View binding for the fragment layout. */
 private FragmentLoginBinding binding;
@@ -1772,10 +2208,15 @@ private EditText ETEmail;
 private EditText ETPassword;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void init(){
     Button loginButton = binding.loginButton;
@@ -1785,8 +2226,14 @@ private void init(){
     loginButton.setOnClickListener(this::loginUser);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את רכיבי ה-UI ומגדירה מאזין לכפתור ההתחברות.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void loginUser(View view){
     String email = ETEmail.getText().toString();
@@ -1828,8 +2275,14 @@ private void loginUser(View view){
             });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מנסה לבצע כניסה באמצעות Firebase Auth. היא מאמתת שכל השדות מלאים, מציגה תיבת התקדמות, ומטפלת בשגיאות אימות נפוצות (כמו משתמש לא קיים או סיסמה שגויה) עם הודעות ידידותיות למשתמש.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void updateFcmToken() {
     FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
@@ -1847,6 +2300,10 @@ private void updateFcmToken() {
     });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 משיגה את ה-FCM token העדכני של המכשיר ושומרת אותו במסד הנתונים תחת המשתמש המחובר, מה שמאפשר לו לקבל הזמנות למשחק כהתראות.
 
 
@@ -1854,6 +2311,9 @@ private void updateFcmToken() {
 תפקיד המחלקה: `DialogFragment` המספק ממשק הרשמה למשתמשים חדשים. הוא מטפל ביצירת חשבון ב-Firebase Authentication, בחירת תמונת פרופיל מהגלריה, ושמירת כל נתוני המשתמש (כולל ה-FCM token) במסד הנתונים בזמן אמת.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** View binding for the fragment layout. */
 private FragmentSignUpBinding binding;
@@ -1884,10 +2344,15 @@ private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
         });
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void init() {
     IVProfileImage = binding.IVProfileImage;
@@ -1904,8 +2369,14 @@ private void init() {
     signup_button.setOnClickListener(v -> createUser());
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את רכיבי המסך ומגדירה מאזינים לבחירת תמונה (באמצעות Photo Picker) ולתהליך ההרשמה.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void createUser() {
     String displayName = Objects.requireNonNull(ETDisplayName.getText()).toString().trim();
@@ -1955,8 +2426,14 @@ private void createUser() {
             });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מנהלת את תהליך יצירת המשתמש: אימות קלטים, יצירת החשבון ב-Firebase Auth, המרת התמונה הנבחרת לפורמט Base64 לשמירה יעילה, וטיפול בשגיאות נפוצות.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void updateProfile(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
     pd.setMessage("Updating Profile...");
@@ -1975,8 +2452,14 @@ private void updateProfile(FirebaseUser user, String displayName, String base64I
             });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעדכנת את הפרופיל של המשתמש ב-Firebase Authentication עם שם התצוגה שנבחר.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
     pd.setMessage("Fetching FCM Token...");
@@ -1991,8 +2474,14 @@ private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, Str
     });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 משיגה את ה-FCM token של המכשיר לפני שמירת רשומת המשתמש המלאה, כדי להבטיח שהמשתמש מוכן לקבל התראות מיד עם סיום ההרשמה.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
     pd.setMessage("Saving User Data...");
@@ -2014,6 +2503,10 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
             });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצרת אובייקט `User` מלא ושומרת אותו במסד הנתונים של Firebase. בסיום מוצלח, היא מעדכנת את ממשק המשתמש במסך הראשי וסוגרת את הדיאלוג.
 
 
@@ -2022,6 +2515,10 @@ private void saveUserToDatabase(FirebaseUser user, String displayName, String ba
 תפקיד המחלקה: ניהול רשימת החברים של המשתמש. מאפשרת חיפוש משתמשים לפי אימייל, הוספת חברים חדשים, צפייה ברשימה הקיימת ושליחת הזמנות למשחקים מרובי משתתפים.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
+
 ```java
 /** Tag used for logging. */
 private static final String TAG = "FriendListActivity";
@@ -2037,14 +2534,25 @@ private FirebaseHandler firebaseHandler;
 private DataSnapshot usersSnapshot;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - List<User> friendsList
 - FriendAdapter adapter
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -2059,8 +2567,14 @@ protected void onCreate(Bundle savedInstanceState) {
     loadUsers();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את ה-Data Binding, את המאזינים לרכיבי ה-UI (חיפוש, כפתורים), ומפעילה את טעינת המשתמשים והחברים.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void loadUsers() {
     firebaseHandler.getRootRef().child("users").get().addOnSuccessListener(snapshot -> {
@@ -2069,8 +2583,14 @@ private void loadUsers() {
     loadFriends();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 טוענת את רשימת כל המשתמשים הרשומים (לצורך חיפוש) ולאחר מכן טוענת את רשימת החברים הספציפית של המשתמש.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void showInviteDialog(User friend) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -2099,8 +2619,14 @@ private void showInviteDialog(User friend) {
     builder.show();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מציגה דיאלוג המאפשר למשתמש להזין קוד חדר ולהזמין חבר למשחק. לאחר השליחה, המשתמש מועבר למסך הראשי במצב מארח.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void sendInvitation(User friend, String roomCode) {
     String currentUserId = firebaseHandler.getCurrentUserId();
@@ -2128,8 +2654,14 @@ private void sendInvitation(User friend, String roomCode) {
             .addOnFailureListener(e -> Toast.makeText(this, "Failed to send invitation", Toast.LENGTH_SHORT).show());
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצרת רשומת הזמנה חדשה ב-Firebase תחת המזהה של החבר המוזמן. זה יפעיל את ה-Cloud Function שישלח הודעת דחיפה לחבר.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void setupSearchInput() {
     binding.friendEmailInput.addTextChangedListener(new TextWatcher() {
@@ -2154,8 +2686,14 @@ private void setupSearchInput() {
     });
 }
 ```
-מגדירה מאזין לשינויי טקסט בשדה החיפוש שמסנן את רשימת המשתמשים בזמן אמת ומציג את התוצאה הראשונה המתאימה.
 
+</div>
+<div dir="rtl" align="right">
+
+מגדירה מאזין לשינויי טקסט בשדה החיפוש שמסנן את רשימת המשתמשים בזמן אמת ומציגה את התוצאה הראשונה המתאימה.
+
+</div>
+<div dir="ltr" align="left">
 ```java
 private void loadFriends() {
     DatabaseReference userRef = firebaseHandler.getUserRef();
@@ -2181,6 +2719,10 @@ private void loadFriends() {
     });
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 טוענת את רשימת מזהי החברים של המשתמש הנוכחי ומפעילה שליפה של הנתונים המלאים עבור כל אחד מהם.
 
 
@@ -2189,22 +2731,36 @@ private void loadFriends() {
 תפקיד המחלקה: אדפטר ל-RecyclerView המציג את רשימת החברים. הוא אחראי על קישור נתוני המשתמשים (User objects) לתצוגה הגרפית ועל טיפול בלחיצות על כפתור ההזמנה. הוא משתמש ב-ListAdapter ו-DiffUtil לעדכונים יעילים.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Callback for when the invite button is clicked for a specific friend. */
 private final OnInviteClickListener inviteClickListener;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 ממשק האזנה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public interface OnInviteClickListener {
     void onInviteClick(User friend);
 }
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
@@ -2220,6 +2776,10 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
     holder.binding.executePendingBindings();
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מקשרת בין אובייקט המשתמש ל-ViewHolder, מגדירה את המאזין לכפתור ההזמנה ומבצעת את הקישור (Binding) באופן מיידי למניעת ריצודים.
 
 מחלקה פנימית: `private static class UserDiffCallback extends DiffUtil.ItemCallback<User>`
@@ -2232,6 +2792,9 @@ public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
 תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק מרובת המשתתפים. היא מנהלת את המעבר בין הלובי למשחק הפעיל ומנקה את נתוני החדר ב-Firebase בסיום.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Tag used for logging. */
 public static final String TAG = "MultiplayerActivity";
@@ -2249,13 +2812,25 @@ private String roomCode;
 private PlayerRole playerRole;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - String roomCode
 - PlayerRole playerRole
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -2288,8 +2863,14 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את ה-Activity ומציגה את ה-LobbyFragment.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public void startGame(){
     if (roomCode != null) {
@@ -2299,7 +2880,14 @@ public void startGame(){
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 עוברת למסך המשחק הפעיל (MultiplayerGameFragment).
+
+</div>
+<div dir="ltr" align="left">
 
 ```java
 public void showGameResults(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords) {
@@ -2307,8 +2895,14 @@ public void showGameResults(HashMap<String, String> solutions, HashMap<User, Arr
     fragment.show(getSupportFragmentManager(), MultiplayerOnGameEndFragment.TAG);
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מציגה את תוצאות המשחק הסופיות בדיאלוג.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onDestroy() {
@@ -2339,6 +2933,10 @@ protected void onDestroy() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מסירה את השחקן מהחדר בשרת ומנקה חדרים ריקים.
 
 
@@ -2346,7 +2944,10 @@ protected void onDestroy() {
 תפקיד המחלקה: דיאלוג המאפשר למשתמש ליצור חדר משחק חדש או להצטרף לחדר קיים באמצעות קוד.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** Tag used for identifying this fragment in the FragmentManager. */
 public static final String TAG = "JoinOrCreateRoomFragment";
 /** Key for the initial room code passed in arguments. */
@@ -2358,32 +2959,67 @@ private static final String ARG_INITIAL_PLAYER_ROLE = "initial_player_role";
 private FragmentJoinOrCreateRoomBinding binding;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public static JoinOrCreateRoomFragment newInstance(String roomCode, PlayerRole playerRole)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצרת מופע עם נתונים התחלתיים.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את הממשק ומטפלת בבקשות הצטרפות ישירות.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+
+```java
 private void createRoom(View view)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצרת חדר חדש ועוברת למסך המולטיפלייר כמארח.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void joinRoom(View view)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בודקת קיום חדר בשרת ומצטרפת כאורח.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private Intent makeIntent(PlayerRole role)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 פונקציית עזר לבניית Intent המעבר.
 
 
@@ -2391,7 +3027,10 @@ private Intent makeIntent(PlayerRole role)
 תפקיד המחלקה: מציגה את חדר ההמתנה (Lobby), רשימת השחקנים המחוברים ומאפשרת למארח להתחיל את המשחק.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** Tag used for identifying this fragment. */
 public static final String TAG = "LobbyFragment";
 
@@ -2414,27 +3053,55 @@ private DatabaseReference roomRef;
 private ValueEventListener playerListener;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - List<User> playerList
 - String roomCode
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 רושמת את השחקן בחדר ומגדירה את התצוגה.
 שולחת את השחקן לתוך משחק אם הופעל דרך intent
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void listenForPlayers()
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעדכנת את הרשימה ומזהה מתי המשחק מתחיל בשרת.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void startGame(View view)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעדכנת בשרת שהמשחק התחיל (למארח בלבד).
 
 
@@ -2442,7 +3109,10 @@ private void startGame(View view)
 תפקיד המחלקה: ניהול לוגיקת המשחק בזמן אמת במצב מרובה משתתפים, כולל סנכרון הלוח והמילים מול Firebase.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** Tag used for logging and fragment identification. */
 public static final String TAG = "MultiplayerGameFragment";
 
@@ -2463,27 +3133,56 @@ private ValueEventListener gameEndListener;
 private ChildEventListener gameDestroyedListener;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 המארח מייצר לוח; האורחים ממתינים לסנכרון הלוח.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void listenForGameEnd()
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מפעילה איסוף תוצאות כשדגל הסיום מתעדכן.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void setupGame(BoggleGame game)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מסנכרנת מילים שנמצאו לשרת ומעדכנת סיום זמן.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+
+```java
 private void collectResultsAndFinish()
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 אוספת את כל המילים של כלל השחקנים מה-Database.
 
 
@@ -2491,7 +3190,10 @@ private void collectResultsAndFinish()
 תפקיד המחלקה: דיאלוג המציג את תוצאות המשחק הסופיות והשוואת המילים בין השחקנים.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** Tag for identifying the fragment. */
 public static final String TAG = "MultiplayerOnGameEndFragment";
 /** Argument key for the map of players to their found words. */
@@ -2505,17 +3207,33 @@ private FragmentMultiplayerOnGameEndBinding binding;
 private PlayersWordsAdapter playersWordsAdapter;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public static MultiplayerOnGameEndFragment newInstance(HashMap<String, String> solutions, HashMap<User, ArrayList<String>> playersWords)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעבירה את מפות הפתרונות והמילים שנמצאו.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את רשימת התוצאות המורחבת.
 
 
@@ -2523,17 +3241,30 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 תפקיד המחלקה: אדפטר להצגת פרטי השחקנים (שם ותמונה) בלובי ההמתנה.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** List of users currently in the lobby. */
 private final List<User> playerList;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מבצעת Data Binding של נתוני השחקן לתצוגה.
 
 
@@ -2541,7 +3272,10 @@ public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position)
 תפקיד המחלקה: אדפטר מורכב המציג את מילות השחקנים בסיום המשחק עם גלילה מסונכרנת.
 
 שדות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 /** List of players whose words are being displayed. */
 private final List<User> players;
 /** Map of each user to their list of found words. */
@@ -2566,17 +3300,33 @@ private int currentScrollX = 0;
 private final RecyclerView.OnScrollListener syncScrollHandler = new RecyclerView.OnScrollListener()
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 private Set<String> findCommonWords(HashMap<User, ArrayList<String>> playersWords)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מזהה כפילויות במילים בין השחקנים.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בונה רשימת מילים פנימית לכל שחקן ומחברת אותה למנגנון סנכרון הגלילה.
 
 ### חבילה: ui.game.singleplayer
@@ -2586,6 +3336,9 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position)
 תפקיד המחלקה: האקטיביטי המארחת את חוויית המשחק לשחקן יחיד. היא מנהלת את לוגיקת המשחק, תוצאות המשחק בסיום והעלאתן ל-Firebase.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Tag used for logging and debugging purposes. */
 private static final String TAG = "SingleplayerActivity";
@@ -2602,10 +3355,16 @@ private BoggleGame game;
 private boolean isGameEnded = false;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 protected void onCreate(Bundle savedInstanceState) {
     // ...
     game.addOnGameEndListener(() ->
@@ -2631,9 +3390,15 @@ protected void onCreate(Bundle savedInstanceState) {
     // ...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את המשחק, מגדירה אירועים לסיום המשחק וגילוי מילות סתר (Easter Egg).
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void uploadGameResults(BoggleGame game) {
     FirebaseHandler handler = FirebaseHandler.getInstance();
     DatabaseReference userRef = handler.getUserRef();
@@ -2652,9 +3417,15 @@ private void uploadGameResults(BoggleGame game) {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעלה את תוצאות המשחק למסד הנתונים בענן עבור המשתמש הנוכחי.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 private void showGameEndDialog() {
     if (isDestroyed()) return;
     try {
@@ -2671,6 +3442,10 @@ private void showGameEndDialog() {
     }
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מציגה חלון סיכום עם המילים שנמצאו ואלו שפוספסו.
 
 
@@ -2678,6 +3453,9 @@ private void showGameEndDialog() {
 תפקיד המחלקה: דיאלוג המוצג בסיום משחק יחיד. מציג את הניקוד, המילים שנמצאו וכל הפתרונות האפשריים.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Tag used for identifying the fragment. */
 public static final String TAG = "SingleplayerOnGameEndFragment";
@@ -2695,10 +3473,16 @@ private FragmentSingleplayerOnGameEndBinding binding;
 private OnWordClickListener listener;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
     SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
     Bundle args = new Bundle();
@@ -2709,9 +3493,15 @@ public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solu
     return fragment;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 יוצרת מופע של הדיאלוג עם הנתונים של המשחק שהסתיים.
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 @NonNull
 @Override
 public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -2728,13 +3518,23 @@ public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
     return dialog;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את רשימת המילים ומקשרת אותה ל-Adapter שיציג את הפתרונות. (הקוד ב-onCreateDialog מחליף את onViewCreated).
 
-``` java
+</div>
+<div dir="ltr" align="left">
+```java
 public void setOnWordClickListener(OnWordClickListener listener) {
     this.listener = listener;
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאפשרת להגדיר מאזין ללחיצות על מילים, כדי שניתן יהיה להציג את המסלול שלהן על הלוח.
 
 ### חבילה: ui.shared
@@ -2744,6 +3544,9 @@ public void setOnWordClickListener(OnWordClickListener listener) {
 תפקיד המחלקה: אדפטר המשמש להצגת רשימת מילים, בדרך כלל במסכי סיכום המשחק. הוא מדגיש מילים שנמצאו על ידי השחקן, ואופציונלית מילים משותפות (שנמצאו על ידי מספר שחקנים), ומאפשר לחיצה על מילה כדי להציג את המסלול שלה על הלוח.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Map of all valid words on the board to their hex-encoded paths. */
 private final Map<String, String> solutions;
@@ -2755,28 +3558,51 @@ private final Set<String> commonWords;
 private final OnWordClickListener listener;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public WordsAdapter(Map<String, String> solutions, List<String> playerWords, Set<String> commonWords, OnWordClickListener listener){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי מלא לאדפטר, מקבל את הפתרונות, המילים שנמצאו, מילים משותפות ומאזין ללחיצות. משמש לתוצאות משחק מרובה משתתפים.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 בנאי פשוט ללא מילים משותפות. משמש לתוצאות משחק לשחקן יחיד.
+
+</div>
+<div dir="ltr" align="left">
 
 ```java
 public void onBindViewHolder(@NonNull ViewHolder holder, int position){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מקשר את הנתונים לתצוגה של פריט בודד. ממיין את הפתרונות אלפביתית, וצובע את המילים בהתאם למצבן: אדום למילה שנמצאה על ידי אחרים (משותפת), ירוק למילה שנמצאה על ידי השחקן הנוכחי, ושחור למילה שפוספסה. מגדיר גם את מאזין הלחיצות על הפריט.
 
 ### חבילה: ui
@@ -2786,6 +3612,9 @@ public void onBindViewHolder(@NonNull ViewHolder holder, int position){
 תפקיד המחלקה: מסך (Activity) המציג דונאט תלת-ממדי מסתובב (ביצת הפתעה). מנהל את אירועי המגע (Touch Events) לסיבוב הדונאט ומחוות צביטה (Pinch-to-zoom) לשינוי הגודל/מרחק.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** The renderer responsible for drawing the 3D donut on the surface. */
 private DonutRenderer renderer;
@@ -2802,30 +3631,53 @@ private float lastTouchX = 0;
 private float lastTouchY = 0;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 protected void onCreate(@Nullable Bundle savedInstanceState){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את ה-SurfaceView, את מזהה מחוות הצביטה, ורושמת Callback למחזור החיים של המשטח כדי להתחיל ולהפסיק את הרינדור מול `DonutRenderer`.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public boolean onTouchEvent(MotionEvent event){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מטפלת באירועי מגע של המשתמש. מעבירה אירועים לזיהוי שינוי גודל (ScaleDetector), ומטפלת בסיבוב הדונאט על ידי חישוב ההפרש במיקום האצבע (dx, dy) לעדכון הזוויות ברנדרר. תומכת במספר אצבעות למניעת קפיצות כשמחליפים אצבע.
 
 מחלקה פנימית: `private class OnScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener`
 מאזינה לאירועי צביטה (זום).
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public boolean onScale(@NonNull ScaleGestureDetector detector){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מעדכנת את מרחק הדונאט (Zoom) ברנדרר בהתאם ליחס המתיחה (ScaleFactor).
 
 ### חבילה: views
@@ -2835,7 +3687,10 @@ public boolean onScale(@NonNull ScaleGestureDetector detector){
 תפקיד המחלקה: רכיב UI מותאם אישית (Custom View) המייצג את לוח המשחק של בוגל ואת הממשק ההיקפי שלו (כפתור אישור, מד זמן, תצוגת ניקוד ומילה).
 
 תכונות המחלקה:
-``` java
+
+</div>
+<div dir="ltr" align="left">
+```java
 - BoggleGame game
 - TextView[] cells
 - TextView lastSelected
@@ -2843,40 +3698,74 @@ public boolean onScale(@NonNull ScaleGestureDetector detector){
 - GameMode gameMode
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 private void initView(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת את הרכיב הגרפי, מחברת אותו ל-XML המותאם אישית שלו, מגדירה את מערך הקוביות (16 תאים) ומשייכת לכל תא וכפתור את המאזין המתאים לו. בסביבת שחקן יחיד היא גם מתחילה את המשחק אוטומטית.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void setupUI(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מסנכרנת את מצב רכיב ה-UI עם ה-`BoggleGame`. פורסת את האותיות על הקוביות בלוח (תוך הצגת 'Qu' במידת הצורך), מעדכנת ניקוד ומפעילה את מד הזמן בהתאם לתקתוקי הטיימר של מנוע המשחק.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 private void onClickSubmit(View v){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מטפלת בלחיצה על כפתור 'אישור מילה'. מגישה את המילה לבדיקה מול ה-`BoggleGame`, מספקת משוב למשתמש (האם המילה חוקית, קצרה מדי, או כבר נמצאה), מעדכנת את הניקוד במידה ונמצאה ומנקה את הבחירה מהלוח.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public void showSolution(String path){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מקבלת נתיב משחק (בפורמט מחרוזת של אינדקסים) ומאירה את המילה הספציפית על הלוח באמצעות צביעת התאים הרלוונטיים בצבע מתאים (עם צבע ייעודי לתא האחרון).
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public void showHint(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 צורכת רמז מסך הרמזים שזמינים למשתמש, מחפשת מילה חוקית שעדיין לא נמצאה – תוך התחשבות במסלול שהשחקן התחיל לבנות (אם קיים) – ומאירה חלק ממנה על הלוח באמצעות קריאה ל-`showSolution`.
 
 
@@ -2885,12 +3774,19 @@ public void showHint(){
 תפקיד המחלקה: רכיב UI של טקסט מותאם אישית השומר תמיד על יחס ממדים ריבועי (1:1). משמשת לייצוג קוביות המשחק ברשת של בוגל, כך שהן יהיו אחידות וריבועיות בכל מסך.
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 עוקפת את מתודת המדידה הסטנדרטית כדי לחשב את הגובה והרוחב של התצוגה, בודקת איזה ממד גדול יותר, ומחילה אותו על שני הצירים לקבלת ריבוע מושלם.
 
 
@@ -2901,41 +3797,72 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 תפקיד המחלקה: מחלקת עזר לטיפול בתמונות והמרת נתונים. היא מספקת מתודות סטטיות להמרה בין `Bitmap`, מחרוזות `Base64` (לצורך שמירה במסד נתונים), ו-`Uri`. בנוסף היא מכילה מתאם (Binding Adapter) עבור Data Binding.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** Tag used for logging. */
 private final static String TAG = "ImageUtils";
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 @BindingAdapter("imageBitmap")
 static public void setImageBitmap(ImageView imageView, Bitmap bitmap){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאפשרת להגדיר דרך ה-XML (Data Binding) אובייקט `Bitmap` שיוצג ב-`ImageView`. אם ה-`Bitmap` ריק (null), היא מציגה תמונת ברירת מחדל (אייקון של משתמש).
 
+</div>
+<div dir="ltr" align="left">
 ```java
 static public String uriToBase64(Uri uri, Context context) throws IOException{
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מקבלת `Uri` (למשל מגלריית המכשיר), פותחת InputStream וקוראת אותו לתוך `Bitmap`, ואז קוראת לפעולת ההמרה ל-`Base64` כדי לאפשר שמירת תמונת משתמש בשרת.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 static public String bitmapToBase64(Bitmap bitmap){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 ממירה אובייקט `Bitmap` למחרוזת `Base64` מקודדת בפורמט JPEG. הפונקציה משתמשת בדחיסה (70% איכות) כדי לאזן בין איכות התמונה לגודל שלה במסד הנתונים.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 static public Bitmap base64ToBitmap(String base64){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 הפעולה ההפוכה: מקבלת מחרוזת `Base64` (למשל כזו שנמשכה מ-Firebase) וממירה אותה חזרה ל-`Bitmap` כדי להציג אותה בממשק המשתמש.
 
 
@@ -2943,6 +3870,9 @@ static public Bitmap base64ToBitmap(String base64){
 תפקיד המחלקה: מחלקת עזר המנהלת ספירה לאחור עבור זמן המשחק. היא משתמשת ב-`Handler` כדי לרוץ על ה-Main Thread ולתזמן קריאות תקופתיות שיעדכנו את ה-UI.
 
 שדות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 /** The total duration of the timer in milliseconds. */
 private final long millisTime;
@@ -2958,7 +3888,13 @@ private final OnTickListener onTick;
 private boolean isStopped = false;
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 ממשקי האזנה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public interface OnTimerEndListener {
     void onTimerEnd();
@@ -2968,34 +3904,62 @@ public interface OnTickListener {
 }
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 תכונות המחלקה: אין
 
 פעולות המחלקה:
+
+</div>
+<div dir="ltr" align="left">
 ```java
 public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מאתחלת טיימר עם זמן מוגדר מראש, ומאזינים (Callbacks) לעדכוני תקתוק ולסיום הזמן.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 @Override
 public void run(){}
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 פעולת הליבה של הטיימר המופעלת על ידי ה-`Handler`. מחשבת את הזמן שעבר, קוראת ל-`onTick`, ואם הזמן תם קוראת ל-`onTimerEnd`. אם לא, היא מתזמנת את עצמה מחדש בצורה חכמה שמשלימה בדיוק לשנייה שלמה.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public void start(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 מתחילה (או ממשיכה) את הטיימר על ידי שליחת הקריאה ל-`Handler`.
 
+</div>
+<div dir="ltr" align="left">
 ```java
 public void stop(){
 //...
 }
 ```
+
+</div>
+<div dir="rtl" align="right">
+
 עוצרת את הטיימר באופן ידני ומנקה קריאות עתידיות הממתינות ב-`Handler`.
 
 
@@ -3007,11 +3971,11 @@ public void stop(){
 תפקיד המחלקה: נתון (Record) פשוט המייצג פוליגון מרובע בודד (פאה של הדונאט התלת-ממדי), עם הנתיב (Path) לציירו על הקנבס, צבעו, והעומק הממוצע שלו לצורך המיון לפני הציור (Painter's Algorithm).
 
 
-<h1 align="center" id="reflection">רפלקציה</h1>
+# רפלקציה
 
 פרוייקט זה היה הפרוייקט הכי מהנה מהפרוייקטים של בית ספר שאי פעם עשיתי. הגעתי מלא לדעת כלום על אנדרואיד ללפתח אפליקציה שלמה. למדתי הרבה על תכנות א-סינכרוני (זה המשיך להופיע בכל מני מקומות!) ואפילו קצת node.js בשביל הפקודות צד שרת. אני כל כך נהניתי בזמן הפרוייקט, שכשרציתי להוסיף איזה ביצת הפתעה (כי כל משחק טוב צריך ביצי הפתעה) אני למדתי על יצירת מנוע תלת מימדי בשביל ליצור דונאט יותר מגניב, ואפילו על מתמטיקה של קווטרניונים, למרות שבסוף זה לא נכנס לקוד הסופי.
 
-<h1 align="center" id="bibliography">ביבליוגרפיה</h1>
+# ביבליוגרפיה
 
 Google. (n.d.). _Get started with Firebase Authentication on Android_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/auth/android/start  
 Google. (n.d.). _Get started with Firebase Cloud Messaging in Android apps_. Firebase. Retrieved May 2, 2026, from https://firebase.google.com/docs/cloud-messaging/android/get-started  
@@ -3022,7 +3986,7 @@ Sloane, A. (2011, July 20). _Donut math: how donut.c works_. a1k0n.net. Retrieve
 Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square cells in Android_ [Post]. StackOverflow. Retrieved May 2, 2026, from https://stackoverflow.com/questions/24416847/how-to-force-gridview-to-generate-square-cells-in-android  
 
 
-<h1 align="center" id="appendices">נספחים</h1>
+# נספחים
 
 [javadoc](https://karakal12.github.io/boggle/)
 
@@ -3031,11 +3995,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 
 ### `activity_main.xml`
 
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -3059,69 +4025,17 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <TextView
-            android:id="@+id/mainTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/boggle_welcome_message"
-            android:textSize="50sp"
-            app:layout_constraintBottom_toTopOf="@+id/singleplayer_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        <TextView android:id="@+id/mainTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/boggle_welcome_message" android:textSize="50sp" app:layout_constraintBottom_toTopOf="@+id/singleplayer_button" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
-        <Button
-            android:id="@+id/singleplayer_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/single_player_button"
-            app:layout_constraintBottom_toTopOf="@+id/multiplayer_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mainTitle" />
+        <Button android:id="@+id/singleplayer_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/single_player_button" app:layout_constraintBottom_toTopOf="@+id/multiplayer_button" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/mainTitle"/>
 
-        <Button
-            android:id="@+id/multiplayer_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/multiplayer_button"
-            app:layout_constraintBottom_toTopOf="@+id/friendsListButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/singleplayer_button" />
+        <Button android:id="@+id/multiplayer_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/multiplayer_button" app:layout_constraintBottom_toTopOf="@+id/friendsListButton" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/singleplayer_button"/>
 
-        <Button
-            android:id="@+id/friendsListButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/friends_list_button"
-            app:layout_constraintBottom_toTopOf="@+id/leaderboardsButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/multiplayer_button" />
+        <Button android:id="@+id/friendsListButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/friends_list_button" app:layout_constraintBottom_toTopOf="@+id/leaderboardsButton" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/multiplayer_button"/>
 
-        <Button
-            android:id="@+id/leaderboardsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/leaderboards_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friendsListButton" />
+        <Button android:id="@+id/leaderboardsButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/leaderboards_button" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/friendsListButton"/>
 
-        <ImageView
-            android:id="@+id/donutButton"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_donut"
-            app:layout_constraintBottom_toBottomOf="@id/main_content"
-            app:layout_constraintEnd_toEndOf="@id/main_content" />
+        <ImageView android:id="@+id/donutButton" android:layout_width="75dp" android:layout_height="75dp" android:scaleType="fitXY" android:src="@drawable/ic_donut" app:layout_constraintBottom_toBottomOf="@id/main_content" app:layout_constraintEnd_toEndOf="@id/main_content"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -3136,39 +4050,26 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.drawerlayout.widget.DrawerLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_sign_up.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
     tools:context=".ui.mainmenu.SignUpFragment">
 
-    <ImageView
-        android:id="@+id/IVProfileImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_person"
-        android:contentDescription="Profile Image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?android:attr/textColorPrimary"/>
+    <ImageView android:id="@+id/IVProfileImage" android:layout_width="100dp" android:layout_height="100dp" android:layout_marginTop="16dp" android:src="@drawable/ic_person" android:contentDescription="Profile Image" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:tint="?android:attr/textColorPrimary"/>
 
-    <Button
-        android:id="@+id/btnSelectImage"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Image"
-        app:layout_constraintEnd_toEndOf="@+id/IVProfileImage"
-        app:layout_constraintStart_toStartOf="@+id/IVProfileImage"
-        app:layout_constraintTop_toBottomOf="@+id/IVProfileImage" />
+    <Button android:id="@+id/btnSelectImage" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Select Image" app:layout_constraintEnd_toEndOf="@+id/IVProfileImage" app:layout_constraintStart_toStartOf="@+id/IVProfileImage" app:layout_constraintTop_toBottomOf="@+id/IVProfileImage"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/TILDisplayName"
@@ -3221,45 +4122,30 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/signup_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/sign_up"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TILPassword" />
+    <Button android:id="@+id/signup_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="16dp" android:text="@string/sign_up" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/TILPassword"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_login.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     tools:context=".ui.mainmenu.LoginFragment">
 
-    <ImageView
-        android:id="@+id/IVLoginImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/ic_login"
-        android:contentDescription="Login Image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?android:attr/textColorPrimary"/>
+    <ImageView android:id="@+id/IVLoginImage" android:layout_width="100dp" android:layout_height="100dp" android:layout_marginTop="32dp" android:src="@drawable/ic_login" android:contentDescription="Login Image" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:tint="?android:attr/textColorPrimary"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/TILEmail"
@@ -3300,27 +4186,23 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             android:autofillHints="password" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/login"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TILPassword" />
+    <Button android:id="@+id/login_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/login" android:textAllCaps="false" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/TILPassword"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `activity_friendlist.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)">
 
     <data>
         <import type="android.view.View"/>
@@ -3329,17 +4211,9 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             type="com.amibar.boggle.data.User"/>
     </data>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
@@ -3355,12 +4229,7 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/add_friend_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Add" />
+            <Button android:id="@+id/add_friend_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Add"/>
 
         </LinearLayout>
 
@@ -3378,16 +4247,7 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
                 app:layout_constraintStart_toStartOf="parent"
                 app:player="@{searchedUser}" />
 
-            <Button
-                android:id="@+id/refresh_button"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:text="Refresh"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <Button android:id="@+id/refresh_button" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_gravity="end" android:text="Refresh" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -3404,22 +4264,20 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
+</div>
+<div dir="ltr" align="left">
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:bind="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)">
     <data>
         <variable
             name="friend"
             type="com.amibar.boggle.data.User" />
     </data>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
 
         <include layout="@layout/item_player"
             bind:player="@{friend}"
@@ -3427,66 +4285,41 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Invite"
-            android:id="@+id/invite_button"/>
+        <Button android:layout_width="wrap_content" android:layout_height="match_parent" android:text="Invite" android:id="@+id/invite_button"/>
     </LinearLayout>
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `nav_header.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="176dp"
-    android:background="?attr/colorPrimary"
-    android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+<LinearLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" android:layout_width="match_parent" android:layout_height="176dp" android:background="?attr/colorPrimary" android:gravity="bottom" android:orientation="vertical" android:padding="16dp" android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/nav_header_imageView"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="Profile Image"
-        android:src="@drawable/ic_person"/>
+    <ImageView android:id="@+id/nav_header_imageView" android:layout_width="64dp" android:layout_height="64dp" android:layout_marginBottom="16dp" android:contentDescription="Profile Image" android:src="@drawable/ic_person"/>
 
-    <TextView
-        android:id="@+id/nav_header_textView_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:text="Not Logged In"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textStyle="bold" />
+    <TextView android:id="@+id/nav_header_textView_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="8dp" android:text="Not Logged In" android:textAppearance="@style/TextAppearance.AppCompat.Body1" android:textStyle="bold"/>
 
-    <TextView
-        android:id="@+id/nav_header_textView_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+    <TextView android:id="@+id/nav_header_textView_email" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
 
 </LinearLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `activity_singleplayer.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.game.singleplayer.SingleplayerActivity">
+<FrameLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)" xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)" android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent" tools:context=".ui.game.singleplayer.SingleplayerActivity">
 
     <com.amibar.boggle.views.BoggleView
         android:id="@+id/boggle_view"
@@ -3497,13 +4330,18 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </FrameLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_singleplayer_on_game_end.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)">
 
     <data>
         <variable
@@ -3523,26 +4361,9 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{`Score: ` + score, default = `Score: 0`}"
-                app:layout_constraintBottom_toTopOf="@+id/click_hint"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <TextView android:id="@+id/tvScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{`Score: ` + score, default = `Score: 0`}" app:layout_constraintBottom_toTopOf="@+id/click_hint" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-            <TextView
-                android:id="@+id/click_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/hint_click_on_the_words_for_solution"
-                android:layout_marginTop="4dp"
-                app:layout_constraintBottom_toTopOf="@id/words_list"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvScore"/>
+            <TextView android:id="@+id/click_hint" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hint_click_on_the_words_for_solution" android:layout_marginTop="4dp" app:layout_constraintBottom_toTopOf="@id/words_list" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/tvScore"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/words_list"
@@ -3564,13 +4385,18 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 
 ### `activity_multiplayer.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.fragment.app.FragmentContainerView xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -3578,38 +4404,23 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
     tools:layout="@layout/fragment_lobby" />
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_join_or_create_room.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/joinRoom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Join Room"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/create_room"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button android:id="@+id/joinRoom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Join Room" android:textAllCaps="false" app:layout_constraintBottom_toTopOf="@+id/create_room" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-    <Button
-        android:id="@+id/create_room"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create Room"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@id/room_code_TIL"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/joinRoom" />
+    <Button android:id="@+id/create_room" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Create Room" android:textAllCaps="false" app:layout_constraintBottom_toTopOf="@id/room_code_TIL" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/joinRoom"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/room_code_TIL"
@@ -3635,42 +4446,27 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_lobby.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)"
+    xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
     <data>
         <variable
             name="room_code"
             type="String"/>
     </data>
 
-    <LinearLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:id="@+id/main"
-        android:orientation="vertical"
-        android:gravity="center">
-        <Button
-            android:layout_margin="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="start"
-            android:id="@+id/start_button"
-            android:textAllCaps="false"
-            android:visibility="gone"/>
+    <LinearLayout android:layout_height="match_parent" android:layout_width="match_parent" android:id="@+id/main" android:orientation="vertical" android:gravity="center">
+        <Button android:layout_margin="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="end" android:text="start" android:id="@+id/start_button" android:textAllCaps="false" android:visibility="gone"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{`Room Code: ` + room_code, default=`Room Code: ******`}"
-            android:textSize="48sp"
-            android:id="@+id/room_code_TV"
-            android:gravity="center"
-            android:textColor="?android:attr/textColorPrimaryNoDisable"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@{`Room Code: ` + room_code, default=`Room Code: ******`}" android:textSize="48sp" android:id="@+id/room_code_TV" android:gravity="center" android:textColor="?android:attr/textColorPrimaryNoDisable"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/player_list"
@@ -3681,16 +4477,16 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_multiplayer_game.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.game.multiplayer.MultiplayerGameFragment">
+<FrameLayout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)" xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)" xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)" android:layout_width="match_parent" android:layout_height="match_parent" tools:context=".ui.game.multiplayer.MultiplayerGameFragment">
 
     <com.amibar.boggle.views.BoggleView
         android:id="@+id/boggle_view"
@@ -3701,13 +4497,18 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </FrameLayout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `fragment_multiplayer_on_game_end.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)">
 
     <data>
     </data>
@@ -3716,16 +4517,7 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/game_over_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Game Over"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="32dp"/>
+        <TextView android:id="@+id/game_over_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Game Over" android:textAppearance="@style/TextAppearance.AppCompat.Display1" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="32dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/players_words_list"
@@ -3747,12 +4539,17 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `item_player.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)">
 
     <data>
         <import type="com.amibar.boggle.utils.ImageUtils"/>
@@ -3761,41 +4558,28 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             type="com.amibar.boggle.data.User" />
     </data>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_horizontal">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="16dp" android:gravity="center_horizontal">
 
-        <ImageView
-            android:id="@+id/player_icon"
-            android:contentDescription="@string/profile_picture"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:imageBitmap="@{ImageUtils.base64ToBitmap(player.profileImageBase64)}"/>
+        <ImageView android:id="@+id/player_icon" android:contentDescription="@string/profile_picture" android:layout_width="48dp" android:layout_height="48dp" app:imageBitmap="@{ImageUtils.base64ToBitmap(player.profileImageBase64)}"/>
 
-        <TextView
-            android:id="@+id/player_name"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@{player.displayName, default=`John Doe`}"
-            android:autoSizeTextType="uniform"
-            android:textColor="?android:attr/textColorPrimaryNoDisable"
-            android:gravity="center"/>
+        <TextView android:id="@+id/player_name" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@{player.displayName, default=`John Doe`}" android:autoSizeTextType="uniform" android:textColor="?android:attr/textColorPrimaryNoDisable" android:gravity="center"/>
 
     </LinearLayout>
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `item_player_score.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)">
 
     <data>
         <variable
@@ -3818,31 +4602,9 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             android:layout_height="match_parent"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/player_name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{playerName}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
-                android:gravity="center"
-                app:layout_constraintBottom_toTopOf="@id/tvScore"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="spread"
-                tools:text="Player Name" />
+            <TextView android:id="@+id/player_name_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{playerName}" android:textAppearance="@style/TextAppearance.AppCompat.Medium" android:textStyle="bold" android:gravity="center" app:layout_constraintBottom_toTopOf="@id/tvScore" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_chainStyle="spread" tools:text="Player Name"/>
 
-            <TextView
-                android:id="@+id/tvScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@{`Score: ` + score, default = `Score: 0`}"
-                app:layout_constraintBottom_toTopOf="@+id/words_list"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/player_name_text" />
+            <TextView android:id="@+id/tvScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@{`Score: ` + score, default = `Score: 0`}" app:layout_constraintBottom_toTopOf="@+id/words_list" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/player_name_text"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/words_list"
@@ -3860,12 +4622,17 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `item_word.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)"
+    xmlns:tools="[http://schemas.android.com/tools](http://schemas.android.com/tools)">
 
     <data>
         <variable
@@ -3873,24 +4640,21 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             type="String" />
     </data>
 
-    <TextView
-        android:id="@+id/word_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@{word}"
-        android:padding="4dp"
-        tools:text="Word"
-        android:gravity="center"
-        android:maxLines="1"/>
+    <TextView android:id="@+id/word_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@{word}" android:padding="4dp" tools:text="Word" android:gravity="center" android:maxLines="1"/>
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `view_boggle.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:app="[http://schemas.android.com/apk/res-auto](http://schemas.android.com/apk/res-auto)"
+    xmlns:android="[http://schemas.android.com/apk/res/android](http://schemas.android.com/apk/res/android)">
     <data>
         <variable
             name="score"
@@ -3906,24 +4670,10 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
             type="String" />
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:layoutDirection="ltr">
+    <LinearLayout android:orientation="vertical" android:gravity="center" android:layout_height="match_parent" android:layout_width="match_parent" android:layoutDirection="ltr">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/tvTime"
-                android:layout_margin="8dp"
-                android:layout_height="wrap_content"  android:layout_width="wrap_content"
-                android:textColor="?android:attr/textColorPrimaryNoDisable"
-                android:text="@{time, default=`00:00`}"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal">
+            <TextView android:id="@+id/tvTime" android:layout_margin="8dp" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="?android:attr/textColorPrimaryNoDisable" android:text="@{time, default=`00:00`}"/>
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -3935,28 +4685,11 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
                 app:indicatorColor="?android:attr/colorSecondary"/>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvBoggleMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/boggle"
-            android:textSize="50sp"
-            android:textColor="?android:attr/textColorPrimaryNoDisable"/>
+        <TextView android:id="@+id/tvBoggleMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/boggle" android:textSize="50sp" android:textColor="?android:attr/textColorPrimaryNoDisable"/>
 
-        <TextView
-            android:id="@+id/tvScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{`Score: ` + score, default=`Score: 0`}"/>
+        <TextView android:id="@+id/tvScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{`Score: ` + score, default=`Score: 0`}"/>
 
-        <GridLayout
-            android:rowCount="4"
-            android:columnCount="4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/colorForeground"
-            android:id="@+id/glGameLayout">
+        <GridLayout android:rowCount="4" android:columnCount="4" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="?android:attr/colorForeground" android:id="@+id/glGameLayout">
             <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
             <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
             <com.amibar.boggle.views.SquareTextView style="@style/BoggleCell"/>
@@ -3992,56 +4725,33 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text='@{`Word: "` + word + `"`, default=`Word: ""`}'
-            android:id="@+id/tvWord"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@{`Word: "` + word + `"`, default=`Word: ""`}" android:id="@+id/tvWord"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/bSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/submit"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <Button android:id="@+id/bSubmit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/submit" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-            <ImageView
-                android:id="@+id/ivHint"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:src="@drawable/ic_hint"
-                app:layout_constraintBottom_toBottomOf="@+id/bSubmit"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.75"
-                app:layout_constraintStart_toEndOf="@+id/bSubmit"
-                app:layout_constraintTop_toTopOf="@+id/bSubmit"
-                app:tint="?android:attr/textColorPrimary" />
+            <ImageView android:id="@+id/ivHint" android:layout_width="0dp" android:layout_height="0dp" android:src="@drawable/ic_hint" app:layout_constraintBottom_toBottomOf="@+id/bSubmit" app:layout_constraintDimensionRatio="1:1" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.75" app:layout_constraintStart_toEndOf="@+id/bSubmit" app:layout_constraintTop_toTopOf="@+id/bSubmit" app:tint="?android:attr/textColorPrimary"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/tvErrors"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="?android:attr/textColorPrimary"
-            android:text="@{error}"/>
+        <TextView android:id="@+id/tvErrors" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="?android:attr/textColorPrimary" android:text="@{error}"/>
 
     </LinearLayout>
 </layout>
 ```
 
+</div>
+<div dir="rtl" align="right">
+
 ## קבצי value:
 
 
 ### `attrs.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4061,8 +4771,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `colors.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4093,8 +4808,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `values-night/colors.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4118,9 +4838,14 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 
 ### `dimens.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4132,8 +4857,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `strings.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <resources>
     <string name="app_name">Boggle</string>
@@ -4166,8 +4896,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `styles.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -4187,9 +4922,14 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 
 ### `themes.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <resources>
     <!-- Base application theme. -->
@@ -4216,8 +4956,13 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
 </resources>
 ```
 
+</div>
+<div dir="rtl" align="right">
 
 ### `values-night/themes.xml`
+
+</div>
+<div dir="ltr" align="left">
 ```xml
 <resources>
     <!-- Base application theme. -->
@@ -4245,3 +4990,6 @@ Silber, M. [Cruceo]. (2014, June 25). _How to force GridView to generate square 
     </style>
 </resources>
 ```
+
+</div>
+````</String></String,></String></String></String,></String></String></String,></String></String,></User,></String></RecyclerView></String></String,></User,></User></User></User,></String,></User></User></User,></String,></User></String,></User></User></PickVisualMediaRequest></String></Intent></String,></String,></Quad></String></String></Die></OnTickListener></OnWordFoundListener></OnGameEndListener></String></String></String></OnTickListener></OnWordFoundListener></OnGameEndListener></String></Integer></String,></String,></String></String></String></T></T></String></T></Javadoc>
