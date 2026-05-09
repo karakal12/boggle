@@ -490,7 +490,6 @@ exports.sendInvitationNotification = onValueCreated(
         instance: "idk-a-school-project-or-smth-default-rtdb"
     },
     async (event) => {
-        // 3. We now get everything from the single 'event' object
         const targetUserId = event.params.targetUserId;
         const invitationData = event.data.val();
 
