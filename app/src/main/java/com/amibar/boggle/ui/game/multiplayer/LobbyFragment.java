@@ -111,9 +111,11 @@ public class LobbyFragment extends Fragment {
             roomRef = FirebaseHandler.getInstance().getRootRef().child("rooms").child(roomCode);
             listenForPlayers();
             
-            if (player != null) {
-                DatabaseReference myPlayerRef = roomRef.child("players").child(FirebaseHandler.getInstance().getCurrentUserId());
-                myPlayerRef.setValue(player);
+            String userId = FirebaseHandler.getInstance().getCurrentUserId();
+            if (userId != null) {
+                DatabaseReference myPlayerRef = roomRef.child("players").child(userId);
+                // Instead of putting all player data, only put a joined flag
+                myPlayerRef.child("joined").setValue(true);
                 // Ensure the player is removed from the room list if they disconnect or close the app
                 myPlayerRef.onDisconnect().removeValue();
             }
@@ -134,12 +136,27 @@ public class LobbyFragment extends Fragment {
                 playerList.clear();
                 DataSnapshot playersSnapshot = snapshot.child("players");
                 for (DataSnapshot playerSnapshot : playersSnapshot.getChildren()) {
-                    User player = playerSnapshot.getValue(User.class);
-                    if (player != null) {
-                        playerList.add(player);
+                    String uid = playerSnapshot.getKey();
+                    if (uid != null) {
+                        // Fetch the full User data from the central 'users' node
+                        FirebaseHandler.getDatabase().getReference("users").child(uid)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot userSnap) {
+                                        User user = userSnap.getValue(User.class);
+                                        if (user != null && isAdded()) {
+                                            if (!playerList.contains(user)) {
+                                                playerList.add(user);
+                                                playerAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {}
+                                });
                     }
                 }
-                playerAdapter.notifyDataSetChanged();
                 
                 // If the host has marked the game as started, transition to the game fragment
                 Boolean gameStarted = snapshot.child("gameStarted").getValue(Boolean.class);

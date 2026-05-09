@@ -411,14 +411,14 @@ public class BoggleView extends LinearLayout {
 
         int currentPathLength = currentPath.length();
         int remainingLength = fullPath.length() - currentPathLength;
-        int revealCount = currentPathLength + (int) Math.floor(remainingLength / 2.0);
+        int revealCount = currentPathLength + (int) Math.ceil(remainingLength / 2.0);
 
 
         if (revealCount >= fullPath.length())
             return;
 
         Log.d("BoggleView", "found solution " + game.getWordFromPath(fullPath) + " with path " + fullPath + " revealing " + revealCount + " characters");
-        showSolution(fullPath.substring(0, revealCount + 1));
+        showSolution(fullPath.substring(0, revealCount));
 
         game.subHint();
         hintBadge.setNumber(game.getHints());

@@ -42,6 +42,8 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
     private final Set<String> commonWords;
     /** Callback listener for word click events. */
     private final OnWordClickListener listener;
+    /** Sorted list of words for efficient access. */
+    private final List<String> sortedWords;
 
     /**
      * Full constructor for WordsAdapter.
@@ -55,6 +57,9 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         this.playerWords = playerWords;
         this.commonWords = commonWords;
         this.listener = listener;
+        // Sort solutions alphabetically once in the constructor for performance
+        this.sortedWords = new ArrayList<>(solutions.keySet());
+        Collections.sort(this.sortedWords);
     }
 
     /**
@@ -64,10 +69,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
      * @param listener     Click listener.
      */
     public WordsAdapter(Map<String, String> solutions, List<String> playerWords, OnWordClickListener listener) {
-        this.solutions = solutions;
-        this.playerWords = playerWords;
-        this.commonWords = null;
-        this.listener = listener;
+        this(solutions, playerWords, null, listener);
     }
 
     @NonNull
@@ -79,10 +81,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Sort solutions alphabetically for a predictable display
-        List<String> words = new ArrayList<>(solutions.keySet());
-        Collections.sort(words);
-        String word = words.get(position);
+        String word = sortedWords.get(position);
         
         holder.binding.setWord(word);
         
@@ -92,7 +91,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         // BLACK: Missed word (not found by this player)
         if (commonWords != null && commonWords.contains(word)) {
             holder.binding.wordText.setTextColor(Color.RED);
-        } else if (playerWords.contains(word)){
+        } else if (playerWords != null && playerWords.contains(word)){
             holder.binding.wordText.setTextColor(Color.GREEN);
         } else {
             holder.binding.wordText.setTextColor(Color.BLACK);
@@ -110,7 +109,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return solutions.size();
+        return sortedWords.size();
     }
 
     /**

@@ -134,7 +134,6 @@ public class FriendListActivity extends AppCompatActivity {
 
         Map<String, Object> invitation = new HashMap<>();
         invitation.put("senderId", currentUserId);
-        invitation.put("senderName", currentUser.getDisplayName());
         invitation.put("message", "Join my Boggle game!");
         invitation.put("roomCode", roomCode);
         invitation.put("timestamp", ServerValue.TIMESTAMP);

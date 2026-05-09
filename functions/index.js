@@ -40,7 +40,16 @@ exports.sendInvitationNotification = onValueCreated(
         const targetUserId = event.params.targetUserId;
         const invitationData = event.data.val();
 
+        if (!invitationData) return null;
+
+        const senderId = invitationData.senderId;
+
         try {
+            // Reconstruct senderName from senderId by fetching it from the users node
+            const senderSnapshot = await admin.database().ref(`/users/${senderId}`).once("value");
+            const senderData = senderSnapshot.val();
+            const senderName = (senderData && senderData.displayName) ? senderData.displayName : "Someone";
+
             // eslint-disable-next-line max-len
             const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
             const fcmToken = tokenSnapshot.val();
@@ -53,10 +62,11 @@ exports.sendInvitationNotification = onValueCreated(
 
             const payload = {
                 data: {
-                    title: `New Invite from ${invitationData.senderName}`,
+                    title: `New Invite from ${senderName}`,
                     body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
                     roomCode: String(invitationData.roomCode),
-                    invitationId: String(event.params.invitationId)
+                    invitationId: String(event.params.invitationId),
+                    senderId: String(senderId)
                 },
                 token: fcmToken,
             };

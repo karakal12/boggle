@@ -27,7 +27,7 @@ public class BoggleGame {
     /**
      * The total duration of a game in milliseconds.
      */
-    public static final long GAME_TIME_MILLIS = 30000; // 180000 millis = 3 minutes
+    public static final long GAME_TIME_MILLIS = 180000; // 180000 millis = 3 minutes
 
     /** The 1D array representation of the 4x4 board letters. */
     private final char[] board;
@@ -111,6 +111,8 @@ public class BoggleGame {
 
         // Solve the board using the GameSolver and the dictionary root.
         // This is done upfront to provide immediate feedback on word validity during the game.
+        Dictionary.ROOT.waitUntilInitialized();
+
         GameSolver.SolverResult result = new GameSolver().solve(getDice(), Dictionary.ROOT);
         solutions = result.solutions();
         allPaths = result.allPaths();

@@ -25,6 +25,19 @@ public final class Dictionary extends Trie<Dictionary>{
     /** Flag indicating if the dictionary has been loaded with words. */
     private boolean isInitialized = false;
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    /**
+     * Ensures the dictionary is fully loaded. If init() is still running
+     * in another thread, this method will block until it completes.
+     */
+    public synchronized void waitUntilInitialized() {
+        if (!isInitialized) {
+            Log.d(TAG, "Waiting for dictionary initialization...");
+        }
+    }
 
     /**
      * Private constructor for Dictionary.

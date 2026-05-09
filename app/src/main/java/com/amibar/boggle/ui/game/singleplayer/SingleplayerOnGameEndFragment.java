@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.amibar.boggle.databinding.FragmentSingleplayerOnGameEndBinding;
@@ -85,9 +87,8 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Ensure arguments are present, as they are required for the dialog to function.
         if (getArguments() == null) {
-             return super.onCreateDialog(savedInstanceState);
+            return super.onCreateDialog(savedInstanceState);
         }
 
         @SuppressWarnings("unchecked")
@@ -95,40 +96,38 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
         List<String> foundWords = getArguments().getStringArrayList(ARG_FOUND_WORDS);
         int score = getArguments().getInt(ARG_SCORE);
 
-        // Inflate the custom layout for the dialog content using ViewBinding.
         binding = FragmentSingleplayerOnGameEndBinding.inflate(getLayoutInflater());
-
-        // Create an AlertDialog builder to construct the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Game Over");
-
-        // Bind UI components and set data.
         binding.setScore(score);
 
         if (solutions != null && foundWords != null) {
-            // Set up the RecyclerView with an adapter that highlights found words and handles clicks.
             binding.wordsList.setAdapter(new WordsAdapter(solutions, foundWords, (word, path) -> {
                 if (listener != null) {
                     listener.onWordClick(word, path);
                 }
-                // Dismiss the dialog once a word is selected to show its path on the board behind it.
                 dismiss();
             }));
         }
 
-        // Set the custom view for the dialog.
-        builder.setView(binding.getRoot());
-
-        // Finish the activity when "OK" is pressed, typically returning the user to the main menu.
-        builder.setPositiveButton("OK", (dialog, which) -> {
+        // Handle the EXIT button click
+        binding.btnExit.setOnClickListener(v -> {
             if (getActivity() != null) {
                 getActivity().finish();
             }
+            dismiss();
         });
 
-        // Create the dialog and prevent it from being dismissed by clicking outside.
+        // Create the dialog without setting title or buttons on the builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(binding.getRoot());
+
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
+
+        // Make the background transparent so the CardView defines the shape
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
         return dialog;
     }
 
@@ -140,4 +139,5 @@ public class SingleplayerOnGameEndFragment extends DialogFragment {
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
     }
+
 }

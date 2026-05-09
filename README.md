@@ -473,10 +473,8 @@ manifest:
 
 </div>
 
-
 ```javascript
 const {setGlobalOptions} = require("firebase-functions");
-
 setGlobalOptions({maxInstances: 10});
 
 const functions = require("firebase-functions");
@@ -492,30 +490,37 @@ exports.sendInvitationNotification = onValueCreated(
         instance: "idk-a-school-project-or-smth-default-rtdb"
     },
     async (event) => {
-        // get everything from the single 'event' object
+        // 3. We now get everything from the single 'event' object
         const targetUserId = event.params.targetUserId;
         const invitationData = event.data.val();
 
+        if (!invitationData) return null;
+
+        const senderId = invitationData.senderId;
+
         try {
+            // Reconstruct senderName from senderId by fetching it from the users node
+            const senderSnapshot = await admin.database().ref(`/users/${senderId}`).once("value");
+            const senderData = senderSnapshot.val();
+            const senderName = (senderData && senderData.displayName) ? senderData.displayName : "Someone";
+
             // eslint-disable-next-line max-len
             const tokenSnapshot = await admin.database().ref(`/users/${targetUserId}/fcmToken`).once("value");
             const fcmToken = tokenSnapshot.val();
 
             if (!fcmToken) {
                 console.log("No FCM token found for user: ", targetUserId);
-                // keep the invitation even if notification fails so user can see it manually
+                // We keep the invitation even if notification fails so user can see it manually
                 return null;
             }
 
             const payload = {
-                notification: {
-                    title: `New Invite from ${invitationData.senderName}`,
-                    // eslint-disable-next-line max-len
-                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
-                },
                 data: {
+                    title: `New Invite from ${senderName}`,
+                    body: `${invitationData.message} Room Code: ${invitationData.roomCode}`,
                     roomCode: String(invitationData.roomCode),
-                    invitationId: String(event.params.invitationId)
+                    invitationId: String(event.params.invitationId),
+                    senderId: String(senderId)
                 },
                 token: fcmToken,
             };
@@ -530,7 +535,9 @@ exports.sendInvitationNotification = onValueCreated(
         }
     }
 );
+
 ```
+
 
 <div dir="rtl" align="right">
 

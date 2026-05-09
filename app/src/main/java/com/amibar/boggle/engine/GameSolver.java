@@ -2,6 +2,8 @@ package com.amibar.boggle.engine;
 
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
+import android.util.Log;
+
 import com.amibar.boggle.data.Dictionary;
 import com.amibar.boggle.data.PathTrie;
 
@@ -120,6 +122,7 @@ public class GameSolver {
                     allPaths.add(path);
                     // Ensure the word is added to the unique solutions set if not already present.
                     if (solutions.get(string) == null) {
+                        Log.v("GameSolver", "Adding " + string + " to solutions");
                         solutions.put(string, path);
                     }
                 }
@@ -159,7 +162,7 @@ public class GameSolver {
                                     nextNode = nextNode.get('u');
                                     // If 'qu' is not a valid prefix in the dictionary, skip this path.
                                     if (nextNode == null) continue;
-                                    nextString = string + "qu";
+                                    nextString = nextString + "u";
                                 }
 
                                 // Create a new task to continue searching from this neighbor.

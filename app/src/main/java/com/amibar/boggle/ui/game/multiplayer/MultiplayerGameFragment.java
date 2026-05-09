@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Fragment responsible for the multiplayer game logic.
@@ -199,39 +200,46 @@ public class MultiplayerGameFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 HashMap<User, ArrayList<String>> playersWordsMap = new HashMap<>();
-                
                 DataSnapshot playersSnapshot = snapshot.child("players");
-                DataSnapshot wordsSnapshot = snapshot.child("playerWords");
                 
-                // Map user IDs to User objects for easier lookups
-                Map<String, User> userIdToUser = new HashMap<>();
+                long playersCount = playersSnapshot.getChildrenCount();
+                if (playersCount == 0) return;
+
+                AtomicInteger fetchedCount = new AtomicInteger(0);
+
                 for (DataSnapshot playerSnap : playersSnapshot.getChildren()) {
-                    User u = playerSnap.getValue(User.class);
-                    if (u != null) {
-                        userIdToUser.put(playerSnap.getKey(), u);
-                        // Initialize an empty list for every player so they still show up even if they got no words
-                        playersWordsMap.put(u, new ArrayList<>());
+                    String uid = playerSnap.getKey();
+                    if (uid == null) continue;
+
+                    // Aggregate words found by this player from the 'words' child
+                    ArrayList<String> words = new ArrayList<>();
+                    DataSnapshot wordsSnap = playerSnap.child("words");
+                    for (DataSnapshot wordSnap : wordsSnap.getChildren()) {
+                        words.add(wordSnap.getKey());
                     }
-                }
-                
-                // Aggregate words found by each player
-                for (DataSnapshot userWordsSnap : wordsSnapshot.getChildren()) {
-                    String userId = userWordsSnap.getKey();
-                    User u = userIdToUser.get(userId);
-                    if (u != null) {
-                        ArrayList<String> words = playersWordsMap.get(u);
-                        if (words != null) {
-                            for (DataSnapshot wordSnap : userWordsSnap.getChildren()) {
-                                words.add(wordSnap.getKey());
-                            }
-                        }
-                    }
-                }
-                
-                if (isAdded()) {
-                    BoggleGame game = binding.boggleView.getGame();
-                    // Transition to the results view in the parent activity
-                    ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutions().toMap(), playersWordsMap);
+
+                    // Fetch the full User object from the central 'users' node
+                    FirebaseHandler.getDatabase().getReference("users").child(uid)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot userSnap) {
+                                    User user = userSnap.getValue(User.class);
+                                    if (user != null) {
+                                        playersWordsMap.put(user, words);
+                                    }
+                                    
+                                    if (fetchedCount.incrementAndGet() == (int) playersCount) {
+                                        finalizeResults(playersWordsMap);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    if (fetchedCount.incrementAndGet() == (int) playersCount) {
+                                        finalizeResults(playersWordsMap);
+                                    }
+                                }
+                            });
                 }
             }
 
@@ -242,6 +250,14 @@ public class MultiplayerGameFragment extends Fragment {
         });
     }
 
+    private void finalizeResults(HashMap<User, ArrayList<String>> playersWordsMap) {
+        if (isAdded()) {
+            BoggleGame game = binding.boggleView.getGame();
+            // Transition to the results view in the parent activity
+            ((MultiplayerActivity) requireActivity()).showGameResults(game.getSolutions().toMap(), playersWordsMap);
+        }
+    }
+
     /**
      * Initializes the Boggle game logic and attaches listeners for local game events.
      *
@@ -250,9 +266,9 @@ public class MultiplayerGameFragment extends Fragment {
     private void setupGame(BoggleGame game) {
         String userId = FirebaseHandler.getInstance().getCurrentUserId();
         
-        // Listen for words found locally and sync them to Firebase
+        // Listen for words found locally and sync them to Firebase under the player's node
         game.addOnWordFoundListener(word ->
-            roomRef.child("playerWords").child(userId).child(word).setValue(true)
+            roomRef.child("players").child(userId).child("words").child(word).setValue(true)
         );
         
         // Listen for game end (timer expire)
