@@ -1,143 +1,107 @@
-package com.amibar.boggle.ui.game.singleplayer;
+package com.amibar.boggle.ui.game.singleplayer
 
-import android.app.Dialog;
-import android.os.Bundle;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.DialogFragment;
-
-import com.amibar.boggle.databinding.FragmentSingleplayerOnGameEndBinding;
-import com.amibar.boggle.ui.shared.WordsAdapter;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.amibar.boggle.ui.shared.SampleData
+import com.amibar.boggle.ui.shared.WordsList
 
 /**
- * A {@link DialogFragment} that appears when a single-player game ends.
+ * An [AlertDialog] that appears when a single-player game ends.
  * It displays the final score and a list of all possible words that could have been found on the board.
  * Words found by the player are highlighted in green.
  * Clicking on a word triggers a callback to show its path on the board.
  */
-public class SingleplayerOnGameEndFragment extends DialogFragment {
 
-    /** Tag used for identifying this fragment in the FragmentManager. */
-    public static final String TAG = "SinglePlayerGameEndDialogFragment";
+@Composable
+fun SingleplayerGameEndDialog(
+    solutions: Map<String, String>,
+    foundWords: List<String>,
+    score: Int,
+    modifier: Modifier = Modifier,
+    listener: (String, String) -> Unit,
+    showingDialogState: MutableState<Boolean> = mutableStateOf(false)
+) {
+    val activity = LocalActivity.current
 
-    /** Key for the solutions map in the arguments bundle. */
-    private static final String ARG_SOLUTIONS = "arg_solutions";
-    /** Key for the found words list in the arguments bundle. */
-    private static final String ARG_FOUND_WORDS = "arg_found_words";
-    /** Key for the score value in the arguments bundle. */
-    private static final String ARG_SCORE = "arg_score";
-
-    /**
-     * Interface definition for a callback to be invoked when a word is clicked.
-     */
-    public interface OnWordClickListener {
-        /**
-         * Called when a word in the dialog is clicked.
-         *
-         * @param word The word that was clicked.
-         * @param path The path of the word on the board (encoded as a string).
-         */
-        void onWordClick(String word, String path);
-    }
-
-    /** Listener for word click events. */
-    private OnWordClickListener listener;
-
-    /** View binding for the fragment layout. */
-    private FragmentSingleplayerOnGameEndBinding binding;
-
-    /**
-     * Sets the listener for word click events.
-     *
-     * @param listener The listener to set.
-     */
-    public void setOnWordClickListener(OnWordClickListener listener) {
-        this.listener = listener;
-    }
-
-    /**
-     * Creates a new instance of the dialog with the provided data.
-     *
-     * @param solutions  Map of all possible words to their paths.
-     * @param foundWords List of words found by the player.
-     * @param score      The final score to display.
-     * @return A configured SingleplayerOnGameEndFragment.
-     */
-    public static SingleplayerOnGameEndFragment newInstance(Map<String, String> solutions, List<String> foundWords, int score) {
-        SingleplayerOnGameEndFragment fragment = new SingleplayerOnGameEndFragment();
-        Bundle args = new Bundle();
-        // Storing data in the arguments bundle to survive configuration changes.
-        args.putSerializable(ARG_SOLUTIONS, new HashMap<>(solutions));
-        args.putStringArrayList(ARG_FOUND_WORDS, new ArrayList<>(foundWords));
-        args.putInt(ARG_SCORE, score);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        if (getArguments() == null) {
-            return super.onCreateDialog(savedInstanceState);
-        }
-
-        @SuppressWarnings("unchecked")
-        Map<String, String> solutions = (Map<String, String>) getArguments().getSerializable(ARG_SOLUTIONS);
-        List<String> foundWords = getArguments().getStringArrayList(ARG_FOUND_WORDS);
-        int score = getArguments().getInt(ARG_SCORE);
-
-        binding = FragmentSingleplayerOnGameEndBinding.inflate(getLayoutInflater());
-        binding.setScore(score);
-
-        if (solutions != null && foundWords != null) {
-            binding.wordsList.setAdapter(new WordsAdapter(solutions, foundWords, (word, path) -> {
-                if (listener != null) {
-                    listener.onWordClick(word, path);
+    if (showingDialogState.value)
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = {},
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        activity?.finish()
+                    }
+                ) {
+                    Text("EXIT")
                 }
-                dismiss();
-            }));
-        }
-
-        // Handle the EXIT button click
-        binding.btnExit.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().finish();
+            },
+            text = {
+                WordsList(
+                    solutions = solutions,
+                    playerWords = foundWords,
+                    onWordClick = { word, path ->
+                        listener(word, path)
+                        showingDialogState.value = false
+                    }
+                )
+            },
+            title = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Game Over",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(Modifier.padding(22.dp))
+                    Text(
+                        text = "Score: $score",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(Modifier.padding(8.dp))
+                    Text(
+                        text = activity?.resources?.getString(com.amibar.boggle.R.string.hint_click_on_the_words_for_solution) ?: "hint: click on the words for solution",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
-            dismiss();
-        });
+        )
+}
 
-        // Create the dialog without setting title or buttons on the builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setView(binding.getRoot());
+@Preview(showBackground = true)
+@Composable
+fun SingleplayerGameEndDialogPreview() {
+    val solutions = SampleData.solutions
+    val foundWords = SampleData.player1Words
+    val score = 42
+    val showingDialogState = remember { mutableStateOf(true) }
 
-        Dialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-
-        // Make the background transparent so the CardView defines the shape
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
-        return dialog;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Set dialog width to match parent for better usability
-        if (getDialog() != null && getDialog().getWindow() != null) {
-            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    MaterialTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            SingleplayerGameEndDialog(
+                solutions = solutions,
+                foundWords = foundWords,
+                score = score,
+                listener = { _, _ -> },
+                showingDialogState = showingDialogState
+            )
         }
     }
-
 }

@@ -1,64 +1,83 @@
-package com.amibar.boggle.data;
-
-import androidx.annotation.NonNull;
-import java.util.HashMap;
+package com.amibar.boggle.data
 
 /**
- * A specialized Trie implementation that stores a string path for each word.
- * This is used to store discovered words and the sequence of board coordinates that form them.
- * The path is typically encoded as a sequence of hexadecimal characters representing board indices.
+ * A specialized Trie that uses [PathTrieNode]s to store word paths.
+ * Optimized to use [PathTrieNode] only for nodes that represent the end of a word,
+ * saving memory for intermediate prefix nodes.
  */
-public class PathTrie extends Trie<PathTrie>{
-    /** The path (sequence of board indices) associated with the word ending at this node. */
-    private String path;
+class PathTrie : Trie() {
+    override val root: TrieNode = createRootNode()
+
+    override fun createRootNode(): TrieNode = PathTrieNode()
 
     /**
-     * Returns the path associated with this word node.
-     *
-     * @return The path string, or null if not set.
+     * A specialized TrieNode that can store a path string.
      */
-    public String getPath() {
-        return path;
+    private inner class PathTrieNode : TrieNode() {
+        var path: String? = null
+        // Note: We do NOT override createChild() here.
+        // This ensures that new children created by putChildIfAbsent() are base TrieNodes.
     }
 
-    /**
-     * Sets the path associated with this word node.
-     * @param path The path string.
-     */
-    public void setPath(String path) {
-        this.path = path;
+    override fun put(str: String) {
+        put(str, null)
     }
-
-
 
     /**
      * Inserts a word and its associated path into the Trie.
-     * If the word already exists, its path is updated if a new one is provided.
-     *
-     * @param str  The word string to insert.
-     * @param path The optional path string associated with the word.
-     *
-     * @return the Trie node representing the end of the string
+     * Ensures that the terminal node is a [PathTrieNode].
      */
-    public PathTrie put(String str, String path){
-        PathTrie node = super.put(str);
-        if (path != null) {
-            node.path = path;
+    @Synchronized
+    fun put(str: String, path: String?) {
+        var node = root
+        var parent: TrieNode? = null
+        var lastCh = ' '
+        for (ch in str) {
+            if (ch !in 'a'..'z') continue
+            parent = node
+            lastCh = ch
+            node = node.putChildIfAbsent(ch) ?: continue
         }
-        return node;
+        node.isEndOfWord = true
+        if (node !is PathTrieNode) {
+            // Replace the base TrieNode with a PathTrieNode to store the path.
+            val newNode = PathTrieNode()
+            newNode.isEndOfWord = true
+            newNode.isLeaf = node.isLeaf
+            newNode.path = path
+            // Copy existing children to the new node.
+            for (i in 0 until ALPHABET_SIZE) {
+                val child = node.children.get(i)
+                if (child != null) {
+                    newNode.children.set(i, child)
+                }
+            }
+            // Update the parent's reference to this node.
+            parent?.children?.set(lastCh - 'a', newNode)
+        } else if (path != null) {
+            node.path = path
+        }
+    }
+
+    /**
+     * Retrieves the path associated with a word.
+     */
+    fun getPath(str: String): String? {
+        var node = root
+        for (ch in str) {
+            node = node.getChild(ch) ?: return null
+        }
+        return (node as? PathTrieNode)?.path
     }
 
     /**
      * Converts the Trie into a Map where keys are words and values are their associated paths.
-     * This is useful for passing word data between different components or activities.
-     *
-     * @return A HashMap containing all words and their paths.
      */
-    public HashMap<String, String> toMap() {
-        HashMap<String, String> map = new HashMap<>();
-        for (String s : getWords()) {
-            map.put(s, get(s).getPath());
+    fun toMap(): HashMap<String, String> {
+        val map = HashMap<String, String>()
+        for (s in words) {
+            map[s] = getPath(s) ?: ""
         }
-        return map;
+        return map
     }
 }

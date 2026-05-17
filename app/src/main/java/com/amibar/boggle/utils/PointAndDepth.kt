@@ -1,4 +1,3 @@
-package com.amibar.boggle.utils;
+package com.amibar.boggle.utils
 
-public record PointAndDepth(int screenX,  int screenY, double ooz) {
-}
+data class PointAndDepth(val screenX: Int, val screenY: Int, val ooz: Double)

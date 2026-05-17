@@ -1,61 +1,35 @@
-package com.amibar.boggle.data;
+package com.amibar.boggle.data
 
+import android.util.Log
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.util.Locale
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Trie (Prefix Tree) implementation representing the game dictionary.
- * Inherits from {@link Trie} to store words efficiently and allow for fast lookups.
+ * Inherits from [Trie] to store words efficiently and allow for fast lookups.
  */
-public final class Dictionary extends Trie<Dictionary>{
-    private static final String TAG = "Dictionary";
-
-    /**
-     * Static root instance of the dictionary.
-     */
-    public static final Dictionary ROOT = new Dictionary();
-
-    /** Flag indicating if the dictionary has been loaded with words. */
-    private boolean isInitialized = false;
-
-    public boolean isInitialized() {
-        return isInitialized;
-    }
+class Dictionary
+/**
+ * Private constructor for Dictionary.
+ */
+private constructor() : Trie() {
+    /** Flag indicating if the dictionary has been loaded with words.  */
+    var isInitialized: Boolean = false
+        private set
 
     /**
      * Ensures the dictionary is fully loaded. If init() is still running
      * in another thread, this method will block until it completes.
      */
-    public synchronized void waitUntilInitialized() {
+    @Synchronized
+    fun waitUntilInitialized() {
         if (!isInitialized) {
-            Log.d(TAG, "Waiting for dictionary initialization...");
+            Log.d(TAG, "Waiting for dictionary initialization...")
         }
-    }
-
-    /**
-     * Private constructor for Dictionary.
-     */
-    private Dictionary() {
-        super();
-    }
-
-
-    /**
-     * Checks if a word exists in the dictionary.
-     *
-     * @param word The word to search for.
-     * @return True if the word is present and valid, false otherwise.
-     */
-    public static boolean contains(@NonNull String word) {
-        Trie<?> node = ROOT.get(word);
-        return node != null && node.isEndOfWord();
     }
 
     /**
@@ -63,20 +37,42 @@ public final class Dictionary extends Trie<Dictionary>{
      * This operation is synchronized to prevent concurrent initializations.
      * @param file The input stream containing the word list.
      */
-    public synchronized void init(InputStream file) {
-        if (isInitialized) return;
-        
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String word = line.trim().toLowerCase();
-                if (!word.isEmpty()) {
-                    put(word);
+    @Synchronized
+    fun init(file: InputStream?) {
+        if (isInitialized) return
+
+        try {
+            BufferedReader(InputStreamReader(file)).use { reader ->
+                var line: String?
+                while ((reader.readLine().also { line = it }) != null) {
+                    val word = line!!.trim { it <= ' ' }.lowercase(Locale.getDefault())
+                    if (!word.isEmpty()) {
+                        put(word)
+                    }
                 }
+                isInitialized = true
             }
-            isInitialized = true;
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading dictionary file", e);
+        } catch (e: IOException) {
+            Log.e(TAG, "Error reading dictionary file", e)
+        }
+    }
+
+    companion object {
+        private const val TAG = "Dictionary"
+
+        /**
+         * Static root instance of the dictionary.
+         */
+        val ROOT: Dictionary = Dictionary()
+
+        /**
+         * Checks if a word exists in the dictionary.
+         * 
+         * @param word The word to search for.
+         * @return True if the word is present and valid, false otherwise.
+         */
+        fun contains(word: String): Boolean {
+            return ROOT.contains(word)
         }
     }
 }

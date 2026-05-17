@@ -1,83 +1,78 @@
-package com.amibar.boggle.ui;
+package com.amibar.boggle.ui
 
-import static android.view.MotionEvent.ACTION_CANCEL;
-import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_MOVE;
-import static android.view.MotionEvent.ACTION_POINTER_UP;
-import static android.view.MotionEvent.ACTION_UP;
-import static android.view.MotionEvent.INVALID_POINTER_ID;
-
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.amibar.boggle.engine.DonutRenderer;
+import android.os.Bundle
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import androidx.appcompat.app.AppCompatActivity
+import com.amibar.boggle.engine.DonutRenderer
 
 /**
  * An Activity that displays a 3D rotating donut (torus).
  * This activity handles touch events for rotating the donut and scale gestures for zooming.
  */
-public class DonutActivity extends AppCompatActivity {
-    /** The renderer responsible for drawing the 3D donut on the surface. */
-    private DonutRenderer renderer;
-    /** The SurfaceView where the donut is drawn. */
-    private SurfaceView surfaceView;
-    /** Detector for pinch-to-zoom gestures. */
-    private ScaleGestureDetector scaleDetector;
+class DonutActivity : AppCompatActivity() {
+    /** The renderer responsible for drawing the 3D donut on the surface.  */
+    private var renderer: DonutRenderer? = null
 
-    /** ID of the pointer currently being tracked for rotation. */
-    private int activePointerId = INVALID_POINTER_ID;
-    /** Last recorded X coordinate of the touch event. */
-    private float lastTouchX = 0;
-    /** Last recorded Y coordinate of the touch event. */
-    private float lastTouchY = 0;
+    /** The SurfaceView where the donut is drawn.  */
+    private var surfaceView: SurfaceView? = null
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        surfaceView = new SurfaceView(this);
-        setContentView(surfaceView);
-        
+    /** Detector for pinch-to-zoom gestures.  */
+    private var scaleDetector: ScaleGestureDetector? = null
+
+    /** ID of the pointer currently being tracked for rotation.  */
+    private var activePointerId = MotionEvent.INVALID_POINTER_ID
+
+    /** Last recorded X coordinate of the touch event.  */
+    private var lastTouchX = 0f
+
+    /** Last recorded Y coordinate of the touch event.  */
+    private var lastTouchY = 0f
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        surfaceView = SurfaceView(this)
+        setContentView(surfaceView)
+
+
         // Initialize the scale gesture detector with a custom listener
-        scaleDetector = new ScaleGestureDetector(this, new OnScaleListener());
+        scaleDetector = ScaleGestureDetector(this, OnScaleListener())
 
         // Add a callback to the SurfaceHolder to manage the renderer lifecycle
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(@NonNull SurfaceHolder holder) {
-                renderer = new DonutRenderer(surfaceView);
-                renderer.startRender();
+        surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                renderer = DonutRenderer(surfaceView!!)
+                renderer!!.startRender()
             }
 
-            @Override
-            public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
                 if (renderer != null) {
-                    renderer.surfaceChanged(holder, format, width, height);
+                    renderer!!.surfaceChanged(holder, format, width, height)
                 }
             }
 
-            @Override
-            public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
                 if (renderer != null) {
-                    renderer.stopRender();
-                    renderer = null;
+                    renderer!!.stopRender()
+                    renderer = null
                 }
             }
-        });
+        })
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    override fun onDestroy() {
+        super.onDestroy()
         // Ensure rendering is stopped when the activity is destroyed
         if (renderer != null) {
-            renderer.stopRender();
+            renderer!!.stopRender()
         }
     }
 
@@ -86,84 +81,79 @@ public class DonutActivity extends AppCompatActivity {
      * Handles touch events for rotation and delegates scale gestures.
      * Implements multi-touch handling to ensure smooth rotation when multiple fingers are present.
      */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
         // Pass the event to the scale detector first
-        scaleDetector.onTouchEvent(event);
+        scaleDetector!!.onTouchEvent(event)
 
-        switch (event.getActionMasked()){
-            case ACTION_DOWN: {
-                int pointerIndex = event.getActionIndex();
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                val pointerIndex = event.actionIndex
 
-                lastTouchX = event.getX(pointerIndex);
-                lastTouchY = event.getY(pointerIndex);
+                lastTouchX = event.getX(pointerIndex)
+                lastTouchY = event.getY(pointerIndex)
 
-                activePointerId = event.getPointerId(pointerIndex);
-                break;
+                activePointerId = event.getPointerId(pointerIndex)
             }
-            case ACTION_MOVE:{
-                int pointerIndex = event.findPointerIndex(activePointerId);
-                if (pointerIndex < 0) return false;
 
-                float touchX = event.getX(pointerIndex);
-                float touchY = event.getY(pointerIndex);
+            MotionEvent.ACTION_MOVE -> {
+                val pointerIndex = event.findPointerIndex(activePointerId)
+                if (pointerIndex < 0) return false
+
+                val touchX = event.getX(pointerIndex)
+                val touchY = event.getY(pointerIndex)
 
                 // Calculate the movement delta since the last event
-                float dx = touchX - lastTouchX;
-                float dy = touchY - lastTouchY;
+                val dx = touchX - lastTouchX
+                val dy = touchY - lastTouchY
 
                 // Update rotation angles in the renderer
                 if (renderer != null) {
-                    renderer.addA(dx * DonutRenderer.A_RATE);
-                    renderer.addB(dy * DonutRenderer.B_RATE);
+                    renderer!!.addA(dx * DonutRenderer.A_RATE)
+                    renderer!!.addB(dy * DonutRenderer.B_RATE)
                 }
 
-                surfaceView.invalidate();
+                surfaceView!!.invalidate()
 
-                lastTouchX = touchX;
-                lastTouchY = touchY;
-                break;
+                lastTouchX = touchX
+                lastTouchY = touchY
             }
-            case ACTION_UP:
-            case ACTION_CANCEL: {
-                activePointerId = INVALID_POINTER_ID;
-                break;
-                }
-            case ACTION_POINTER_UP:{
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                activePointerId = MotionEvent.INVALID_POINTER_ID
+            }
+
+            MotionEvent.ACTION_POINTER_UP -> {
                 // Handle another finger being lifted while the primary finger might still be down
-                final int pointerIndex = event.getActionIndex();
-                final int pointerId = event.getPointerId(pointerIndex);
+                val pointerIndex = event.actionIndex
+                val pointerId = event.getPointerId(pointerIndex)
 
                 if (pointerId == activePointerId) {
                     // This is the active pointer going up. Choose a new active pointer.
-                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-                    lastTouchX = event.getX(newPointerIndex);
-                    lastTouchY = event.getY(newPointerIndex);
-                    activePointerId = event.getPointerId(newPointerIndex);
+                    val newPointerIndex = if (pointerIndex == 0) 1 else 0
+                    lastTouchX = event.getX(newPointerIndex)
+                    lastTouchY = event.getY(newPointerIndex)
+                    activePointerId = event.getPointerId(newPointerIndex)
                 }
-                break;
             }
         }
 
-        return true;
+        return true
     }
 
     /**
      * Listener class for handling pinch-to-zoom gestures.
      */
-    private class OnScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+    private inner class OnScaleListener : SimpleOnScaleGestureListener() {
         /**
          * Called when a scale gesture is detected.
          * Adjusts the distance of the donut from the viewer in the renderer.
          */
-        @Override
-        public boolean onScale(@NonNull ScaleGestureDetector detector) {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
             if (renderer != null) {
-                renderer.scaleDonutDistance(1 / detector.getScaleFactor());
-                surfaceView.invalidate();
+                renderer!!.scaleDonutDistance((1 / detector.getScaleFactor()).toDouble())
+                surfaceView!!.invalidate()
             }
-            return true;
+            return true
         }
     }
-
 }

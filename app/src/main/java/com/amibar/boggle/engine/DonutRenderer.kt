@@ -1,102 +1,64 @@
-package com.amibar.boggle.engine;
+@file:Suppress("PrivatePropertyName")
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.view.Choreographer;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+package com.amibar.boggle.engine
 
-import androidx.annotation.NonNull;
-
-import com.amibar.boggle.utils.PointAndDepth;
-import com.amibar.boggle.utils.Quad;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.stream.IntStream;
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.view.Choreographer
+import android.view.Choreographer.FrameCallback
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import com.amibar.boggle.utils.PointAndDepth
+import com.amibar.boggle.utils.Quad
+import java.util.Arrays
+import java.util.Collections
+import java.util.stream.IntStream
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * A real-time 3D renderer for a rotating torus (donut) shape.
  * This class handles the mathematical projections, lighting, and rendering
- * of a torus onto a {@link SurfaceView} using Android's {@link Canvas} API.
- * inspired by <a href="https://www.a1k0n.net/2011/07/20/donut-math.html">donut.c</a>
+ * of a torus onto a [SurfaceView] using Android's [Canvas] API.
+ * inspired by [donut.c](https://www.a1k0n.net/2011/07/20/donut-math.html)
  */
-public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder.Callback {
-    /** Default rotation rate for angle A */
-    public static final double A_RATE = 0.005;
-    /** Default rotation rate for angle B */
-    public static final double B_RATE = 0.007;
+class DonutRenderer(private val surfaceView: SurfaceView) : FrameCallback, SurfaceHolder.Callback {
+    private var choreographer: Choreographer? = null
+    private var bitmap: Bitmap? = null
+    private var screenWidth = 0
+    private var screenHeight = 0
 
-    /** Paint used for scaling operations (filtering disabled for performance/look) */
-    public static final Paint scalingPaint = new Paint();
-    /** Paint used for drawing the donut segments */
-    public static final Paint shapePaint = new Paint();
+    /** Projection constant based on screen size  */
+    private var K1 = 0.0
 
-    private Choreographer choreographer;
-    private final SurfaceView surfaceView;
-    private Bitmap bitmap;
-    private int screenWidth;
-    private int screenHeight;
+    /** Rotation angles around two axes  */
+    private var A = 0.0
+    private var B = 0.0
 
-    /** The vector representing the light source direction in 3D space */
-    private static final double[] lightVector = normalize(new double[]{0, 1, -1});
-    /** Minimum light level for lighting calculations */
-    public static final float MIN_LIGHT = 0.2f;
-
-    /**
-     * Normalizes a 3D vector to have a magnitude of 1.
-     * @param vector The 3D vector to normalize.
-     * @return The normalized vector.
-     */
-    private static double[] normalize(double[] vector) {
-        double factor = 1 / Math.sqrt(Arrays.stream(vector).map(x -> x*x).sum());
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] *= factor;
-        }
-        return vector;
-    }
-
-    // Geometry resolution settings
-    private static final double thetaSpacing = 0.1;
-    private static final double phiSpacing = 0.07;
-    private static final int thetaSteps = (int) (2 * Math.PI / thetaSpacing + 1);
-    private static final int phiSteps = (int) (2 * Math.PI / phiSpacing + 1);
-
-    // Torus dimensions
-    private static final double R1 = 1; // Radius of the tube
-    private static final double R2 = 2; // Radius from center to tube center
-    
-    /** Distance from the viewer to the object center */
-    private static double K2 = 10;
-    /** Projection constant based on screen size */
-    private double K1;
-
-    /** Rotation angles around two axes */
-    private double A = 0, B = 0;
-    
-    /** Flag indicating if the surface is ready for drawing */
-    private boolean isSurfaceReady = false;
+    /** Flag indicating if the surface is ready for drawing  */
+    private var isSurfaceReady = false
 
 
     /**
      * Constructs a new DonutRenderer.
      * @param surfaceView The SurfaceView where the donut will be rendered.
      */
-    public DonutRenderer(SurfaceView surfaceView) {
-        this.surfaceView = surfaceView;
-        scalingPaint.setFilterBitmap(false);
-        shapePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        shapePaint.setStrokeWidth(5);
-        surfaceView.getHolder().addCallback(this);
-        
+    init {
+        scalingPaint.isFilterBitmap = false
+        shapePaint.style = Paint.Style.FILL_AND_STROKE
+        shapePaint.strokeWidth = 5f
+        surfaceView.holder.addCallback(this)
+
+
         // If surface is already valid, initialize immediately
-        if (surfaceView.getHolder().getSurface().isValid()) {
-            isSurfaceReady = true;
-            initResources(surfaceView.getWidth(), surfaceView.getHeight());
+        if (surfaceView.holder.surface.isValid) {
+            isSurfaceReady = true
+            initResources(surfaceView.width, surfaceView.height)
         }
     }
 
@@ -105,51 +67,51 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
      * @param width New width of the surface.
      * @param height New height of the surface.
      */
-    private void initResources(int width, int height) {
-        if (width <= 0 || height <= 0) return;
-        screenWidth = width;
-        screenHeight = height;
+    private fun initResources(width: Int, height: Int) {
+        if (width <= 0 || height <= 0) return
+        screenWidth = width
+        screenHeight = height
 
         // Manage bitmap lifecycle
         if (bitmap != null) {
-            if (bitmap.getWidth() == width && bitmap.getHeight() == height) return;
-            bitmap.recycle();
+            if (bitmap!!.getWidth() == width && bitmap!!.getHeight() == height) return
+            bitmap!!.recycle()
         }
 
-        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+
         // Calculate projection constant K1 based on screen width to maintain aspect ratio
-        K1 = (width * K2 * 3 / (8f * (R1 + R2)));
+        K1 = (width * K2 * 3 / (8f * (R1 + R2)))
     }
 
     /**
      * Main animation frame callback called by Choreographer.
      * @param frameTimeNanos The time in nanoseconds when the frame started.
      */
-    @Override
-    public void doFrame(long frameTimeNanos) {
-        if (choreographer == null) return;
+    override fun doFrame(frameTimeNanos: Long) {
+        if (choreographer == null) return
 
         if (isSurfaceReady) {
-            int width = surfaceView.getWidth();
-            int height = surfaceView.getHeight();
+            val width = surfaceView.width
+            val height = surfaceView.height
             if (width > 0 && height > 0) {
-                initResources(width, height);
+                initResources(width, height)
 
                 if (bitmap != null) {
-                    Canvas surfaceCanvas = surfaceView.getHolder().lockCanvas();
+                    val surfaceCanvas = surfaceView.holder.lockCanvas()
                     if (surfaceCanvas != null) {
-                        drawDonut();
+                        drawDonut()
                         // Draw the back-buffer bitmap to the surface
-                        surfaceCanvas.drawBitmap(bitmap, 0, 0, null);
-                        surfaceView.getHolder().unlockCanvasAndPost(surfaceCanvas);
+                        surfaceCanvas.drawBitmap(bitmap!!, 0f, 0f, null)
+                        surfaceView.holder.unlockCanvasAndPost(surfaceCanvas)
                     }
                 }
             }
         }
 
         // Request next frame
-        choreographer.postFrameCallback(this);
+        choreographer!!.postFrameCallback(this)
     }
 
     /**
@@ -157,206 +119,270 @@ public class DonutRenderer implements Choreographer.FrameCallback, SurfaceHolder
      * This method handles the full 3D to 2D transformation pipeline, lighting calculations,
      * and depth sorting (Painter's algorithm) before drawing to the back-buffer.
      */
-    private void drawDonut() {
-        if (bitmap == null) return;
+    private fun drawDonut() {
+        if (bitmap == null) return
 
         // Create a canvas to draw on the back-buffer BITMAP
-        Canvas bitmapCanvas = new Canvas(bitmap);
-        bitmapCanvas.drawColor(Color.DKGRAY);
+        val bitmapCanvas = Canvas(bitmap!!)
+        bitmapCanvas.drawColor(Color.DKGRAY)
 
         // Precompute trigonometric values for current rotation angles to optimize performance
-        double cosA = Math.cos(A), sinA = Math.sin(A);
-        double cosB = Math.cos(B), sinB = Math.sin(B);
+        val cosA = cos(A)
+        val sinA = sin(A)
+        val cosB = cos(B)
+        val sinB = sin(B)
 
         // Generate the 3D grid of points projected into 2D screen space
-        PointAndDepth[][] grid = getToroidalMap(cosA, sinA, cosB, sinB);
+        val grid = getToroidalMap(cosA, sinA, cosB, sinB)
 
         // Thread-safe list to store quadrilateral faces for depth sorting
-        java.util.List<Quad> quadsToDraw = Collections.synchronizedList(new java.util.ArrayList<>());
+        val quadsToDraw = Collections.synchronizedList(ArrayList<Quad>())
 
         // Use a parallel stream to distribute heavy mathematical computations across CPU cores
-        IntStream.range(0, thetaSteps).parallel().forEach(thetaIndex -> {
-            int nextTheta = (thetaIndex + 1) % thetaSteps;
-            double theta = thetaIndex * thetaSpacing;
-            double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
-
-            for (int phiIndex = 0; phiIndex < phiSteps; phiIndex++) {
-                int nextPhi = (phiIndex + 1) % phiSteps;
-                double phi = phiIndex * phiSpacing;
-                double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+        IntStream.range(0, THETA_STEPS).parallel().forEach { thetaIndex: Int ->
+            val nextTheta: Int = (thetaIndex + 1) % THETA_STEPS
+            val thetaCos = thetaCosTable[thetaIndex]
+            val thetaSin = thetaSinTable[thetaIndex]
+            
+            for (phiIndex in 0..<PHI_STEPS) {
+                val nextPhi: Int = (phiIndex + 1) % PHI_STEPS
+                val cosPhi = phiCosTable[phiIndex]
+                val sinPhi = phiSinTable[phiIndex]
 
                 // --- Lighting Logic ---
                 // 1. Define the surface normal in local coordinates
-                double nx = cosTheta * cosPhi;
-                @SuppressWarnings("UnnecessaryLocalVariable")
-                double ny = sinTheta;
-                
+                val nx = thetaCos * cosPhi
+
+
                 // 2. Rotate the normal to match the current orientation of the torus (A and B angles)
-                double rotNx = nx * (cosB * cosPhi + sinA * sinB * sinPhi) - ny * cosA * sinB;
-                double rotNy = nx * (sinB * cosPhi - sinA * cosB * sinPhi) + ny * cosA * cosB;
-                double rotNz = nx * cosA * sinPhi + ny * sinA;
-                
+                val rotNx = nx * (cosB * cosPhi + sinA * sinB * sinPhi) - thetaSin * cosA * sinB
+                val rotNy = nx * (sinB * cosPhi - sinA * cosB * sinPhi) + thetaSin * cosA * cosB
+                val rotNz = nx * cosA * sinPhi + thetaSin * sinA
+
+
                 // 3. Calculate luminosity via dot product with the light source vector
-                float L = (float) (lightVector[0] * rotNx + lightVector[1] * rotNy + lightVector[2] * rotNz);
+                val normDotLight =
+                    (lightVector[0] * rotNx + lightVector[1] * rotNy + lightVector[2] * rotNz).toFloat()
 
                 // --- Geometry Mapping ---
                 // Retrieve the four projected corners of the current quad face
-                PointAndDepth p1 = grid[thetaIndex][phiIndex];
-                PointAndDepth p2 = grid[nextTheta][phiIndex];
-                PointAndDepth p3 = grid[thetaIndex][nextPhi];
-                PointAndDepth p4 = grid[nextTheta][nextPhi];
-                
+                val p1 = grid[thetaIndex][phiIndex]
+                val p2 = grid[nextTheta][phiIndex]
+                val p3 = grid[thetaIndex][nextPhi]
+                val p4 = grid[nextTheta][nextPhi]
+
+
                 // Calculate average inverse depth (1/z) for sorting (larger ooz means closer to viewer)
-                double avgOoz = (p1.ooz() + p2.ooz() + p3.ooz() + p4.ooz()) * 0.25;
+                val avgOoz = (p1.ooz + p2.ooz + p3.ooz + p4.ooz) * 0.25
 
                 // --- Styling ---
                 // Calculate final brightness, hue (based on phi), and saturation (based on theta)
-                float luminosity = getLuminosityWithMinLight(L);
-                float hue = (phiIndex * 360f / phiSteps) % 360;
-                float saturation = Math.abs(thetaIndex - thetaSteps * 0.5f) / (thetaSteps * 0.5f);
-                int color = Color.HSVToColor(new float[]{hue, saturation, luminosity});
+                val luminosity: Float = getLuminosityWithMinLight(normDotLight)
+                val hue: Float = (phiIndex * 360f / PHI_STEPS) % 360
+                val saturation: Float = abs(thetaIndex - THETA_STEPS * 0.5f) / (THETA_STEPS * 0.5f)
+                val color = Color.HSVToColor(floatArrayOf(hue, saturation, luminosity))
 
                 // Define the 2D path for the quad face
-                Path path = new Path();
-                path.moveTo((float)p1.screenX(), (float)p1.screenY());
-                path.lineTo((float)p2.screenX(), (float)p2.screenY());
-                path.lineTo((float)p4.screenX(), (float)p4.screenY());
-                path.lineTo((float)p3.screenX(), (float)p3.screenY());
-                path.close();
+                val path = Path()
+                path.moveTo(p1.screenX.toFloat(), p1.screenY.toFloat())
+                path.lineTo(p2.screenX.toFloat(), p2.screenY.toFloat())
+                path.lineTo(p4.screenX.toFloat(), p4.screenY.toFloat())
+                path.lineTo(p3.screenX.toFloat(), p3.screenY.toFloat())
+                path.close()
 
-                quadsToDraw.add(new Quad(path, color, avgOoz));
+                quadsToDraw.add(Quad(path, color, avgOoz))
             }
-        });
-        
-        // Painter's Algorithm: Sort quads by depth (back-to-front) to ensure correct occlusion
-        quadsToDraw.sort(Comparator.comparingDouble(Quad::avgOoz));
-        
-        // Render the sorted quads to the bitmap canvas
-        for (Quad quad : quadsToDraw) {
-            shapePaint.setColor(quad.color());
-            bitmapCanvas.drawPath(quad.path(), shapePaint);
         }
-    }
 
-    /**
-     * Maps luminosity value to a specific range.
-     *
-     * @param L Calculated dot product luminosity.
-     * @return Clamped luminosity value.
-     */
-    private static float getLuminosityWithMinLight(float L) {
-        return Math.clamp((L * (1 - MIN_LIGHT)) + MIN_LIGHT, 0, 1);
+
+        // Painter's Algorithm: Sort quads by depth (back-to-front) to ensure correct occlusion
+        quadsToDraw.sortWith(Comparator.comparingDouble(Quad::avgOoz))
+
+
+        // Render the sorted quads to the bitmap canvas
+        quadsToDraw.forEach { quad ->
+            shapePaint.setColor(quad.color)
+            bitmapCanvas.drawPath(quad.path, shapePaint)
+        }
     }
 
     /**
      * Converts a 3D Y coordinate to a 2D screen coordinate.
      */
-    private int toScreenY(double height, double y, double ooz) {
-        return (int) (height / 2 - K1 * y * ooz);
+    private fun toScreenY(height: Double, y: Double, ooz: Double): Int {
+        return (height / 2 - K1 * y * ooz).toInt()
     }
 
     /**
      * Converts a 3D X coordinate to a 2D screen coordinate.
      */
-    private int toScreenX(double width, double x, double ooz) {
-        return (int) (width / 2 + K1 * x * ooz);
+    private fun toScreenX(width: Double, x: Double, ooz: Double): Int {
+        return (width / 2 + K1 * x * ooz).toInt()
     }
 
     /**
      * Generates a grid of 3D points rotated and projected onto a 2D plane.
      * @return A 2D array of PointAndDepth objects.
      */
-    public PointAndDepth[][] getToroidalMap(double cosA, double sinA, double cosB, double sinB) {
-        PointAndDepth[][] grid = new PointAndDepth[thetaSteps][phiSteps];
+    fun getToroidalMap(
+        cosA: Double,
+        sinA: Double,
+        cosB: Double,
+        sinB: Double
+    ): Array<Array<PointAndDepth>> {
+        val sinAsinB = sinA * sinB
+        val sinAcosB = sinA * cosB
+        val cosAcosB = cosA * cosB
+        val cosAsinB = cosA * sinB
 
-        IntStream.range(0, thetaSteps).parallel().forEach(i -> {
-            double theta = i * thetaSpacing;
-            double cosTheta = Math.cos(theta), sinTheta = Math.sin(theta);
-            
-            // 2D Circle in the XY plane (cross-section of the torus)
-            double circleX = R2 + R1 * cosTheta;
-            double circleY = R1 * sinTheta;
+        return Array(THETA_STEPS) { i ->
+            val circleX = circleXTable[i]
+            val circleY = circleYTable[i]
 
-            for (int j = 0; j < phiSteps; j++) {
-                double phi = j * phiSpacing;
-                double cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+            val yTermOffset = circleY * cosAcosB
+            val xTermOffset = circleY * cosAsinB
+            val zTermOffset = circleY * sinA
 
-                // 3D Rotation and projection math
-                // Final X position after rotations
-                double x = circleX * (cosB * cosPhi + sinA * sinB * sinPhi) - circleY * cosA * sinB;
-                // Final Y position after rotations
-                double y = circleX * (sinB * cosPhi - sinA * cosB * sinPhi) + circleY * cosA * cosB;
-                // Final Z position (depth)
-                double z = K2 + cosA * circleX * sinPhi + circleY * sinA;
-                
-                // One over Z (inverse depth)
-                double ooz = 1 / z;
+            Array(PHI_STEPS) { j ->
+                val cosPhi = phiCosTable[j]
+                val sinPhi = phiSinTable[j]
 
-                // Project to screen coordinates
-                int screenX = toScreenX(screenWidth, x, ooz);
-                int screenY = toScreenY(screenHeight, y, ooz);
+                val x = circleX * (cosB * cosPhi + sinAsinB * sinPhi) - xTermOffset
+                val y = circleX * (sinB * cosPhi - sinAcosB * sinPhi) + yTermOffset
+                val z: Double = K2 + cosA * circleX * sinPhi + zTermOffset
 
-                grid[i][j] = new PointAndDepth(screenX, screenY, ooz);
+                val ooz = 1 / z
+
+                val screenX = toScreenX(screenWidth.toDouble(), x, ooz)
+                val screenY = toScreenY(screenHeight.toDouble(), y, ooz)
+
+                PointAndDepth(screenX, screenY, ooz)
             }
-        });
-        return grid;
+        }
     }
 
 
     /**
      * Starts the rendering loop.
      */
-    public void startRender() {
-        if (choreographer != null) return;
-        choreographer = Choreographer.getInstance();
-        choreographer.postFrameCallback(this);
+    fun startRender() {
+        if (choreographer != null) return
+        choreographer = Choreographer.getInstance()
+        choreographer!!.postFrameCallback(this)
     }
 
     /**
      * Stops the rendering loop and releases resources.
      */
-    public void stopRender() {
+    fun stopRender() {
         if (choreographer != null) {
-            choreographer.removeFrameCallback(this);
-            choreographer = null;
+            choreographer!!.removeFrameCallback(this)
+            choreographer = null
         }
         if (bitmap != null) {
-            bitmap.recycle();
-            bitmap = null;
+            bitmap!!.recycle()
+            bitmap = null
         }
-        surfaceView.getHolder().removeCallback(this);
+        surfaceView.holder.removeCallback(this)
     }
 
-    @Override
-    public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        isSurfaceReady = true;
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        isSurfaceReady = true
     }
 
-    @Override
-    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        initResources(width, height);
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        initResources(width, height)
     }
 
-    @Override
-    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-        isSurfaceReady = false;
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        isSurfaceReady = false
     }
 
-    /** Adds to rotation angle A */
-    public void addA(double v) {
-        A += v;
+    /** Adds to rotation angle A  */
+    fun addA(v: Double) {
+        A += v
     }
 
-    /** Adds to rotation angle B */
-    public void addB(double v) {
-        B += v;
+    /** Adds to rotation angle B  */
+    fun addB(v: Double) {
+        B += v
     }
 
     /**
      * Scales the distance (K2) of the donut from the viewer.
      * @param v Scaling factor.
      */
-    public void scaleDonutDistance(double v){
-        K2 *= v;
+    fun scaleDonutDistance(v: Double) {
+        K2 *= v
+    }
+
+    companion object {
+        /** Default rotation rate for angle A  */
+        const val A_RATE: Double = 0.005
+
+        /** Default rotation rate for angle B  */
+        const val B_RATE: Double = 0.007
+
+        /** Paint used for scaling operations (filtering disabled for performance/look)  */
+        val scalingPaint: Paint = Paint()
+
+        /** Paint used for drawing the donut segments  */
+        val shapePaint: Paint = Paint()
+
+        /** The vector representing the light source direction in 3D space  */
+        private val lightVector: DoubleArray = normalize(doubleArrayOf(0.0, 1.0, -1.0))
+
+        /** Minimum light level for lighting calculations  */
+        const val MIN_LIGHT: Float = 0.2f
+
+        /**
+         * Normalizes a 3D vector to have a magnitude of 1.
+         * @param vector The 3D vector to normalize.
+         * @return The normalized vector.
+         */
+        private fun normalize(vector: DoubleArray): DoubleArray {
+            val factor =
+                1 / sqrt(
+                    Arrays.stream(vector).map { x: Double -> x * x }
+                        .sum()
+                )
+            for (i in vector.indices) {
+                vector[i] *= factor
+            }
+            return vector
+        }
+
+        // Geometry resolution settings
+        private const val THETA_SPACING = 0.1
+        private const val PHI_SPACING = 0.07
+        private const val THETA_STEPS = (2 * Math.PI / THETA_SPACING + 1).toInt()
+        private const val PHI_STEPS = (2 * Math.PI / PHI_SPACING + 1).toInt()
+
+        // Precomputed lookup tables for trigonometric values
+        private val thetaCosTable = DoubleArray(THETA_STEPS) { cos(it * THETA_SPACING) }
+        private val thetaSinTable = DoubleArray(THETA_STEPS) { sin(it * THETA_SPACING) }
+        private val phiCosTable = DoubleArray(PHI_STEPS) { cos(it * PHI_SPACING) }
+        private val phiSinTable = DoubleArray(PHI_STEPS) { sin(it * PHI_SPACING) }
+
+        // Torus dimensions
+        private const val R1 = 1.0 // Radius of the tube
+        private const val R2 = 2.0 // Radius from center to tube center
+
+        // Precomputed circle values
+        private val circleXTable = DoubleArray(THETA_STEPS) { R2 + R1 * thetaCosTable[it] }
+        private val circleYTable = DoubleArray(THETA_STEPS) { R1 * thetaSinTable[it] }
+
+        /** Distance from the viewer to the object center  */
+        private var K2 = 10.0
+
+        /**
+         * Maps luminosity value to a specific range.
+         * 
+         * @param light Calculated dot product luminosity.
+         * @return Clamped luminosity value.
+         */
+        private fun getLuminosityWithMinLight(light: Float): Float {
+            return Math.clamp((light * (1 - MIN_LIGHT)) + MIN_LIGHT, 0f, 1f)
+        }
     }
 }

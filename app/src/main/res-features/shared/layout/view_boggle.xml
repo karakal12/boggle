@@ -2,18 +2,13 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
+        <import type="com.amibar.boggle.views.BoggleViewModelKt"/>
         <variable
-            name="score"
-            type="int" />
+            name="viewModel"
+            type="com.amibar.boggle.views.BoggleViewModel" />
         <variable
-            name="word"
-            type="String" />
-        <variable
-            name="time"
-            type="String"/>
-        <variable
-            name="error"
-            type="String" />
+            name="state"
+            type="com.amibar.boggle.views.BoggleUiState" />
     </data>
 
     <LinearLayout
@@ -33,14 +28,14 @@
                 android:layout_margin="8dp"
                 android:layout_height="wrap_content"  android:layout_width="wrap_content"
                 android:textColor="?android:attr/textColorPrimaryNoDisable"
-                android:text="@{time, default=`00:00`}"/>
+                android:text="@{BoggleViewModelKt.formatTime(state.remainingTimeMillis), default=`00:00`}"/>
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/progressBar"
                 android:indeterminate="false"
-                android:max="60"
-                android:progress="60"
+                android:max="180"
+                android:progress="@{(int)(state.remainingTimeMillis / 1000)}"
                 android:layout_marginEnd="8dp"
                 app:indicatorColor="?android:attr/colorSecondary"/>
         </LinearLayout>
@@ -58,7 +53,7 @@
             android:id="@+id/tvScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{`Score: ` + score, default=`Score: 0`}"/>
+            android:text="@{@string/score(state.score)}"/>
 
         <GridLayout
             android:rowCount="4"
@@ -105,7 +100,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text='@{`Word: "` + word + `"`, default=`Word: ""`}'
+            android:text="@{@string/word(state.currentWord)}"
             android:id="@+id/tvWord"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -117,6 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/submit"
+                android:onClick="@{() -> viewModel.submitWord()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -127,6 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:src="@drawable/ic_hint"
+                android:onClick="@{() -> viewModel.showHint()}"
                 app:layout_constraintBottom_toBottomOf="@+id/bSubmit"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -142,7 +139,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textColor="?android:attr/textColorPrimary"
-            android:text="@{error}"/>
+            android:text="@{state.feedbackMessage}"/>
 
     </LinearLayout>
 </layout>

@@ -1,100 +1,27 @@
-package com.amibar.boggle.data;
+package com.amibar.boggle.data
 
-import java.io.Serializable;
-import java.util.Objects;
+import java.io.Serializable
+import java.util.Objects
 
 /**
  * Represents a user of the Boggle app.
- * This is a simple data class (POJO) used for storing user information, especially when
- * interacting with Firebase Realtime Database.
+ * This is a data class used for storing user information in Firebase Realtime Database.
  */
-@SuppressWarnings("unused")
-public class User implements Serializable {
-    /** The user's unique ID. */
-    private String uid;
-    /** The user's chosen display name. */
-    private String displayName;
-    /** The user's email address, used for authentication and identification. */
-    private String email;
-    /** A Base64 encoded string of the user's profile picture. */
-    private String profileImageBase64;
-    /** The User's current device's Firebase Cloud Messaging (FCM) token. */
-    private String fcmToken;
+class User(
+    var uid: String = "",
+    var displayName: String = "",
+    var email: String = "",
+    var profileImageBase64: String? = null,
+    @Suppress("unused") var fcmToken: String? = null
+) : Serializable {
 
-    /**
-     * Default constructor required for Firebase Realtime Database deserialization.
-     */
-    public User() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is User) return false
+        return uid == other.uid
     }
 
-    /**
-     * Creates a new User object.
-     * @param uid The user's unique ID.
-     * @param displayName The user's display name.
-     * @param email The user's email address.
-     * @param profileImageBase64 The Base64 string of the user's profile image.
-     * @param fcmToken The user's Firebase Cloud Messaging (FCM) token.
-     */
-    public User(String uid, String displayName, String email, String profileImageBase64, String fcmToken) {
-        this.uid = uid;
-        this.displayName = displayName;
-        this.email = email;
-        this.profileImageBase64 = profileImageBase64;
-        this.fcmToken = fcmToken;
-    }
-
-    /**
-     * @return The user's unique ID.
-     */
-    public String getUid() {
-        return uid;
-    }
-
-    /**
-     * @param uid The user's unique ID.
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    /**
-     * @return The user's email.
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @return The user's display name.
-     */
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    /**
-     * @return The Base64 encoded profile image string.
-     */
-    public String getProfileImageBase64() {
-        return profileImageBase64;
-    }
-    /**
-     * @return The user's Firebase Cloud Messaging (FCM) token.
-     */
-    public String getFcmToken() {
-        return fcmToken;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(uid, user.uid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uid);
+    override fun hashCode(): Int {
+        return Objects.hash(uid)
     }
 }

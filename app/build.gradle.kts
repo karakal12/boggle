@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -10,6 +11,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        compose = true
     }
 
     defaultConfig {
@@ -34,13 +36,16 @@ android {
 
     sourceSets {
         getByName("main") {
-            res.srcDirs(
-                "src/main/res",
-                "src/main/res-features/auth",
-                "src/main/res-features/mainmenu",
-                "src/main/res-features/game-single",
-                "src/main/res-features/game-multi",
-                "src/main/res-features/shared"
+            res.directories.clear()
+            res.directories.addAll(
+                listOf(
+                    "src/main/res",
+                    "src/main/res-features/auth",
+                    "src/main/res-features/mainmenu",
+                    "src/main/res-features/game-single",
+                    "src/main/res-features/game-multi",
+                    "src/main/res-features/shared"
+                )
             )
         }
     }
@@ -53,11 +58,13 @@ android {
 
 dependencies {
     implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.compose.ui.viewbinding)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
+    implementation(libs.fragment.ktx)
     implementation(libs.constraintlayout)
     implementation(libs.annotation)
     implementation(libs.lifecycle.livedata.ktx)
@@ -65,59 +72,56 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.functions)
+    
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.activity.compose)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
 
-afterEvaluate {
-    tasks.register<Javadoc>("generateJavadoc") {
-        group = "documentation"
-        description = "Generates Javadoc for the debug variant."
+androidComponents {
+    onVariants(selector().withBuildType("debug")) { variant ->
+        tasks.register<Javadoc>("generateJavadoc") {
+            group = "documentation"
+            description = "Generates Javadoc for the debug variant."
 
-        val debugVariant = android.applicationVariants.find { it.name == "debug" }
-        if (debugVariant != null) {
-            val javaCompile = debugVariant.javaCompileProvider.get()
-            
-            // Source files from the variant (includes manual and some generated sources)
-            source = javaCompile.source
-            
-            // Classpath must include:
-            // 1. All dependencies (javaCompile.classpath)
-            // 2. Android SDK (android.bootClasspath)
-            // 3. Compiled classes of the module (javaCompile.destinationDir) 
-            //    This is crucial for Javadoc to resolve symbols from generated classes.
-            classpath = javaCompile.classpath + 
-                        files(android.bootClasspath) + 
-                        files(javaCompile.destinationDirectory)
-            
-            // Ensure the project is compiled so all generated classes are available
-            dependsOn(javaCompile)
-        }
-
-        // We change the destination to a non-ignored folder so it can be committed to GitHub.
-        destinationDir = file("${project.rootDir}/docs")
-
-        options {
-            (this as StandardJavadocDocletOptions).apply {
-                encoding = "UTF-8"
-                // Link to online Android documentation.
-                // Added a trailing slash to ensure Javadoc tool resolves it correctly.
-                links("https://developer.android.com/reference/")
-                
-                // Removed the problematic Firebase link as it lacks a valid package-list/element-list 
-                // at the expected location, which was causing the FileNotFoundException.
-
-                // Silence linting errors that often break Javadoc on Android
-                addStringOption("Xdoclint:none", "-quiet")
+            // Use the new variant API to get sources and classpath
+            val javaSources = variant.sources.java?.all
+            if (javaSources != null) {
+                source(javaSources)
             }
-        }
+            
+            classpath = variant.compileClasspath + files(sdkComponents.bootClasspath.get())
 
-        // Exclude internal/generated classes from the final documentation output
-        exclude("**/R.java", "**/BuildConfig.java", "**/databinding/**", "**/BR.java")
-        
-        // Javadoc often encounters errors with Android's complex dependency graph; 
-        // we set this to false to allow the task to complete even with minor resolution warnings.
-        isFailOnError = false
+            // We change the destination to a non-ignored folder so it can be committed to GitHub.
+            destinationDir = file("${project.rootDir}/docs")
+
+            options {
+                (this as StandardJavadocDocletOptions).apply {
+                    encoding = "UTF-8"
+                    // Link to online Android documentation.
+                    // Added a trailing slash to ensure Javadoc tool resolves it correctly.
+                    links("https://developer.android.com/reference/")
+                    
+                    // Silence linting errors that often break Javadoc on Android
+                    addStringOption("Xdoclint:none", "-quiet")
+                }
+            }
+
+            // Exclude internal/generated classes from the final documentation output
+            exclude("**/R.java", "**/BuildConfig.java", "**/databinding/**", "**/BR.java")
+            
+            // Javadoc often encounters errors with Android's complex dependency graph; 
+            // we set this to false to allow the task to complete even with minor resolution warnings.
+            isFailOnError = false
+        }
     }
 }

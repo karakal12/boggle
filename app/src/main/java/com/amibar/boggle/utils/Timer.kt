@@ -1,102 +1,79 @@
-package com.amibar.boggle.utils;
+package com.amibar.boggle.utils
 
+import android.os.Handler
+import android.os.Looper
 
-import android.os.Handler;
-import android.os.Looper;
 
 /**
  * A utility class to manage a countdown timer for the Boggle game.
  * It periodically notifies listeners of the elapsed time and executes a callback when the time is up.
- * Implements {@link Runnable} to run on the main thread via a {@link Handler}.
+ * Implements [Runnable] to run on the main thread via a [Handler].
  */
-public class Timer implements Runnable {
-    /** The total duration of the timer in milliseconds. */
-    private final long millisTime;
-    /** The system time when the timer was started or resumed. */
-    private final long millisTimeBegan;
-    /** Handler used to schedule the next periodic update on the main UI thread. */
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    /** Listener to be notified when the timer reaches its duration. */
-    private final OnTimerEndListener onTimerEnd;
-    /** Listener to be notified on every tick (increment). */
-    private final OnTickListener onTick;
-    /** Flag to track if the timer has been stopped or paused. */
-    private boolean isStopped = false;
+class Timer(
+    /** The total duration of the timer in milliseconds.  */
+    private val millisTime: Long,
+    /** Listener to be notified on every tick (increment).  */
+    private val onTick: (millis: Long) -> Unit,
+    /** Listener to be notified when the timer reaches its duration.  */
+    private val onTimerEnd: () -> Unit
+) : Runnable {
+    /** The system time when the current session started. */
+    private var millisTimeBegan: Long = 0
 
-    /**
-     * Interface definition for a callback to be invoked when the timer expires.
-     */
-    public interface OnTimerEndListener{
-        /** Called when the elapsed time meets or exceeds the set duration. */
-        void onTimerEnd();
-    }
+    /** Total time elapsed in previous sessions before the current one started. */
+    private var accumulatedTime: Long = 0
 
-    /**
-     * Interface definition for a callback to be invoked on every timer tick.
-     */
-    public interface OnTickListener {
-        /**
-         * Called periodically to report progress.
-         * @param elapsedTime The total time in milliseconds since the timer started.
-         */
-        void onTick(long elapsedTime);
-    }
+    /** Handler used to schedule the next periodic update on the main UI thread.  */
+    private val handler = Handler(Looper.getMainLooper())
 
-    /**
-     * Initializes a new Timer with the specified duration and callbacks.
-     * @param timeInMillis The total duration in milliseconds.
-     * @param onTick       Callback for periodic updates.
-     * @param onTimerEnd   Callback for completion.
-     */
-    public Timer(long timeInMillis, OnTickListener onTick, OnTimerEndListener onTimerEnd) {
-        this.millisTimeBegan = System.currentTimeMillis();
-        this.millisTime = timeInMillis;
-        this.onTick = onTick;
-        this.onTimerEnd = onTimerEnd;
-    }
+    /** Flag to track if the timer has been stopped or paused.  */
+    private var isStopped = true
+
 
     /**
      * The main execution loop of the timer.
      * Calculates elapsed time, notifies listeners, and schedules the next tick.
      */
-    @Override
-    public void run() {
-        if (isStopped) return;
+    override fun run() {
+        if (isStopped) return
 
-        long elapsedTime = System.currentTimeMillis() - millisTimeBegan;
+        val sessionElapsedTime = System.currentTimeMillis() - millisTimeBegan
+        val totalElapsedTime = accumulatedTime + sessionElapsedTime
 
         // Notify listener of the current progress
-        if (onTick != null) {
-            onTick.onTick(elapsedTime);
-        }
-        
+        onTick(totalElapsedTime)
+
+
         // Check if the timer has reached its final duration
-        if (elapsedTime >= millisTime) {
-            if (onTimerEnd != null) {
-                onTimerEnd.onTimerEnd();
-            }
-            return;
+        if (totalElapsedTime >= millisTime) {
+            onTimerEnd()
+            isStopped = true
+            return
         }
-        
+
+
         // Schedule the next update.
         // The delay is calculated to align the next tick precisely with the next whole second boundary.
-        handler.postDelayed(this, 1000L - (elapsedTime % 1000L));
+        handler.postDelayed(this, 1000L - (totalElapsedTime % 1000L))
     }
 
     /**
      * Starts or resumes the timer.
      */
-    public void start(){
-        isStopped = false;
-        handler.post(this);
+    fun start() {
+        if (!isStopped) return
+        isStopped = false
+        millisTimeBegan = System.currentTimeMillis()
+        handler.post(this)
     }
 
     /**
      * Stops the timer and cancels any pending scheduled updates.
      */
-    public void stop() {
-        isStopped = true;
-        handler.removeCallbacks(this);
+    fun stop() {
+        if (isStopped) return
+        accumulatedTime += System.currentTimeMillis() - millisTimeBegan
+        isStopped = true
+        handler.removeCallbacks(this)
     }
-
 }

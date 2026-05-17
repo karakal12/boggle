@@ -1,162 +1,125 @@
-package com.amibar.boggle.ui.game.singleplayer;
+package com.amibar.boggle.ui.game.singleplayer
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-
-import androidx.activity.EdgeToEdge;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.amibar.boggle.data.FirebaseHandler;
-import com.amibar.boggle.data.GameResult;
-import com.amibar.boggle.databinding.ActivitySingleplayerBinding;
-import com.amibar.boggle.engine.BoggleGame;
-import com.amibar.boggle.ui.DonutActivity;
-import com.google.firebase.database.DatabaseReference;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.amibar.boggle.databinding.ActivitySingleplayerBinding
+import com.amibar.boggle.ui.DonutActivity
+import kotlinx.coroutines.launch
 
 /**
  * Activity that hosts the single-player Boggle game session.
  * It manages the game lifecycle, UI layout adjustments for edge-to-edge display,
  * and handles the end-of-game result reporting and summary display.
  */
-public class SingleplayerActivity extends AppCompatActivity {
+class SingleplayerActivity : AppCompatActivity() {
+    /** View binding instance for accessing layout components.  */
+    lateinit var binding: ActivitySingleplayerBinding
 
-    /** Tag used for logging and debugging purposes. */
-    private static final String TAG = "SingleplayerActivity";
+    private val viewModel: SingleplayerViewModel by viewModels()
 
-
-    /** View binding instance for accessing layout components. */
-    ActivitySingleplayerBinding binding;
-
-    /** Key for passing the final score in an Intent result. */
-    public static final String EXTRA_SCORE = "extra_score";
-
-    /** The underlying game engine instance. */
-    private BoggleGame game;
-    /** Flag to track if the current game session has concluded. */
-    private boolean isGameEnded = false;
+    private var showingDialogState = mutableStateOf(false)
 
     /**
      * Called when the activity is first created.
      * Sets up the UI, handles window insets for edge-to-edge display,
      * and initializes the game end logic.
-     *
+     * 
      * @param savedInstanceState If the activity is being re-initialized after
-     *     previously being shut down then this Bundle contains the data it most
-     *     recently supplied in {@link #onSaveInstanceState}.
+     * previously being shut down then this Bundle contains the data it most
+     * recently supplied in [.onSaveInstanceState].
      */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         // Initialize view binding
-        binding = ActivitySingleplayerBinding.inflate(getLayoutInflater());
+        binding = ActivitySingleplayerBinding.inflate(layoutInflater)
 
-        // Enable Edge-to-Edge display support for modern Android navigation
-        EdgeToEdge.enable(this);
-        setContentView(binding.getRoot());
+        setupUI()
 
-        // Adjust padding to account for system bars (status bar, navigation bar) to prevent UI overlap
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        observeViewModel()
+    }
 
-        // Reference the underlying game engine from the custom BoggleView
-        game = binding.boggleView.getGame();
+    private fun observeViewModel() {
+        binding.boggleView.viewModel = viewModel
 
-        // Set up a listener for when the game timer runs out or the game ends
-        game.addOnGameEndListener(() ->
-                runOnUiThread(() -> {
-                    // Ensure activity is still active before updating UI
-                    if (isDestroyed()) {
-                        return;
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is SinglePlayerEvent.GameEnded -> handleGameEnd(event.Score)
+                        is SinglePlayerEvent.NavigateToDonutSecret -> startActivity(
+                            Intent(this@SingleplayerActivity, DonutActivity::class.java)
+                        )
+                        is SinglePlayerEvent.ShowToast -> Toast.makeText(
+                            this@SingleplayerActivity, event.message, Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    isGameEnded = true;
-
-                    // Prepare result data to be returned to the calling activity (e.g., MainActivity)
-                    Intent data = new Intent();
-                    data.putExtra(EXTRA_SCORE, game.getScore());
-                    setResult(RESULT_OK, data);
-
-                    // Show the game summary dialog with found/missed words
-                    showGameEndDialog();
-
-                    // Synchronize the game results with the cloud database
-                    uploadGameResults(game);
-                }));
-
-        // Secret feature: Finding the word "donut" triggers a special renderer
-        game.addOnWordFoundListener(word -> {
-            if (word.equalsIgnoreCase("donut")){
-                game.stopTimer();
-                Intent intent = new Intent(this, DonutActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Handle back press: if game ended, show results; otherwise, allow default behavior
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (isGameEnded) {
-                    showGameEndDialog();
-                } else {
-                    setEnabled(false);
-                    getOnBackPressedDispatcher().onBackPressed();
                 }
             }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Resume game timer if the game is still active
-        if (game != null && !isGameEnded) {
-            game.startTimer();
         }
     }
 
-    /**
-     * Uploads the game results to Firebase Realtime Database.
-     * Data is organized under the user's reference in a "games" node,
-     * using the current date and time as the unique key.
-     *
-     * @param game The finished {@link BoggleGame} instance containing final stats.
-     */
-    private void uploadGameResults(BoggleGame game) {
-        FirebaseHandler handler = FirebaseHandler.getInstance();
-        DatabaseReference userRef = handler.getUserRef();
-
-        // Only attempt upload if the user is authenticated and reference is valid
-        if (userRef != null) {
-            // Map game engine data to a GameResult POJO
-            GameResult result = new GameResult(
-                    game.getScore(),
-                    game.getFoundWords().size(),
-                    game.getSolutions().size(),
-                    game.getMaxScore(),
-                    game.getFoundWords(),
-                    String.valueOf(game.getBoard())
-            );
-
-            // Generate a formatted timestamp to serve as the database key
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            String timestamp = sdf.format(new Date());
-
-            // Write the data to Firebase
-            userRef.child("games").child(timestamp).setValue(result);
+    fun handleGameEnd(score: Int) {
+        val resultIntent = Intent().apply {
+            putExtra(EXTRA_SCORE, score)
         }
+
+        setResult(RESULT_OK, resultIntent)
+
+        showingDialogState.value = true
+        showGameEndDialog()
+    }
+
+    private fun setupUI() {
+        // Enable Edge-to-Edge display support for modern Android navigation
+        this.enableEdgeToEdge()
+        setContentView(binding.getRoot())
+
+        // Adjust padding to account for system bars (status bar, navigation bar) to prevent UI overlap
+        ViewCompat.setOnApplyWindowInsetsListener(
+            binding.main
+        ) { v: View?, insets: WindowInsetsCompat? ->
+            val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
+            v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+
+        // Handle back press: if game ended, show results; otherwise, allow default behavior
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (viewModel.uiState.value.isGameEnded) {
+                    showingDialogState.value = !showingDialogState.value
+                    showGameEndDialog()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Resume game timer
+        viewModel.resumeGame()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.pauseGame()
     }
 
     /**
@@ -164,29 +127,30 @@ public class SingleplayerActivity extends AppCompatActivity {
      * Iterates through all possible words on the board and highlights words
      * successfully found by the player in green.
      */
-    private void showGameEndDialog() {
-        if (isDestroyed()) {
-            return;
-        }
+    private fun showGameEndDialog() {
+        val state = viewModel.uiState.value
 
-        // Initialize and display the custom dialog fragment
-        try {
-            // Create fragment instance with the formatted word list and final score
-            SingleplayerOnGameEndFragment fragment = SingleplayerOnGameEndFragment.newInstance(
-                    game.getSolutions().toMap(),
-                    game.getFoundWords(),
-                    game.getScore()
-            );
-            // Allow user to click missed words to see their paths on the board
-            fragment.setOnWordClickListener((word, path) -> binding.boggleView.showSolution(path));
-
-            // Use commitAllowingStateLoss to prevent crashes if the activity state was already saved
-            getSupportFragmentManager().beginTransaction()
-                    .add(fragment, SingleplayerOnGameEndFragment.TAG)
-                    .commitAllowingStateLoss();
-        } catch (Exception e) {
-            // Fallback to prevent app crash if fragment transaction fails
-            Log.e(TAG, "Failed to show game end dialog", e);
+        binding.composeView.setContent {
+            if (showingDialogState.value) {
+                SingleplayerGameEndDialog(
+                    solutions = viewModel.solutions,
+                    foundWords = state.foundWords,
+                    score = state.score,
+                    listener = { _, path ->
+                        binding.boggleView.showSolution(path)
+                    },
+                    showingDialogState = showingDialogState
+                )
+            }
         }
+    }
+
+    companion object {
+        /** Tag used for logging and debugging purposes.  */
+        private const val TAG = "SingleplayerActivity"
+
+
+        /** Key for passing the final score in an Intent result.  */
+        const val EXTRA_SCORE: String = "extra_score"
     }
 }

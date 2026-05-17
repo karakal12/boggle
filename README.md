@@ -1765,8 +1765,8 @@ private static final String CHANNEL_ID = "invitation_channel";
 @Override
 public void onNewToken(@NonNull String token) {
     Log.d(TAG, "Refreshed token: " + token);
-    if (FirebaseHandler.getAuth().getCurrentUser() != null){
-        FirebaseHandler.getInstance().getUserRef().child("fcmToken").setValue(token);
+    if (FirebaseHandler.auth.getCurrentUser() != null){
+        FirebaseHandler.instance.getUserRef().child("fcmToken").setValue(token);
     }
 }
 ```
@@ -1814,9 +1814,9 @@ public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
 
 ```java
 private void deleteInvitation(String invitationId) {
-    String currentUserId = FirebaseAuth.getInstance().getUid();
+    String currentUserId = FirebaseAuth.getInstance().uid;
     if (currentUserId != null) {
-        FirebaseHandler.getInstance().getRootRef()
+        FirebaseHandler.instance.getRootRef()
                 .child("invitations")
                 .child(currentUserId)
                 .child(invitationId)
@@ -1990,9 +1990,9 @@ private void handleIntent(Intent intent) {
 
         if (intent.hasExtra("invitationId")) {
             String invitationId = intent.getStringExtra("invitationId");
-            String currentUserId = FirebaseAuth.getInstance().getUid();
+            String currentUserId = FirebaseAuth.getInstance().uid;
             if (currentUserId != null && invitationId != null) {
-                FirebaseHandler.getInstance().getRootRef()
+                FirebaseHandler.instance.getRootRef()
                         .child("invitations")
                         .child(currentUserId)
                         .child(invitationId)
@@ -2031,7 +2031,7 @@ private void init(){
 
     // Navigation for Multiplayer - requires login
     binding.multiplayerButton.setOnClickListener(v -> {
-        if (FirebaseHandler.getAuth().getCurrentUser() != null){
+        if (FirebaseHandler.auth.getCurrentUser() != null){
             JoinOrCreateRoomFragment fragment = new JoinOrCreateRoomFragment();
             fragment.show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG);
         } else {
@@ -2072,21 +2072,21 @@ private void init(){
 private void setupAuthStateListener() {
     authStateListener = firebaseAuth -> {
         updateUI();
-        FirebaseHandler.getInstance().updateUserData();
+        FirebaseHandler.instance.updateUserData();
     };
 }
 
 @Override
 protected void onStart() {
     super.onStart();
-    FirebaseHandler.getAuth().addAuthStateListener(authStateListener);
+    FirebaseHandler.auth.addAuthStateListener(authStateListener);
 }
 
 @Override
 protected void onStop() {
     super.onStop();
     if (authStateListener != null) {
-        FirebaseHandler.getAuth().removeAuthStateListener(authStateListener);
+        FirebaseHandler.auth.removeAuthStateListener(authStateListener);
     }
 }
 ```
@@ -2100,8 +2100,8 @@ protected void onStop() {
 
 ```java
 void updateUI() {
-    boolean isLoggedIn = FirebaseHandler.getInstance().getCurrentUser() != null;
-    FirebaseUser user = FirebaseHandler.getInstance().getCurrentUser();
+    boolean isLoggedIn = FirebaseHandler.instance.getCurrentUser() != null;
+    FirebaseUser user = FirebaseHandler.instance.getCurrentUser();
 
     // Update navigation menu visibility
     Menu menu = binding.navView.getMenu();
@@ -2118,14 +2118,14 @@ void updateUI() {
         NavHeaderBinding headerBinding = NavHeaderBinding.bind(binding.navView.getHeaderView(0));
 
         headerBinding.navHeaderTextViewName
-                .setText(user != null ? user.getDisplayName() : "Not Logged In");
+                .setText(user != null ? user.displayName : "Not Logged In");
         headerBinding.navHeaderTextViewEmail
-                .setText(user != null ? user.getEmail() : "");
+                .setText(user != null ? user.email : "");
 
         ImageView imageView = headerBinding.navHeaderImageView;
         if (user != null) {
             // Fetch additional user data (like profile image) from the database
-            FirebaseHandler.getInstance().getUserRef().get().addOnCompleteListener(task -> {
+            FirebaseHandler.instance.getUserRef().get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     User userData = task.getResult().getValue(User.class);
                     if (userData != null && userData.getProfileImageBase64() != null) {
@@ -2156,7 +2156,7 @@ void updateUI() {
 private boolean onNavigationItemSelected(MenuItem item) {
     int id = item.getItemId();
     if (id == R.id.nav_logout) {
-        FirebaseHandler.getInstance().signOut();
+        FirebaseHandler.instance.signOut();
     } else if (id == R.id.nav_login) {
         LoginFragment loginFragment = new LoginFragment();
         loginFragment.show(getSupportFragmentManager(), "LoginFragment");
@@ -2255,7 +2255,7 @@ private void loginUser(View view){
     pd.setMessage("Logging in...");
     pd.show();
     
-    FirebaseHandler.getAuth().signInWithEmailAndPassword(email, password)
+    FirebaseHandler.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity(), task -> {
                 String toastMessage;
                 pd.dismiss();
@@ -2290,13 +2290,13 @@ private void loginUser(View view){
 
 ```java
 private void updateFcmToken() {
-    FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+    FirebaseHandler.messaging.getToken().addOnCompleteListener(task -> {
         if (task.isSuccessful() && task.getResult() != null) {
             String token = task.getResult();
-            FirebaseHandler.getInstance().getUserRef().child("fcmToken").setValue(token)
+            FirebaseHandler.instance.getUserRef().child("fcmToken").setValue(token)
                     .addOnSuccessListener(aVoid -> {
                         // Refresh local user data to include the new token
-                        FirebaseHandler.getInstance().updateUserData();
+                        FirebaseHandler.instance.updateUserData();
                     })
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to update FCM token", e));
         } else {
@@ -2399,10 +2399,10 @@ private void createUser() {
     pd.setCancelable(false);
     pd.show();
 
-    FirebaseHandler.getAuth().createUserWithEmailAndPassword(email, password)
+    FirebaseHandler.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener((requireActivity()), task -> {
                 if (task.isSuccessful()) {
-                    FirebaseUser user = FirebaseHandler.getAuth().getCurrentUser();
+                    FirebaseUser user = FirebaseHandler.auth.getCurrentUser();
                     if (user != null) {
                         String base64Image = null;
                         if (selectedImageUri != null) {
@@ -2468,7 +2468,7 @@ private void updateProfile(FirebaseUser user, String displayName, String base64I
 ```java
 private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, String base64Image, ProgressDialog pd) {
     pd.setMessage("Fetching FCM Token...");
-    FirebaseHandler.getMessaging().getToken().addOnCompleteListener(task -> {
+    FirebaseHandler.messaging.getToken().addOnCompleteListener(task -> {
         String token = null;
         if (task.isSuccessful()) {
             token = task.getResult();
@@ -2490,9 +2490,9 @@ private void fetchFcmTokenAndSaveUser(FirebaseUser user, String displayName, Str
 ```java
 private void saveUserToDatabase(FirebaseUser user, String displayName, String base64Image, String fcmToken, ProgressDialog pd) {
     pd.setMessage("Saving User Data...");
-    User newUser = new User(user.getUid(), displayName, user.getEmail(), base64Image, fcmToken);
+    User newUser = new User(user.uid, displayName, user.email, base64Image, fcmToken);
 
-    DatabaseReference userRef = FirebaseHandler.getInstance().getRootRef().child("users").child(user.getUid());
+    DatabaseReference userRef = FirebaseHandler.instance.getRootRef().child("users").child(user.uid);
     userRef.setValue(newUser)
             .addOnCompleteListener(task -> {
                 pd.dismiss();
@@ -2563,7 +2563,7 @@ private DataSnapshot usersSnapshot;
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     binding = DataBindingUtil.setContentView(this, R.layout.activity_friendlist);
-    firebaseHandler = FirebaseHandler.getInstance();
+    firebaseHandler = FirebaseHandler.instance;
 
     setupRecyclerView();
     setupClickListeners();
@@ -2599,7 +2599,7 @@ private void loadUsers() {
 ```java
 private void showInviteDialog(User friend) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle("Invite " + friend.getDisplayName());
+    builder.setTitle("Invite " + friend.displayName);
     builder.setMessage("Enter room code to invite them to play:");
 
     final EditText input = new EditText(this);
@@ -2635,7 +2635,7 @@ private void showInviteDialog(User friend) {
 ```java
 private void sendInvitation(User friend, String roomCode) {
     String currentUserId = firebaseHandler.getCurrentUserId();
-    User currentUser = firebaseHandler.getUserData();
+    User currentUser = firebaseHandler.userData;
     
     if (currentUserId == null || currentUser == null) {
         Toast.makeText(this, "Error: You must be logged in", Toast.LENGTH_SHORT).show();
@@ -2644,18 +2644,18 @@ private void sendInvitation(User friend, String roomCode) {
 
     DatabaseReference invitationsRef = firebaseHandler.getRootRef()
             .child("invitations")
-            .child(friend.getUid())
+            .child(friend.uid)
             .push();
 
     Map<String, Object> invitation = new HashMap<>();
     invitation.put("senderId", currentUserId);
-    invitation.put("senderName", currentUser.getDisplayName());
+    invitation.put("senderName", currentUser.displayName);
     invitation.put("message", "Join my Boggle game!");
     invitation.put("roomCode", roomCode);
     invitation.put("timestamp", ServerValue.TIMESTAMP);
 
     invitationsRef.setValue(invitation)
-            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Invitation sent to " + friend.getDisplayName(), Toast.LENGTH_SHORT).show())
+            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Invitation sent to " + friend.displayName, Toast.LENGTH_SHORT).show())
             .addOnFailureListener(e -> Toast.makeText(this, "Failed to send invitation", Toast.LENGTH_SHORT).show());
 }
 ```
@@ -2678,13 +2678,13 @@ private void setupSearchInput() {
             List<User> filteredList = new ArrayList<>();
             for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
                 User user = userSnapshot.getValue(User.class);
-                if (user != null && user.getEmail().toLowerCase().contains(query)) {
-                    if (!user.getUid().equals(firebaseHandler.getCurrentUserId())) {
+                if (user != null && user.email.toLowerCase().contains(query)) {
+                    if (!user.uid.equals(firebaseHandler.getCurrentUserId())) {
                         filteredList.add(user);
                     }
                 }
             }
-            filteredList.sort((u1, u2) -> u1.getDisplayName().compareToIgnoreCase(u2.getDisplayName()));
+            filteredList.sort((u1, u2) -> u1.displayName.compareToIgnoreCase(u2.displayName));
             binding.setSearchedUser(filteredList.isEmpty() ? null : filteredList.get(0));
         }
         // ...
@@ -2915,9 +2915,9 @@ protected void onDestroy() {
     // Cleanup: remove the player from the room or delete the room if empty
     // Only perform cleanup if the activity is actually finishing (not just rotating)
     if (isFinishing() && roomCode != null) {
-        String userId = FirebaseHandler.getInstance().getCurrentUserId();
+        String userId = FirebaseHandler.instance.getCurrentUserId();
         if (userId != null) {
-            DatabaseReference roomRef = FirebaseHandler.getDatabase().getReference("rooms").child(roomCode);
+            DatabaseReference roomRef = FirebaseHandler.database.getReference("rooms").child(roomCode);
             // Remove local player from the Firebase list
             roomRef.child("players").child(userId).removeValue().addOnCompleteListener(task -> {
                 // Check if any players remain; if not, remove the entire room node
@@ -3405,7 +3405,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 ```java
 private void uploadGameResults(BoggleGame game) {
-    FirebaseHandler handler = FirebaseHandler.getInstance();
+    FirebaseHandler handler = FirebaseHandler.instance;
     DatabaseReference userRef = handler.getUserRef();
 
     if (userRef != null) {
