@@ -27,4 +27,11 @@ object SampleData {
         player1 to player1Words,
         player2 to player2Words
     )
+
+    val board = charArrayOf(
+        't', 'h', 'i', 's',
+        'i', 's', 'a', 'n',
+        'e', 'x', 'a', 'm',
+        'p', 'l', 'e', 'Q'
+    )
 }

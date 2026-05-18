@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.amibar.boggle.data.PlayerRole
 import com.amibar.boggle.databinding.FragmentMultiplayerGameBinding
+import com.amibar.boggle.views.BoggleBoard
 import kotlinx.coroutines.launch
 
 /**
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
  * Refactored to use MVVM pattern.
  */
 class MultiplayerGameFragment : Fragment() {
-    private var binding: FragmentMultiplayerGameBinding? = null
+    private lateinit var binding: FragmentMultiplayerGameBinding
     private val viewModel: MultiplayerViewModel by viewModels()
 
     private var roomCode: String? = null
@@ -39,13 +40,17 @@ class MultiplayerGameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMultiplayerGameBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        binding!!.boggleView.viewModel = viewModel
+        binding.boggleView.setContent {
+            BoggleBoard(
+                viewModel = viewModel
+            )
+        }
         
         observeViewModel()
 
@@ -82,11 +87,6 @@ class MultiplayerGameFragment : Fragment() {
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 
     companion object {

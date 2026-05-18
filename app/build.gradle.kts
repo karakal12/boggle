@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -74,6 +75,7 @@ dependencies {
     implementation(libs.firebase.functions)
     
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -87,41 +89,29 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 }
 
-androidComponents {
-    onVariants(selector().withBuildType("debug")) { variant ->
-        tasks.register<Javadoc>("generateJavadoc") {
-            group = "documentation"
-            description = "Generates Javadoc for the debug variant."
+dokka {
+    moduleName.set("Boggle")
+    
+    dokkaPublications.configureEach {
+        outputDirectory.set(file("${project.rootDir}/docs"))
+    }
 
-            // Use the new variant API to get sources and classpath
-            val javaSources = variant.sources.java?.all
-            if (javaSources != null) {
-                source(javaSources)
-            }
-            
-            classpath = variant.compileClasspath + files(sdkComponents.bootClasspath.get())
+    dokkaSourceSets.configureEach {
+        // Link to online Android documentation
+        enableAndroidDocumentationLink.set(true)
 
-            // We change the destination to a non-ignored folder so it can be committed to GitHub.
-            destinationDir = file("${project.rootDir}/docs")
-
-            options {
-                (this as StandardJavadocDocletOptions).apply {
-                    encoding = "UTF-8"
-                    // Link to online Android documentation.
-                    // Added a trailing slash to ensure Javadoc tool resolves it correctly.
-                    links("https://developer.android.com/reference/")
-                    
-                    // Silence linting errors that often break Javadoc on Android
-                    addStringOption("Xdoclint:none", "-quiet")
-                }
-            }
-
-            // Exclude internal/generated classes from the final documentation output
-            exclude("**/R.java", "**/BuildConfig.java", "**/databinding/**", "**/BR.java")
-            
-            // Javadoc often encounters errors with Android's complex dependency graph; 
-            // we set this to false to allow the task to complete even with minor resolution warnings.
-            isFailOnError = false
+        // Exclude internal/generated classes from the final documentation output
+        perPackageOption {
+            matchingRegex.set(".*\\.databinding.*|.*\\.R.*|.*\\.BuildConfig.*|.*\\.BR.*")
+            suppress.set(true)
         }
     }
 }
+
+// Alias for the user's requested task name
+tasks.register("generateKDoc") {
+    group = "documentation"
+    description = "Generates KDoc documentation using Dokka."
+    dependsOn("dokkaGenerate")
+}
+

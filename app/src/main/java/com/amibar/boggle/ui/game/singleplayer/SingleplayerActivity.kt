@@ -2,21 +2,36 @@ package com.amibar.boggle.ui.game.singleplayer
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.amibar.boggle.databinding.ActivitySingleplayerBinding
 import com.amibar.boggle.ui.DonutActivity
+import com.amibar.boggle.ui.theme.BoggleTheme
+import com.amibar.boggle.views.BoggleBoard
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import com.amibar.boggle.engine.BoggleGame
+import com.amibar.boggle.ui.shared.SampleData
+import com.amibar.boggle.views.BoggleUiState
+import com.amibar.boggle.views.BoggleViewModel
 
 /**
  * Activity that hosts the single-player Boggle game session.
@@ -24,8 +39,6 @@ import kotlinx.coroutines.launch
  * and handles the end-of-game result reporting and summary display.
  */
 class SingleplayerActivity : AppCompatActivity() {
-    /** View binding instance for accessing layout components.  */
-    lateinit var binding: ActivitySingleplayerBinding
 
     private val viewModel: SingleplayerViewModel by viewModels()
 
@@ -43,26 +56,21 @@ class SingleplayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize view binding
-        binding = ActivitySingleplayerBinding.inflate(layoutInflater)
-
         setupUI()
 
         observeViewModel()
     }
 
     private fun observeViewModel() {
-        binding.boggleView.viewModel = viewModel
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collect { event ->
                     when (event) {
-                        is SinglePlayerEvent.GameEnded -> handleGameEnd(event.Score)
-                        is SinglePlayerEvent.NavigateToDonutSecret -> startActivity(
+                        is SingleplayerEvent.GameEnded -> handleGameEnd(event.Score)
+                        is SingleplayerEvent.NavigateToDonutSecret -> startActivity(
                             Intent(this@SingleplayerActivity, DonutActivity::class.java)
                         )
-                        is SinglePlayerEvent.ShowToast -> Toast.makeText(
+                        is SingleplayerEvent.ShowToast -> Toast.makeText(
                             this@SingleplayerActivity, event.message, Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -79,21 +87,15 @@ class SingleplayerActivity : AppCompatActivity() {
         setResult(RESULT_OK, resultIntent)
 
         showingDialogState.value = true
-        showGameEndDialog()
     }
 
     private fun setupUI() {
         // Enable Edge-to-Edge display support for modern Android navigation
         this.enableEdgeToEdge()
-        setContentView(binding.getRoot())
-
-        // Adjust padding to account for system bars (status bar, navigation bar) to prevent UI overlap
-        ViewCompat.setOnApplyWindowInsetsListener(
-            binding.main
-        ) { v: View?, insets: WindowInsetsCompat? ->
-            val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-            v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContent {
+            BoggleTheme {
+                SingleplayerContent(viewModel, showingDialogState)
+            }
         }
 
 
@@ -101,8 +103,9 @@ class SingleplayerActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (viewModel.uiState.value.isGameEnded) {
-                    showingDialogState.value = !showingDialogState.value
-                    showGameEndDialog()
+                    viewModel.game.deselectPath()
+                    viewModel.syncState()
+                    showingDialogState.value = true
                 } else {
                     isEnabled = false
                     onBackPressedDispatcher.onBackPressed()
@@ -122,35 +125,107 @@ class SingleplayerActivity : AppCompatActivity() {
         viewModel.pauseGame()
     }
 
-    /**
-     * Builds and displays a dialog summary showing all possible solutions.
-     * Iterates through all possible words on the board and highlights words
-     * successfully found by the player in green.
-     */
-    private fun showGameEndDialog() {
-        val state = viewModel.uiState.value
-
-        binding.composeView.setContent {
-            if (showingDialogState.value) {
-                SingleplayerGameEndDialog(
-                    solutions = viewModel.solutions,
-                    foundWords = state.foundWords,
-                    score = state.score,
-                    listener = { _, path ->
-                        binding.boggleView.showSolution(path)
-                    },
-                    showingDialogState = showingDialogState
-                )
-            }
-        }
-    }
 
     companion object {
-        /** Tag used for logging and debugging purposes.  */
-        private const val TAG = "SingleplayerActivity"
-
-
         /** Key for passing the final score in an Intent result.  */
         const val EXTRA_SCORE: String = "extra_score"
+    }
+}
+
+/**
+ * Composables that defines the UI for the SingleplayerActivity.
+ */
+@Composable
+fun SingleplayerContent(
+    viewModel: SingleplayerViewModel,
+    showingDialogState: MutableState<Boolean>
+) {
+    val state by viewModel.uiState.collectAsState()
+
+    SingleplayerContent(
+        state = state,
+        solutions = viewModel.solutions,
+        showingDialogState = showingDialogState,
+        onWordSelected = { _, path ->
+            viewModel.game.selectPath(path)
+            viewModel.syncState()
+        },
+        boardContent = {
+            BoggleBoard(
+                viewModel = viewModel
+            )
+        }
+    )
+}
+
+@Composable
+private fun SingleplayerContent(
+    state: BoggleUiState,
+    solutions: Map<String, String>,
+    showingDialogState: MutableState<Boolean>,
+    onWordSelected: (String, String) -> Unit,
+    boardContent: @Composable () -> Unit
+) {
+    Surface(
+        Modifier
+            .safeDrawingPadding()
+            .fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            boardContent()
+        }
+    }
+    if (showingDialogState.value) {
+        SingleplayerGameEndDialog(
+            solutions = solutions,
+            foundWords = state.foundWords,
+            score = state.score,
+            listener = onWordSelected,
+            showingDialogState = showingDialogState
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SingleplayerActivityPreview() {
+    BoggleTheme {
+        SingleplayerContent(
+            state = BoggleUiState(board = SampleData.board),
+            solutions = emptyMap(),
+            showingDialogState = remember { mutableStateOf(false) },
+            onWordSelected = { _, _ -> },
+            boardContent = {
+                BoggleBoard(
+                    viewModel = BoggleViewModel(BoggleGame(SampleData.board))
+                )
+            }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SingleplayerActivityGameEndPreview() {
+    BoggleTheme {
+        SingleplayerContent(
+            state = BoggleUiState(
+                board = SampleData.board,
+                foundWords = SampleData.player1Words,
+                score = 42,
+                isGameEnded = true
+            ),
+            solutions = SampleData.solutions,
+            showingDialogState = remember { mutableStateOf(true) },
+            onWordSelected = { _, _ -> },
+            boardContent = {
+                BoggleBoard(
+                    viewModel = BoggleViewModel(BoggleGame(SampleData.board))
+                )
+            }
+        )
     }
 }

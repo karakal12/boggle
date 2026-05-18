@@ -3,7 +3,6 @@ package com.amibar.boggle.ui.game.singleplayer
 import androidx.lifecycle.viewModelScope
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.GameResult
-import com.amibar.boggle.engine.BoggleGame
 import com.amibar.boggle.views.BoggleViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -13,14 +12,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-sealed class SinglePlayerEvent {
-    data class GameEnded(val Score: Int) : SinglePlayerEvent()
-    object NavigateToDonutSecret : SinglePlayerEvent()
-    data class ShowToast(val message: String) : SinglePlayerEvent()
+sealed class SingleplayerEvent {
+    data class GameEnded(val Score: Int) : SingleplayerEvent()
+    object NavigateToDonutSecret : SingleplayerEvent()
+    data class ShowToast(val message: String) : SingleplayerEvent()
 }
 
 class SingleplayerViewModel : BoggleViewModel() {
-    private val _events = Channel<SinglePlayerEvent>()
+    private val _events = Channel<SingleplayerEvent>()
     val events = _events.receiveAsFlow()
 
     val solutions: Map<String, String> get() = game.solutions.toMap()
@@ -34,7 +33,7 @@ class SingleplayerViewModel : BoggleViewModel() {
             _uiState.update { it.copy(isGameEnded = true) }
             uploadGameResults()
             viewModelScope.launch {
-                _events.send(SinglePlayerEvent.GameEnded(game.score))
+                _events.send(SingleplayerEvent.GameEnded(game.score))
             }
         }
     }
@@ -47,17 +46,17 @@ class SingleplayerViewModel : BoggleViewModel() {
 
         if (word.equals("donut", ignoreCase = true)) {
             viewModelScope.launch {
-                _events.send(SinglePlayerEvent.NavigateToDonutSecret)
+                _events.send(SingleplayerEvent.NavigateToDonutSecret)
             }
         }
 
         _uiState.update {
             it.copy(
-                feedbackMessage = "$word is ${result.name}",
                 score = game.score,
                 currentWord = "",
                 selectedIndices = emptyList(),
-                foundWords = game.foundWords.toList()
+                foundWords = game.foundWords.toList(),
+                feedbackMessageResId = result.messageId
             )
         }
     }

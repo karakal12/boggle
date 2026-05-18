@@ -32,7 +32,7 @@ class BoggleGame @JvmOverloads constructor(
      */
     /** Stores words successfully found and submitted by the player.  */
     private val _foundWords: ArrayList<String> = ArrayList()
-    public val foundWords: List<String> get() = _foundWords.toList()
+    val foundWords: List<String> get() = _foundWords.toList()
 
     /**
      * Gets the current player score.
@@ -354,15 +354,6 @@ class BoggleGame @JvmOverloads constructor(
     }
 
     /**
-     * Returns the uppercase letter currently showing on the die at the given index.
-     * @param index The index of the die.
-     * @return The character on the die.
-     */
-    fun getDie(index: Int): Char {
-        return board[index]
-    }
-
-    /**
      * Internal class representing a Boggle die with 6 sides.
      */
     private class Die
@@ -465,7 +456,7 @@ class BoggleGame @JvmOverloads constructor(
         /**
          * The total duration of a game in milliseconds.
          */
-        const val GAME_TIME_MILLIS: Long = 18000 // 180000 millis = 3 minutes
+        const val GAME_TIME_MILLIS: Long = 180000 // 180000 millis = 3 minutes
 
         /**
          * Generates a randomized 16-character board based on standard Boggle dice.

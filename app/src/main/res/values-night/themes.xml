@@ -16,9 +16,6 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">#1E1E1E</item>
 
-        <item name="colorUnselected">@color/background</item>
-        <item name="colorSelected">@color/selected</item>
-        <item name="colorLastSelected">@color/last_selected</item>
 <!--        <item name="android:textColorPrimary">?android:attr/textColorPrimaryInverse</item>-->
 
     </style>

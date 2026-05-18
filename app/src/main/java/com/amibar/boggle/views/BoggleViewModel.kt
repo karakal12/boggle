@@ -9,15 +9,18 @@ import kotlinx.coroutines.flow.update
 import java.util.Locale
 
 /**
- * ViewModel for the BoggleView, managing the game state and logic.
+ * ViewModel for the Boggle game, managing the game state and logic.
  */
-fun formatTime(millis: Long): String {
-    val seconds = (millis / 1000) % 60
-    val minutes = (millis / 1000) / 60
-    return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-}
-
 open class BoggleViewModel(initialGame: BoggleGame = BoggleGame()) : ViewModel() {
+
+    companion object {
+        @JvmStatic
+        fun formatTime(millis: Long): String {
+            val seconds = (millis / 1000) % 60
+            val minutes = (millis / 1000) / 60
+            return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+        }
+    }
 
     private var _game: BoggleGame = initialGame
     val game: BoggleGame get() = _game
@@ -41,7 +44,7 @@ open class BoggleViewModel(initialGame: BoggleGame = BoggleGame()) : ViewModel()
     }
 
     fun updateGame(newGame: BoggleGame) {
-        _game.stopTimer()
+        stopTimer()
         _game = newGame
         setupGameListeners(_game)
         syncState()
@@ -56,15 +59,8 @@ open class BoggleViewModel(initialGame: BoggleGame = BoggleGame()) : ViewModel()
 
     open fun submitWord() {
         if (_game.isEnded) return
-        val word = _game.word
         val result = _game.submitWord()
         _uiState.update { it.copy(
-            feedbackMessage = if (result.messageId != 0) {
-                // We can't easily access context here without a dependency. 
-                // But we can let the Activity handle it or provide a way.
-                // For now, I'll just store the result and let the UI handle it.
-                null 
-            } else null,
             feedbackMessageResId = result.messageId
         ) }
         syncState()
@@ -129,7 +125,6 @@ data class BoggleUiState(
     val remainingTimeMillis: Long = BoggleGame.GAME_TIME_MILLIS,
     val isGameEnded: Boolean = false,
     val hintsAvailable: Int = 0,
-    val feedbackMessage: String? = null,
     val feedbackMessageResId: Int? = null,
     val foundWords: List<String> = emptyList()
 ) {
@@ -144,7 +139,6 @@ data class BoggleUiState(
         if (remainingTimeMillis != other.remainingTimeMillis) return false
         if (isGameEnded != other.isGameEnded) return false
         if (hintsAvailable != other.hintsAvailable) return false
-        if (feedbackMessage != other.feedbackMessage) return false
         if (feedbackMessageResId != other.feedbackMessageResId) return false
         if (foundWords != other.foundWords) return false
         return true
@@ -158,7 +152,6 @@ data class BoggleUiState(
         result = 31 * result + remainingTimeMillis.hashCode()
         result = 31 * result + isGameEnded.hashCode()
         result = 31 * result + hintsAvailable
-        result = 31 * result + (feedbackMessage?.hashCode() ?: 0)
         result = 31 * result + (feedbackMessageResId ?: 0)
         result = 31 * result + foundWords.hashCode()
         return result

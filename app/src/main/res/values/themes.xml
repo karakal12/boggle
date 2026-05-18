@@ -16,10 +16,6 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">#FFFFFF</item>
 
-        <item name="colorUnselected">@color/background</item>
-        <item name="colorSelected">@color/selected</item>
-        <item name="colorLastSelected">@color/last_selected</item>
-
         <!-- Customize your theme here. -->
     </style>
 </resources>
