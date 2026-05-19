@@ -26,7 +26,7 @@ import com.amibar.boggle.databinding.NavHeaderBinding
 import com.amibar.boggle.ui.DonutActivity
 import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomFragment
 import com.amibar.boggle.ui.game.singleplayer.SingleplayerActivity
-import com.amibar.boggle.utils.ImageUtils
+import com.amibar.boggle.utils.base64ToBitmap
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity() {
                             val userData = task.getResult()!!.getValue(User::class.java)
                             if (userData != null && userData.profileImageBase64 != null) {
                                 val imageBitMap =
-                                    ImageUtils.base64ToBitmap(userData.profileImageBase64)
+                                    base64ToBitmap(userData.profileImageBase64)
                                 imageView.setImageBitmap(imageBitMap)
                             } else {
                                 imageView.setImageResource(R.drawable.ic_person)

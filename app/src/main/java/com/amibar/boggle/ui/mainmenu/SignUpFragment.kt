@@ -17,7 +17,8 @@ import com.amibar.boggle.R
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.User
 import com.amibar.boggle.databinding.FragmentSignUpBinding
-import com.amibar.boggle.utils.ImageUtils
+import com.amibar.boggle.utils.bitmapToBase64
+import com.amibar.boggle.utils.uriToBase64
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthResult
@@ -135,11 +136,11 @@ class SignUpFragment
                         if (selectedImageUri != null) {
                             try {
                                 // Convert selected image to Base64 for database storage
-                                base64Image = ImageUtils.uriToBase64(selectedImageUri!!, requireContext())
+                                base64Image = uriToBase64(selectedImageUri!!, requireContext())
                             } catch (e: IOException) {
                                 Log.e(TAG, "Error converting image to Base64", e)
                                 // Use default person icon if conversion fails
-                                base64Image = ImageUtils.bitmapToBase64(
+                                base64Image = bitmapToBase64(
                                     BitmapFactory.decodeResource(
                                         resources,
                                         R.drawable.ic_person

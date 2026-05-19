@@ -1,20 +1,25 @@
 package com.amibar.boggle.ui.game.multiplayer
 
 import android.os.Bundle
-import android.view.View
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
-import com.amibar.boggle.data.User
-import com.amibar.boggle.databinding.ActivityMultiplayerBinding
+import com.amibar.boggle.ui.theme.BoggleTheme
+import com.amibar.boggle.views.BoggleBoard
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.launch
 
 /**
  * Activity that hosts the multiplayer game experience.
@@ -22,8 +27,6 @@ import com.google.firebase.database.ValueEventListener
  * and ensures proper cleanup of the room in Firebase when the activity is destroyed.
  */
 class MultiplayerActivity : AppCompatActivity() {
-    /** View binding for the activity layout.  */
-    private lateinit var binding: ActivityMultiplayerBinding
 
     /** The code of the current multiplayer room.  */
     private lateinit var roomCode: String
@@ -31,23 +34,19 @@ class MultiplayerActivity : AppCompatActivity() {
     /** The role of the local player in this session.  */
     private lateinit var playerRole: PlayerRole
 
+    private val viewModel: MultiplayerViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return MultiplayerViewModel(playerRole, roomCode) as T
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Enable edge-to-edge display
         this.enableEdgeToEdge()
-
-        binding = ActivityMultiplayerBinding.inflate(layoutInflater)
-        setContentView(binding.getRoot())
-
-        // Adjust layout for system bars
-        ViewCompat.setOnApplyWindowInsetsListener(
-            binding.main
-        ) { v: View?, insets: WindowInsetsCompat? ->
-            val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-            v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
 
         // Retrieve room details from the starting Intent
         if (intent != null) {
@@ -57,47 +56,44 @@ class MultiplayerActivity : AppCompatActivity() {
             ) ?: PlayerRole.Guest
             roomCode = intent.getStringExtra(ARG_ROOM_CODE) ?: return
         }
+        
+        setContent { 
+            BoggleTheme {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface
+                ) { 
+                    LobbyScreen(viewModel = viewModel)
+                }
+            }
+        }
 
-        // Initialize by showing the LobbyFragment
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .add(
-                    binding!!.main.id,
-                    LobbyFragment.newInstance(roomCode, playerRole),
-                    LobbyFragment.TAG
-                )
-                .commit()
+        // Observe events from the ViewModel
+        lifecycleScope.launch {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is MultiplayerEvent.GameStarted -> startGame()
+                    is MultiplayerEvent.GameDestroyed -> finish()
+                    else -> {} // Handle other events if necessary
+                }
+            }
         }
     }
 
     /**
-     * Replaces the current fragment with MultiplayerGameFragment to start the active game.
+     * Replaces the current screen with BoggleBoard to start the active game.
      */
     fun startGame() {
-        supportFragmentManager.beginTransaction()
-            .replace(
-                binding!!.main.id,
-                MultiplayerGameFragment.newInstance(playerRole, roomCode),
-                MultiplayerGameFragment.TAG
-            )
-            .commit()
+        setContent {
+            BoggleTheme {
+                Surface (
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    BoggleBoard(viewModel = viewModel)
+                }
+            }
+        }
     }
-
-    /**
-     * Displays a dialog showing the final words and scores of all players.
-     * @param solutions Map of all possible words and their paths.
-     * @param playersWords Map of each user to the list of words they found.
-     */
-    fun showGameResults(
-        solutions: Map<String, String>,
-        playersWords: Map<User, List<String>>
-    ) {
-        val fragment: MultiplayerOnGameEndFragment =
-            MultiplayerOnGameEndFragment.newInstance(solutions, playersWords)
-        fragment.show(supportFragmentManager, MultiplayerOnGameEndFragment.TAG)
-    }
-
+    
     override fun onDestroy() {
         super.onDestroy()
         // Cleanup: remove the player from the room or delete the room if empty

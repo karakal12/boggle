@@ -5,11 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.amibar.boggle.R
 import com.amibar.boggle.data.PlayerRole
 import com.amibar.boggle.databinding.FragmentMultiplayerGameBinding
 import com.amibar.boggle.views.BoggleBoard
@@ -23,14 +30,21 @@ class MultiplayerGameFragment : Fragment() {
     private lateinit var binding: FragmentMultiplayerGameBinding
     private val viewModel: MultiplayerViewModel by viewModels()
 
-    private var roomCode: String? = null
-    private var playerRole: PlayerRole? = null
+    private lateinit var roomCode: String
+    private lateinit var playerRole: PlayerRole
+
+    private var showingEndDialog by mutableStateOf(false)
+    private var gameResult: MultiplayerEvent.ResultsReady? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            roomCode = requireArguments().getString(MultiplayerActivity.ARG_ROOM_CODE)
-            playerRole = PlayerRole.valueOf(requireArguments().getString(MultiplayerActivity.ARG_PLAYER_ROLE)!!)
+            try {
+                roomCode = requireArguments().getString(MultiplayerActivity.ARG_ROOM_CODE)!!
+                playerRole = PlayerRole.valueOf(requireArguments().getString(MultiplayerActivity.ARG_PLAYER_ROLE)!!)
+            } catch (_: NullPointerException) {
+                parentFragmentManager.beginTransaction().replace(R.id.main, LobbyFragment()).commit()
+            }
         }
     }
 
@@ -50,13 +64,30 @@ class MultiplayerGameFragment : Fragment() {
             BoggleBoard(
                 viewModel = viewModel
             )
+
+            if (showingEndDialog) {
+                AlertDialog(
+                    text = {
+                        PlayersScores(
+                            solutions = gameResult!!.solutions,
+                            playersWords = gameResult!!.playersWords
+                        )
+                    },
+                    onDismissRequest = {  },
+                    confirmButton = {
+                        Button(
+                            onClick = { activity?.finish() }
+                        ) {
+                            Text("EXIT")
+                        }
+                    }
+                )
+            }
         }
         
         observeViewModel()
 
-        if (roomCode != null && playerRole != null) {
-            viewModel.initRoom(roomCode!!, playerRole!!)
-        }
+        viewModel.initRoom(roomCode, playerRole)
     }
 
     private fun observeViewModel() {
@@ -65,10 +96,7 @@ class MultiplayerGameFragment : Fragment() {
                 viewModel.events.collect { event ->
                     when (event) {
                         is MultiplayerEvent.ResultsReady -> {
-                            (requireActivity() as MultiplayerActivity).showGameResults(
-                                event.solutions,
-                                event.playersWords
-                            )
+                            gameResult = event
                         }
                         is MultiplayerEvent.GameDestroyed -> {
                             if (isAdded) {

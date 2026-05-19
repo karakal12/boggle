@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.amibar.boggle.utils.ImageUtils"/>
+        <import type="com.amibar.boggle.utils.ImageUtilsKt"/>
         <variable
             name="player"
             type="com.amibar.boggle.data.User" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -21,7 +21,7 @@
             android:contentDescription="@string/profile_picture"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:imageBitmap="@{ImageUtils.base64ToBitmap(player.profileImageBase64)}"/>
+            app:imageBitmap="@{ImageUtilsKt.base64ToBitmap(player.profileImageBase64)}"/>
 
         <TextView
             android:id="@+id/player_name"
@@ -33,5 +33,5 @@
             android:textColor="?android:attr/textColorPrimaryNoDisable"
             android:gravity="center"/>
 
-    </LinearLayout>
+    </FrameLayout>
 </layout>

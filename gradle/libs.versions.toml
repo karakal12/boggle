@@ -16,6 +16,7 @@ coreKtx = "1.17.0"
 firebaseMessaging = "25.0.1"
 firebaseFunctions = "22.1.0"
 fragment = "1.8.6"
+paletteKtx = "1.0.0"
 dokka = "2.2.0"
 composeBom = "2026.05.00"
 activityCompose = "1.13.0"
@@ -50,6 +51,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding", version.ref = "uiViewbinding" }
+androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.amibar.boggle.data.User
 import com.amibar.boggle.databinding.ItemFriendBinding
-import com.amibar.boggle.ui.mainmenu.FriendAdapter.FriendViewHolder
 
 /**
  * Adapter for displaying a list of friends in the FriendListActivity.
@@ -15,8 +14,8 @@ import com.amibar.boggle.ui.mainmenu.FriendAdapter.FriendViewHolder
  */
 class FriendAdapter(
     /** Callback for when the invite button is clicked for a specific friend. */
-    private val onInviteClick: (User?) -> Unit
-) : ListAdapter<User?, FriendViewHolder?>(UserDiffCallback()) {
+    private val onInviteClick: (User) -> Unit
+) : ListAdapter<User, FriendAdapter.FriendViewHolder>(UserDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
         // Inflate the item layout using View Binding
@@ -45,10 +44,7 @@ class FriendAdapter(
     /**
      * ViewHolder for individual friend items in the list.
      */
-    class FriendViewHolder
-    /**
-     * @param binding The binding object for the item.
-     */(
+    class FriendViewHolder(
         /** View binding for the friend item layout.  */
         val binding: ItemFriendBinding
     ) : RecyclerView.ViewHolder(
@@ -58,10 +54,10 @@ class FriendAdapter(
     /**
      * DiffUtil callback for comparing User objects to optimize list updates.
      */
-    private class UserDiffCallback : DiffUtil.ItemCallback<User?>() {
+    private class UserDiffCallback : DiffUtil.ItemCallback<User>() {
         override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            // Check identity based on email (assuming emails are unique)
-            return oldItem.email == newItem.email
+            // Check identity based on UID
+            return oldItem.uid == newItem.uid
         }
 
         override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {

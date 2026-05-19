@@ -5,22 +5,39 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.amibar.boggle.R
-import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.User
 import com.amibar.boggle.databinding.ActivityFriendlistBinding
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ServerValue
-import com.google.firebase.database.ValueEventListener
-import java.util.Locale
+import com.amibar.boggle.ui.game.multiplayer.Player
+import com.amibar.boggle.ui.shared.SampleData
+import com.amibar.boggle.ui.theme.BoggleTheme
+import kotlinx.coroutines.launch
 
 /**
  * Activity for managing and viewing a user's friend list.
@@ -28,17 +45,13 @@ import java.util.Locale
  * Uses Firebase Realtime Database for all persistence.
  */
 class FriendListActivity : AppCompatActivity() {
+    private val viewModel: FriendListViewModel by viewModels()
+
     /** View binding for the activity.  */
     private var binding: ActivityFriendlistBinding? = null
 
     /** Adapter for the friends list RecyclerView.  */
     private var adapter: FriendAdapter? = null
-
-    /** Local list of friend objects fetched from the database.  */
-    private val friendsList: MutableList<User> = ArrayList()
-
-    /** Cached snapshot of all users for searching purposes.  */
-    private var usersSnapshot: DataSnapshot? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,29 +59,47 @@ class FriendListActivity : AppCompatActivity() {
             this,
             R.layout.activity_friendlist
         )
+        binding?.lifecycleOwner = this
 
         setupRecyclerView()
         setupClickListeners()
         setupSearchInput()
-
-        loadUsers()
+        observeViewModel()
     }
 
-    /**
-     * Loads the global user list (for searching) and the current user's friends list.
-     */
-    private fun loadUsers() {
-        FirebaseHandler.rootRef.child("users").get()
-            .addOnSuccessListener(OnSuccessListener { snapshot: DataSnapshot? ->
-                usersSnapshot = snapshot
-            }).addOnFailureListener { e: Exception? ->
-                Log.e(
-                    TAG,
-                    "Failed to load users",
-                    e
-                )
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.friends.collect { friends ->
+                        adapter?.submitList(friends)
+                    }
+                }
+                launch {
+                    viewModel.searchedUser.collect { user ->
+                        binding?.searchedUser = user
+                    }
+                }
+                launch {
+                    viewModel.events.collect { event ->
+                        when (event) {
+                            is FriendListEvent.ShowToast -> Toast.makeText(
+                                this@FriendListActivity,
+                                event.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            is FriendListEvent.NavigateToHostGame -> {
+                                val intent = Intent(this@FriendListActivity, MainActivity::class.java)
+                                intent.putExtra("roomCode", event.roomCode)
+                                intent.putExtra("action", "host")
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                }
             }
-        loadFriends()
+        }
     }
 
     /**
@@ -95,14 +126,9 @@ class FriendListActivity : AppCompatActivity() {
         builder.setPositiveButton(
             "Send"
         ) { dialog: DialogInterface?, which: Int ->
-            val roomCode = input.getText().toString().trim { it <= ' ' }
-            if (!roomCode.isEmpty()) {
-                sendInvitation(friend, roomCode)
-                // After sending, transition the host to the MainActivity which will open the room
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("roomCode", roomCode)
-                intent.putExtra("action", "host")
-                startActivity(intent)
+            val roomCode = input.text.toString().trim()
+            if (roomCode.isNotEmpty()) {
+                viewModel.sendInvitation(friend, roomCode)
             } else {
                 Toast.makeText(this, "Room code cannot be empty", Toast.LENGTH_SHORT).show()
             }
@@ -115,77 +141,16 @@ class FriendListActivity : AppCompatActivity() {
     }
 
     /**
-     * Sends a game invitation record to the recipient's invitations node in Firebase.
-     * This will trigger an FCM notification via the InvitationService.
-     * @param friend   The recipient of the invitation.
-     * @param roomCode The room code the recipient should join.
-     */
-    private fun sendInvitation(friend: User, roomCode: String?) {
-        val currentUserId = FirebaseHandler.currentUserId
-        val currentUser = FirebaseHandler.userData
-
-        if (currentUserId == null || currentUser == null) {
-            Toast.makeText(this, "Error: You must be logged in", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val invitationsRef = FirebaseHandler.rootRef
-            .child("invitations")
-            .child(friend.uid)
-            .push()
-
-        val invitation: MutableMap<String?, Any?> = HashMap()
-        invitation["senderId"] = currentUserId
-        invitation["message"] = "Join my Boggle game!"
-        invitation["roomCode"] = roomCode
-        invitation["timestamp"] = ServerValue.TIMESTAMP
-
-        invitationsRef.setValue(invitation)
-            .addOnSuccessListener(OnSuccessListener { aVoid: Void? ->
-                Toast.makeText(
-                    this,
-                    "Invitation sent to " + friend.displayName,
-                    Toast.LENGTH_SHORT
-                ).show()
-            })
-            .addOnFailureListener { _: Exception? ->
-                Toast.makeText(
-                    this,
-                    "Failed to send invitation",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-    }
-
-    /**
      * Sets up click listeners for the refresh and add friend UI elements.
      */
     private fun setupClickListeners() {
         binding!!.refreshButton.setOnClickListener {
-            loadUsers()
-            loadFriends()
+            viewModel.loadData()
         }
-        binding!!.addFriendButton.setOnClickListener { _ ->
-            this.addFriend()
+        binding!!.addFriendButton.setOnClickListener {
+            viewModel.addFriend()
+            binding!!.friendEmailInput.setText("")
         }
-    }
-
-    /**
-     * Adds the currently searched user as a friend in the database.
-     */
-    private fun addFriend() {
-        val friendId = binding!!.getSearchedUser()?.uid
-        if (friendId.isNullOrEmpty()) {
-            Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show()
-            return
-        }
-        FirebaseHandler.addFriend(friendId)
-        binding!!.friendEmailInput.setText("")
-        Toast.makeText(this, "Friend added!", Toast.LENGTH_SHORT).show()
-
-
-        // Refresh local friend list
-        loadFriends()
     }
 
     /**
@@ -196,87 +161,109 @@ class FriendListActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (usersSnapshot == null) return
-
-                val query = s.toString().lowercase(Locale.getDefault())
-                val filteredList: MutableList<User?> = ArrayList()
-                for (userSnapshot in usersSnapshot!!.getChildren()) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    if (user != null && user.email.lowercase(Locale.getDefault())
-                            .contains(query)
-                    ) {
-                        // Don't show current user in search results
-                        if (user.uid != FirebaseHandler.currentUserId) {
-                            filteredList.add(user)
-                        }
-                    }
-                }
-                filteredList.sortWith { u1: User, u2: User ->
-                    u1.displayName.compareTo(u2.displayName, ignoreCase = true)
-                }
-                // Update data binding for the searched user UI
-                binding!!.setSearchedUser(if (filteredList.isEmpty()) null else filteredList[0])
+                viewModel.onSearchQueryChanged(s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
     }
 
-    /**
-     * Loads the current user's friend list from Firebase.
-     */
-    private fun loadFriends() {
-        val userRef = FirebaseHandler.userRef ?: return
-
-        val friendsRef = userRef.child("friends")
-        friendsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                friendsList.clear()
-                if (!snapshot.exists()) {
-                    adapter!!.submitList(ArrayList<User?>(friendsList))
-                    return
-                }
-                for (friendSnapshot in snapshot.getChildren()) {
-                    val friendId = friendSnapshot.key
-                    if (friendId != null) {
-                        fetchFriendData(friendId)
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Failed to load friends", error.toException())
-            }
-        })
-    }
-
-    /**
-     * Fetches details for a specific friend ID and updates the list.
-     * @param friendId The UID of the friend to fetch.
-     */
-    private fun fetchFriendData(friendId: String) {
-        FirebaseHandler.rootRef.child("users").child(friendId).get()
-            .addOnSuccessListener(OnSuccessListener { dataSnapshot: DataSnapshot? ->
-                val friend = dataSnapshot!!.getValue(User::class.java)
-                if (friend != null) {
-                    // Avoid duplicates in the local list
-                    var exists = false
-                    for (u in friendsList) {
-                        if (u.uid == friend.uid) {
-                            exists = true
-                            break
-                        }
-                    }
-                    if (!exists) {
-                        friendsList.add(friend)
-                        adapter!!.submitList(ArrayList<User?>(friendsList))
-                    }
-                }
-            })
-    }
-
     companion object {
         /** Tag used for logging.  */
         private const val TAG = "FriendListActivity"
+    }
+}
+
+@Composable
+fun FriendListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: FriendListViewModel,
+    onInviteFriend: (User) -> Unit = {}
+) {
+    val searchedUser by viewModel.searchedUser.collectAsState()
+    val friends by viewModel.friends.collectAsState()
+
+    FriendListScreenContent(
+        searchedUser = searchedUser,
+        friends = friends,
+        searchQueryState = viewModel.searchQueryState,
+        onAddFriend = viewModel::addFriend,
+        onRefresh = viewModel::loadData,
+        onInviteFriend = onInviteFriend,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun FriendListScreenContent(
+    searchedUser: User?,
+    friends: List<User>,
+    searchQueryState: TextFieldState,
+    onAddFriend: () -> Unit,
+    onRefresh: () -> Unit,
+    onInviteFriend: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Row {
+            TextField(
+                state = searchQueryState,
+                label = { Text("Email") }
+            )
+            Button(
+                onClick = onAddFriend
+            ) {
+                Text("Add")
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            searchedUser?.let { user ->
+                Player(player = user)
+            }
+            Button(
+                onClick = onRefresh
+            ) {
+                Text("Refresh")
+            }
+        }
+
+        LazyColumn {
+            items(friends) { friend ->
+                Friend(friend = friend, onClickInvite = { onInviteFriend(friend) })
+            }
+        }
+    }
+}
+
+// TODO: fix
+@Composable
+fun Friend(friend: User, modifier: Modifier = Modifier, onClickInvite: () -> Unit = {}) {
+    Row(
+        modifier = modifier
+    ) {
+        Player(player = friend)
+        Button(
+            onClick = onClickInvite
+        ) {
+            Text("invite")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FriendListScreenPreview() {
+    BoggleTheme {
+        FriendListScreenContent(
+            searchedUser = SampleData.player2,
+            friends = listOf(SampleData.player1, SampleData.player2),
+            searchQueryState = remember { TextFieldState("test@example.com") },
+            onAddFriend = {},
+            onRefresh = {},
+            onInviteFriend = {}
+        )
     }
 }
