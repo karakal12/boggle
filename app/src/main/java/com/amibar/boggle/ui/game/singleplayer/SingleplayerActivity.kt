@@ -28,7 +28,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.getValue
-import com.amibar.boggle.engine.BoggleGame
 import com.amibar.boggle.ui.shared.SampleData
 import com.amibar.boggle.views.BoggleUiState
 import com.amibar.boggle.views.BoggleViewModel
@@ -66,7 +65,7 @@ class SingleplayerActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collect { event ->
                     when (event) {
-                        is SingleplayerEvent.GameEnded -> handleGameEnd(event.Score)
+                        is SingleplayerEvent.GameEnded -> handleGameEnd(event.score)
                         is SingleplayerEvent.NavigateToDonutSecret -> startActivity(
                             Intent(this@SingleplayerActivity, DonutActivity::class.java)
                         )
@@ -200,7 +199,7 @@ fun SingleplayerActivityPreview() {
             onWordSelected = { _, _ -> },
             boardContent = {
                 BoggleBoard(
-                    viewModel = BoggleViewModel(BoggleGame(SampleData.board))
+                    viewModel = SampleData.boggleViewModel
                 )
             }
         )
@@ -223,7 +222,7 @@ fun SingleplayerActivityGameEndPreview() {
             onWordSelected = { _, _ -> },
             boardContent = {
                 BoggleBoard(
-                    viewModel = BoggleViewModel(BoggleGame(SampleData.board))
+                    viewModel = SampleData.boggleViewModel
                 )
             }
         )

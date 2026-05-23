@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.Locale
 
 sealed class SingleplayerEvent {
-    data class GameEnded(val Score: Int) : SingleplayerEvent()
+    data class GameEnded(val score: Int) : SingleplayerEvent()
     object NavigateToDonutSecret : SingleplayerEvent()
     data class ShowToast(val message: String) : SingleplayerEvent()
 }

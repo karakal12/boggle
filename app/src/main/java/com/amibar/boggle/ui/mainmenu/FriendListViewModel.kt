@@ -24,9 +24,9 @@ import java.util.Locale
 /**
  * Events that can be triggered from the FriendListViewModel.
  */
-sealed class FriendListEvent {
-    data class ShowToast(val message: String) : FriendListEvent()
-    data class NavigateToHostGame(val roomCode: String) : FriendListEvent()
+sealed interface FriendListEvent {
+    data class ShowToast(val message: String) : FriendListEvent
+    data class NavigateToHostGame(val roomCode: String) : FriendListEvent
 }
 
 /**

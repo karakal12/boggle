@@ -72,7 +72,7 @@ fun SingleplayerGameEndDialog(
                     )
                     Spacer(Modifier.padding(22.dp))
                     Text(
-                        text = "Score: $score",
+                        text = "score: $score",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(Modifier.padding(8.dp))

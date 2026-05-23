@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.androidx.navigation.safeargs)
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -60,12 +62,15 @@ android {
 dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.compose.ui.viewbinding)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.constraintlayout)
     implementation(libs.annotation)
     implementation(libs.lifecycle.livedata.ktx)
@@ -85,9 +90,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 dokka {

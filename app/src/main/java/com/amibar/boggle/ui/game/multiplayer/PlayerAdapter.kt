@@ -111,10 +111,7 @@ fun Player(
 
     Row(
         modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
-            .padding(8.dp)
             .heightIn(max = 48.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

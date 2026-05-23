@@ -74,7 +74,7 @@ fun BoggleBoard(
             modifier = Modifier.height(48.dp)
         )
         Text(
-            text = "Score: ${state.score}",
+            text = "score: ${state.score}",
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.tertiary
         )
@@ -204,11 +204,7 @@ private fun BoggleBoardPreview() {
             color = MaterialTheme.colorScheme.surface
         ) {
             BoggleBoard(
-                viewModel = BoggleViewModel(
-                    BoggleGame(
-                        SampleData.board
-                    )
-                )
+                viewModel = SampleData.boggleViewModel
             )
         }
     }

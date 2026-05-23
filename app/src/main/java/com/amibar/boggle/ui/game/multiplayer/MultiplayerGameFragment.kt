@@ -43,7 +43,7 @@ class MultiplayerGameFragment : Fragment() {
                 roomCode = requireArguments().getString(MultiplayerActivity.ARG_ROOM_CODE)!!
                 playerRole = PlayerRole.valueOf(requireArguments().getString(MultiplayerActivity.ARG_PLAYER_ROLE)!!)
             } catch (_: NullPointerException) {
-                parentFragmentManager.beginTransaction().replace(R.id.main, LobbyFragment()).commit()
+//                parentFragmentManager.beginTransaction().replace(R.id.main, LobbyFragment()).commit()
             }
         }
     }
@@ -59,7 +59,7 @@ class MultiplayerGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         binding.boggleView.setContent {
             BoggleBoard(
                 viewModel = viewModel
@@ -84,7 +84,7 @@ class MultiplayerGameFragment : Fragment() {
                 )
             }
         }
-        
+
         observeViewModel()
 
         viewModel.initRoom(roomCode, playerRole)
@@ -111,6 +111,7 @@ class MultiplayerGameFragment : Fragment() {
                         is MultiplayerEvent.ShowToast -> {
                             Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT).show()
                         }
+                        is MultiplayerEvent.GameStarted -> viewModel::startGame
                     }
                 }
             }

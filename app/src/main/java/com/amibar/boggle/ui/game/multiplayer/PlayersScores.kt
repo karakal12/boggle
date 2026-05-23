@@ -101,7 +101,7 @@ fun PlayersScores(
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = "Score: ${scores[player]}",
+                        text = "score: ${scores[player]}",
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = Color.Gray
                         )
