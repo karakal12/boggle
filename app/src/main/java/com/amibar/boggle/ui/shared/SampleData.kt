@@ -1,6 +1,8 @@
 package com.amibar.boggle.ui.shared
 
 import com.amibar.boggle.data.User
+import com.amibar.boggle.engine.BoggleGame
+import com.amibar.boggle.views.BoggleViewModel
 
 /**
  * Shared sample data for use in Compose Previews.
@@ -34,4 +36,6 @@ object SampleData {
         'e', 'x', 'a', 'm',
         'p', 'l', 'e', 'Q'
     )
+
+    val boggleViewModel = BoggleViewModel(BoggleGame(board))
 }
