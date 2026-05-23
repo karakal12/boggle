@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.amibar.boggle.data.User
 import com.amibar.boggle.engine.BoggleGame
-import com.amibar.boggle.ui.shared.SampleData
 import com.amibar.boggle.ui.shared.WordsList
 import com.amibar.boggle.ui.shared.visibleWords
 
@@ -35,19 +34,6 @@ private fun findCommonWords(playersWords: Map<User, List<String>>): Set<String> 
         .eachCount()
         .filterValues { it > 1 }
         .keys
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun PlayersScoresPreview() {
-    MaterialTheme {
-        PlayersScores(
-            modifier = Modifier.padding(16.dp),
-            solutions = SampleData.solutions,
-            playersWords = SampleData.playersWordsMap
-        )
-    }
 }
 
 @Composable

@@ -16,9 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.amibar.boggle.ui.shared.SampleData
 import com.amibar.boggle.ui.shared.WordsList
 
 /**
@@ -83,25 +81,4 @@ fun SingleplayerGameEndDialog(
                 }
             }
         )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SingleplayerGameEndDialogPreview() {
-    val solutions = SampleData.solutions
-    val foundWords = SampleData.player1Words
-    val score = 42
-    val showingDialogState = remember { mutableStateOf(true) }
-
-    MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            SingleplayerGameEndDialog(
-                solutions = solutions,
-                foundWords = foundWords,
-                score = score,
-                listener = { _, _ -> },
-                showingDialogState = showingDialogState
-            )
-        }
-    }
 }

@@ -141,25 +141,6 @@ private fun WordItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun WordsListPreview() {
-    val solutions = SampleData.solutions
-    val playerWords = SampleData.player1Words
-    val commonWords = setOf("hit", "hire", "met")
-
-    MaterialTheme {
-        WordsList(
-            solutions = solutions,
-            playerWords = playerWords,
-            commonWords = commonWords,
-            modifier = Modifier
-                .padding(16.dp)
-                .visibleWords(10)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun WordItemPreview() {
     MaterialTheme {
         Column(modifier = Modifier.padding(16.dp)) {

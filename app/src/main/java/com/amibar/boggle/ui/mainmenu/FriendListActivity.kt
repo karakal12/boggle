@@ -30,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,7 +37,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.amibar.boggle.R
 import com.amibar.boggle.data.User
 import com.amibar.boggle.ui.game.multiplayer.Player
-import com.amibar.boggle.ui.shared.SampleData
 import com.amibar.boggle.ui.theme.BoggleTheme
 import kotlinx.coroutines.launch
 
@@ -207,37 +205,6 @@ fun Friend(friend: User, modifier: Modifier = Modifier, onClickInvite: () -> Uni
         ) {
             Text("invite")
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FriendListScreenPreview() {
-    BoggleTheme {
-        FriendListScreenContent(
-//            searchedUser = SampleData.player2,
-            friends = listOf(SampleData.player1, SampleData.player2),
-//            searchQueryState = remember { TextFieldState("test@example.com") },
-            onAddFriend = {},
-            onRefresh = {},
-            onInviteFriend = {},
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-@Preview(showBackground = true)
-@Composable
-fun FriendListScreenPreviewWithSearch() {
-    BoggleTheme {
-        FriendListScreenContent(
-            searchedUser = SampleData.player2,
-            friends = listOf(SampleData.player1, SampleData.player2),
-            searchQueryState = rememberTextFieldState("test@example.com"),
-            onAddFriend = {},
-            onRefresh = {},
-            onInviteFriend = {},
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 

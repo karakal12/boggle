@@ -26,9 +26,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.getValue
-import com.amibar.boggle.ui.shared.SampleData
 import com.amibar.boggle.views.BoggleUiState
 import com.amibar.boggle.views.BoggleViewModel
 
@@ -158,7 +156,7 @@ fun SingleplayerContent(
 }
 
 @Composable
-private fun SingleplayerContent(
+internal fun SingleplayerContent(
     state: BoggleUiState,
     solutions: Map<String, String>,
     showingDialogState: MutableState<Boolean>,
@@ -184,47 +182,6 @@ private fun SingleplayerContent(
             score = state.score,
             listener = onWordSelected,
             showingDialogState = showingDialogState
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SingleplayerActivityPreview() {
-    BoggleTheme {
-        SingleplayerContent(
-            state = BoggleUiState(board = SampleData.board),
-            solutions = emptyMap(),
-            showingDialogState = remember { mutableStateOf(false) },
-            onWordSelected = { _, _ -> },
-            boardContent = {
-                BoggleBoard(
-                    viewModel = SampleData.boggleViewModel
-                )
-            }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SingleplayerActivityGameEndPreview() {
-    BoggleTheme {
-        SingleplayerContent(
-            state = BoggleUiState(
-                board = SampleData.board,
-                foundWords = SampleData.player1Words,
-                score = 42,
-                isGameEnded = true
-            ),
-            solutions = SampleData.solutions,
-            showingDialogState = remember { mutableStateOf(true) },
-            onWordSelected = { _, _ -> },
-            boardContent = {
-                BoggleBoard(
-                    viewModel = SampleData.boggleViewModel
-                )
-            }
         )
     }
 }
