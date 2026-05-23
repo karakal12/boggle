@@ -15,16 +15,13 @@ object FirebaseHandler {
     private const val TAG = "FirebaseHandler"
 
     /** Instance of Firebase Authentication. */
-    val auth: FirebaseAuth
-        get() = FirebaseAuth.getInstance()
+    val auth by lazy { FirebaseAuth.getInstance() }
 
     /** Instance of Firebase Realtime Database. */
-    val database: FirebaseDatabase
-        get() = FirebaseDatabase.getInstance()
+    val database by lazy { FirebaseDatabase.getInstance() }
 
     /** Instance of Firebase Messaging. */
-    val messaging: FirebaseMessaging
-        get() = FirebaseMessaging.getInstance()
+    val messaging by lazy { FirebaseMessaging.getInstance() }
 
     /** Cached local user data. */
     var userData: User? = null
@@ -48,8 +45,7 @@ object FirebaseHandler {
      * Returns a DatabaseReference pointing to the root of the Realtime Database.
      * @return A DatabaseReference pointing to the root of the Realtime Database.
      */
-    val rootRef: DatabaseReference
-        get() = database.reference
+    val rootRef by lazy { database.reference }
 
     /**
      * Returns a DatabaseReference pointing to the current user's entry in the "users" node.

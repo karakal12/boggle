@@ -3,13 +3,13 @@ package com.amibar.boggle.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.databinding.BindingAdapter
-import com.amibar.boggle.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -24,27 +24,6 @@ import java.io.IOException
 private const val TAG = "ImageUtils"
 
 /**
- * Data Binding adapter to set a [Bitmap] to an [ImageView].
- * Displays a default placeholder if the bitmap is null.
- *
- * @param imageView The target [ImageView].
- * @param bitmap The [Bitmap] to display.
- */
-@BindingAdapter("imageBitmap")
-fun setImageBitmap(imageView: ImageView, bitmap: Bitmap?) {
-    if (bitmap != null) {
-        imageView.setImageBitmap(bitmap)
-    } else {
-        imageView.setImageDrawable(
-            AppCompatResources.getDrawable(
-                imageView.context,
-                R.drawable.ic_person
-            )
-        )
-    }
-}
-
-/**
  * Converts a content [Uri] to a Base64 encoded JPEG string.
  *
  * @param uri The image [Uri] to convert.
@@ -53,19 +32,28 @@ fun setImageBitmap(imageView: ImageView, bitmap: Bitmap?) {
  * @throws IOException If the input stream cannot be opened or read.
  */
 @Throws(IOException::class)
-fun uriToBase64(uri: Uri, context: Context): String? {
-    return try {
-        context.contentResolver.openInputStream(uri).use { inputStream ->
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            if (bitmap != null) {
-                bitmapToBase64(bitmap)
-            } else {
-                null
-            }
+suspend fun uriToBase64(uri: Uri, context: Context): String? {
+    return withContext(Dispatchers.IO){
+        try {
+            val bitmap = uriToBitmap(uri, context)
+            bitmapToBase64(bitmap!!)
+        } catch (e: FileNotFoundException) {
+            Log.e(TAG, "File not found: $uri", e)
+            null
         }
-    } catch (e: FileNotFoundException) {
-        Log.e(TAG, "File not found: $uri", e)
-        null
+    }
+}
+
+suspend fun uriToBitmap(uri: Uri, context: Context): Bitmap? {
+    return withContext(Dispatchers.IO){
+        try {
+            ImageDecoder.createSource(context.contentResolver, uri).let {
+                ImageDecoder.decodeBitmap(it)
+            }
+        } catch (e: FileNotFoundException) {
+            Log.e(TAG, "File not found: $uri", e)
+            null
+        }
     }
 }
 

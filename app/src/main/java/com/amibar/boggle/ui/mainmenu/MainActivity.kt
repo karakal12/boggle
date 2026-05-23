@@ -3,7 +3,6 @@ package com.amibar.boggle.ui.mainmenu
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding!!.getRoot())
+        setContentView(binding.getRoot())
 
 
         // Enable edge-to-edge display
@@ -87,14 +86,14 @@ class MainActivity : AppCompatActivity() {
 
         // Handle window insets for both the main content and the navigation drawer
         ViewCompat.setOnApplyWindowInsetsListener(
-            binding!!.mainContent
+            binding.mainContent
         ) { v: View?, insets: WindowInsetsCompat? ->
             val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
             v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
         ViewCompat.setOnApplyWindowInsetsListener(
-            binding!!.navView
+            binding.navView
         ) { v: View?, insets: WindowInsetsCompat? ->
             val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
             v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -148,19 +147,19 @@ class MainActivity : AppCompatActivity() {
      * Initializes UI components, toolbar, and click listeners.
      */
     private fun init() {
-        setSupportActionBar(binding!!.toolbar)
+        setSupportActionBar(binding.toolbar)
 
         // Navigation for Singleplayer
-        binding!!.singleplayerButton.setOnClickListener { v: View? ->
+        binding.singleplayerButton.setOnClickListener { v: View? ->
             val intent = Intent(this, SingleplayerActivity::class.java)
             singleplayerLauncher.launch(intent)
         }
 
         // Navigation for Multiplayer - requires login
-        binding!!.multiplayerButton.setOnClickListener { v: View? ->
+        binding.multiplayerButton.setOnClickListener { v: View? ->
             if (FirebaseHandler.auth.currentUser != null) {
                 val fragment = JoinOrCreateRoomFragment()
-                fragment.show(getSupportFragmentManager(), JoinOrCreateRoomFragment.TAG)
+                fragment.show(supportFragmentManager, JoinOrCreateRoomFragment.TAG)
             } else {
                 Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT)
                     .show()
@@ -168,28 +167,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Navigation for Friend List
-        binding!!.friendsListButton.setOnClickListener { v: View? ->
+        binding.friendsListButton.setOnClickListener { v: View? ->
             val intent = Intent(this, FriendListActivity::class.java)
             startActivity(intent)
         }
 
         // Easter Egg / Bonus feature
-        binding!!.donutButton.setOnClickListener { v: View? ->
+        binding.donutButton.setOnClickListener { v: View? ->
             val intent = Intent(this, DonutActivity::class.java)
             startActivity(intent)
         }
 
         // Setup Drawer and Navigation View
-        binding!!.navView.setNavigationItemSelectedListener { item: MenuItem? ->
+        binding.navView.setNavigationItemSelectedListener { item: MenuItem? ->
             this.onNavigationItemSelected(
                 item!!
             )
         }
 
         val toggle = ActionBarDrawerToggle(
-            this, binding!!.main, binding!!.toolbar, R.string.open_nav, R.string.close_nav
+            this, binding.main, binding.toolbar, R.string.open_nav, R.string.close_nav
         )
-        binding!!.main.addDrawerListener(toggle)
+        binding.main.addDrawerListener(toggle)
         toggle.syncState()
     }
 
@@ -222,7 +221,7 @@ class MainActivity : AppCompatActivity() {
         val user: FirebaseUser? = FirebaseHandler.currentUser
 
         // Update navigation menu visibility
-        val menu = binding!!.navView.menu
+        val menu = binding.navView.menu
         val loginItem = menu.findItem(R.id.nav_login)
         val signupItem = menu.findItem(R.id.nav_signup)
         val logoutItem = menu.findItem(R.id.nav_logout)
@@ -232,8 +231,8 @@ class MainActivity : AppCompatActivity() {
         if (logoutItem != null) logoutItem.isVisible = isLoggedIn
 
         // Update navigation header with user info
-        if (binding!!.navView.headerCount > 0) {
-            val headerBinding = NavHeaderBinding.bind(binding!!.navView.getHeaderView(0))
+        if (binding.navView.headerCount > 0) {
+            val headerBinding = NavHeaderBinding.bind(binding.navView.getHeaderView(0))
 
             headerBinding.navHeaderTextViewName.text = if (user != null) user.displayName else "Not Logged In"
             headerBinding.navHeaderTextViewEmail.text = if (user != null) user.email else ""
@@ -277,8 +276,8 @@ class MainActivity : AppCompatActivity() {
                 loginFragment.show(supportFragmentManager, "LoginFragment")
             }
             R.id.nav_signup -> {
-                val signUpFragment = SignUpFragment()
-                signUpFragment.show(supportFragmentManager, "SignUpFragment")
+                val signUpFragment = SignUpDialogFragment()
+                signUpFragment.show(supportFragmentManager, SignUpDialogFragment.TAG)
             }
         }
 
@@ -290,10 +289,8 @@ class MainActivity : AppCompatActivity() {
      * Requests POST_NOTIFICATIONS permission for Android 13+.
      */
     private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }
