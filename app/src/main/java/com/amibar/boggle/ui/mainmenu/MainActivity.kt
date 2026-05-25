@@ -4,43 +4,78 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.amibar.boggle.R
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
-import com.amibar.boggle.data.User
-import com.amibar.boggle.databinding.ActivityMainBinding
-import com.amibar.boggle.databinding.NavHeaderBinding
 import com.amibar.boggle.donuteasteregg.DonutActivity
-import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomFragment
+import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomDialog
 import com.amibar.boggle.ui.game.singleplayer.SingleplayerActivity
+import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.utils.base64ToBitmap
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
+import kotlinx.coroutines.launch
 
 /**
  * The primary entry point of the application.
  * Manages the main navigation drawer, handles authentication state changes,
  * and provides access to different game modes and user features.
  */
-@Suppress("unused")
 class MainActivity : AppCompatActivity() {
-    /** View binding for the activity layout.  */
-    private lateinit var binding: ActivityMainBinding
+
+    private val viewModel: MainMenuViewModel by viewModels()
+    private val loginViewModel: LoginViewModel by viewModels()
+    private val signUpViewModel: SignUpViewModel by viewModels()
 
     /** Listener for Firebase Authentication state changes.  */
     private lateinit var authStateListener: AuthStateListener
@@ -76,31 +111,43 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.getRoot())
+        enableEdgeToEdge()
 
+        setContent {
+            BoggleTheme {
+                val uiState by viewModel.uiState.collectAsState()
+                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-        // Enable edge-to-edge display
-        this.enableEdgeToEdge()
-
-
-        // Handle window insets for both the main content and the navigation drawer
-        ViewCompat.setOnApplyWindowInsetsListener(
-            binding.mainContent
-        ) { v: View?, insets: WindowInsetsCompat? ->
-            val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-            v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+                MainMenuScreenContent(
+                    uiState = uiState,
+                    drawerState = drawerState,
+                    loginViewModel = loginViewModel,
+                    signUpViewModel = signUpViewModel,
+                    onLogoutClick = { FirebaseHandler.signOut() },
+                    onLoginClick = { viewModel.showDialog(MainMenuDialog.Login) },
+                    onSignUpClick = { viewModel.showDialog(MainMenuDialog.SignUp) },
+                    onDismissDialog = { viewModel.dismissDialog() },
+                    onSingleplayerClick = {
+                        val intent = Intent(this, SingleplayerActivity::class.java)
+                        singleplayerLauncher.launch(intent)
+                    },
+                    onMultiplayerClick = {
+                        if (FirebaseHandler.auth.currentUser != null) {
+                            viewModel.showDialog(MainMenuDialog.JoinOrCreateRoom)
+                        } else {
+                            Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onFriendsListClick = {
+                        startActivity(Intent(this, FriendListActivity::class.java))
+                    },
+                    onDonutClick = {
+                        startActivity(Intent(this, DonutActivity::class.java))
+                    }
+                )
+            }
         }
-        ViewCompat.setOnApplyWindowInsetsListener(
-            binding.navView
-        ) { v: View?, insets: WindowInsetsCompat? ->
-            val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-            v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
-        init()
         askNotificationPermission()
         setupAuthStateListener()
         handleIntent(intent)
@@ -137,67 +184,17 @@ class MainActivity : AppCompatActivity() {
                 if (intent.hasExtra("action") && "host" == intent.getStringExtra("action")) {
                     role = PlayerRole.Host
                 }
-                JoinOrCreateRoomFragment.newInstance(roomCode, role)
-                    .show(supportFragmentManager, JoinOrCreateRoomFragment.TAG)
+                viewModel.showDialog(MainMenuDialog.JoinOrCreateRoom, roomCode, role)
             }
         }
-    }
-
-    /**
-     * Initializes UI components, toolbar, and click listeners.
-     */
-    private fun init() {
-        setSupportActionBar(binding.toolbar)
-
-        // Navigation for Singleplayer
-        binding.singleplayerButton.setOnClickListener { v: View? ->
-            val intent = Intent(this, SingleplayerActivity::class.java)
-            singleplayerLauncher.launch(intent)
-        }
-
-        // Navigation for Multiplayer - requires login
-        binding.multiplayerButton.setOnClickListener { v: View? ->
-            if (FirebaseHandler.auth.currentUser != null) {
-                val fragment = JoinOrCreateRoomFragment()
-                fragment.show(supportFragmentManager, JoinOrCreateRoomFragment.TAG)
-            } else {
-                Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-
-        // Navigation for Friend List
-        binding.friendsListButton.setOnClickListener { v: View? ->
-            val intent = Intent(this, FriendListActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Easter Egg / Bonus feature
-        binding.donutButton.setOnClickListener { v: View? ->
-            val intent = Intent(this, DonutActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Setup Drawer and Navigation View
-        binding.navView.setNavigationItemSelectedListener { item: MenuItem? ->
-            this.onNavigationItemSelected(
-                item!!
-            )
-        }
-
-        val toggle = ActionBarDrawerToggle(
-            this, binding.main, binding.toolbar, R.string.open_nav, R.string.close_nav
-        )
-        binding.main.addDrawerListener(toggle)
-        toggle.syncState()
     }
 
     /**
      * Sets up the listener that updates the UI when the user signs in or out.
      */
     private fun setupAuthStateListener() {
-        authStateListener = AuthStateListener {
-            updateUI()
+        authStateListener = AuthStateListener { auth ->
+            viewModel.updateCurrentUser(auth.currentUser)
             FirebaseHandler.updateUserData()
         }
     }
@@ -213,84 +210,231 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Updates the UI elements based on the current authentication state.
-     * This includes menu visibility (login vs logout) and user profile info in the header.
-     */
-    fun updateUI() {
-        val isLoggedIn = FirebaseHandler.currentUser != null
-        val user: FirebaseUser? = FirebaseHandler.currentUser
-
-        // Update navigation menu visibility
-        val menu = binding.navView.menu
-        val loginItem = menu.findItem(R.id.nav_login)
-        val signupItem = menu.findItem(R.id.nav_signup)
-        val logoutItem = menu.findItem(R.id.nav_logout)
-
-        if (loginItem != null) loginItem.isVisible = !isLoggedIn
-        if (signupItem != null) signupItem.isVisible = !isLoggedIn
-        if (logoutItem != null) logoutItem.isVisible = isLoggedIn
-
-        // Update navigation header with user info
-        if (binding.navView.headerCount > 0) {
-            val headerBinding = NavHeaderBinding.bind(binding.navView.getHeaderView(0))
-
-            headerBinding.navHeaderTextViewName.text = if (user != null) user.displayName else "Not Logged In"
-            headerBinding.navHeaderTextViewEmail.text = if (user != null) user.email else ""
-
-            val imageView = headerBinding.navHeaderImageView
-            if (user != null) {
-                // Fetch additional user data (like profile image) from the database
-                FirebaseHandler.userRef?.get()
-                    ?.addOnCompleteListener { task: Task<DataSnapshot?>? ->
-                        if (task!!.isSuccessful && task.getResult() != null) {
-                            val userData = task.getResult()!!.getValue(User::class.java)
-                            if (userData != null && userData.profileImageBase64 != null) {
-                                val imageBitMap =
-                                    base64ToBitmap(userData.profileImageBase64)
-                                imageView.setImageBitmap(imageBitMap)
-                            } else {
-                                imageView.setImageResource(R.drawable.ic_person)
-                            }
-                        } else {
-                            imageView.setImageResource(R.drawable.ic_person)
-                        }
-                    }
-            } else {
-                imageView.setImageResource(R.drawable.ic_person)
-            }
-        }
-    }
-
-    /**
-     * Handles selection of items from the navigation drawer.
-     * @param item The selected MenuItem.
-     * @return True if the event was handled.
-     */
-    private fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (val id = item.itemId) {
-            R.id.nav_logout -> {
-                FirebaseHandler.signOut()
-            }
-            R.id.nav_login -> {
-                val loginFragment = LoginDialogFragment()
-                loginFragment.show(supportFragmentManager, LoginDialogFragment.TAG)
-            }
-            R.id.nav_signup -> {
-                val signUpFragment = SignUpDialogFragment()
-                signUpFragment.show(supportFragmentManager, SignUpDialogFragment.TAG)
-            }
-        }
-
-        binding.main.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    /**
      * Requests POST_NOTIFICATIONS permission for Android 13+.
      */
     private fun askNotificationPermission() {
         if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+}
+
+@Composable
+fun MainMenuScreenContent(
+    uiState: MainMenuUiState,
+    modifier: Modifier = Modifier,
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    loginViewModel: LoginViewModel? = null,
+    signUpViewModel: SignUpViewModel? = null,
+    onLogoutClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {},
+    onSignUpClick: () -> Unit = {},
+    onDismissDialog: () -> Unit = {},
+    onSingleplayerClick: () -> Unit = {},
+    onMultiplayerClick: () -> Unit = {},
+    onFriendsListClick: () -> Unit = {},
+    onDonutClick: () -> Unit = {}
+) {
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            val user = uiState.currentUser
+            val profileBitmap = remember(user?.profileImageBase64) {
+                user?.profileImageBase64?.let { base64ToBitmap(it)?.asImageBitmap() }
+            }
+            ModalDrawerSheet {
+                Column {
+                    DrawerHeader(
+                        profilePicture = profileBitmap,
+                        name = user?.displayName,
+                        email = user?.email
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    if (uiState.currentUser != null) {
+                        NavigationDrawerItem(
+                            icon = { Icon(painterResource(R.drawable.ic_logout), null) },
+                            label = { Text("Logout") },
+                            selected = false,
+                            onClick = {
+                                onLogoutClick()
+                                scope.launch { drawerState.close() }
+                            },
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                        )
+                    } else {
+                        NavigationDrawerItem(
+                            icon = { Icon(painterResource(R.drawable.ic_login), null) },
+                            label = { Text("Login") },
+                            selected = false,
+                            onClick = {
+                                onLoginClick()
+                                scope.launch { drawerState.close() }
+                            },
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                        )
+                        NavigationDrawerItem(
+                            icon = { Icon(Icons.Default.PersonAdd, null) },
+                            label = { Text("Sign Up") },
+                            selected = false,
+                            onClick = {
+                                onSignUpClick()
+                                scope.launch { drawerState.close() }
+                            },
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                        )
+                    }
+                }
+            }
+        }
+    ) {
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                Surface(
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .height(TopAppBarDefaults.MediumAppBarCollapsedHeight)
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {
+                                scope.launch { drawerState.open() }
+                            }
+                        ) {
+                            Icon(Icons.Default.Menu, "Open Menu")
+                        }
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+            },
+            // secret donut
+            floatingActionButton = {
+                IconButton(
+                    onClick = onDonutClick,
+                    modifier = Modifier.size(75.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_donut),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.inverseOnSurface
+                    )
+                }
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text(
+                    text = stringResource(R.string.boggle_welcome_message),
+                    style = MaterialTheme.typography.displayLarge,
+                    textAlign = TextAlign.Center
+                )
+                Button(
+                    onClick = onSingleplayerClick
+                ) {
+                    Text(stringResource(R.string.single_player_button))
+                }
+                Button(
+                    onClick = onMultiplayerClick
+                ) {
+                    Text(stringResource(R.string.multiplayer_button))
+                }
+                Button(
+                    onClick = onFriendsListClick
+                ) {
+                    Text(stringResource(R.string.friends_list_button))
+                }
+            }
+        }
+    }
+
+    when (uiState.showingDialog) {
+        MainMenuDialog.Login -> {
+            loginViewModel?.let {
+                LoginDialog(
+                    viewModel = it,
+                    onDismissRequest = onDismissDialog
+                )
+            }
+        }
+        MainMenuDialog.SignUp -> {
+            signUpViewModel?.let {
+                SignUpDialog(
+                    viewModel = it,
+                    onDismissRequest = onDismissDialog
+                )
+            }
+        }
+        MainMenuDialog.JoinOrCreateRoom -> {
+            JoinOrCreateRoomDialog(
+                onDismissRequest = onDismissDialog,
+                initialRoomCode = uiState.initialRoomCode,
+                initialPlayerRole = uiState.initialPlayerRole
+            )
+        }
+        MainMenuDialog.None -> {}
+    }
+}
+
+@Composable
+fun DrawerHeader(profilePicture: ImageBitmap?, name: String?, email: String?, modifier: Modifier = Modifier) {
+    BoggleTheme(
+        darkTheme = true
+    ) {
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(176.dp),
+            color = MaterialTheme.colorScheme.primary
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                if (profilePicture != null && !name.isNullOrEmpty() && !email.isNullOrEmpty()) {
+                    Icon(
+                        bitmap = profilePicture,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.size(64.dp)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_person),
+                        contentDescription = "Default Profile Picture",
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    text = name ?: "Not Logged In",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = email ?: "",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MainMenuScreenContentPreview() {
+    BoggleTheme {
+        MainMenuScreenContent(
+            MainMenuUiState()
+        )
     }
 }

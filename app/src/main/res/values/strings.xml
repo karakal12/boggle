@@ -14,7 +14,6 @@
     <string name="boggle_welcome_message">Welcome to Boggle!</string>
     <string name="multiplayer_button">Multiplayer</string>
     <string name="friends_list_button">Friends List</string>
-    <string name="leaderboards_button">Leaderboards</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_display_name">Display Name</string>

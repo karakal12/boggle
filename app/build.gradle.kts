@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.dokka)
     alias(libs.plugins.androidx.navigation.safeargs)
-    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -12,8 +12,6 @@ android {
     compileSdk = 36
 
     buildFeatures {
-        viewBinding = true
-        dataBinding = true
         compose = true
     }
 
@@ -37,21 +35,6 @@ android {
         }
     }
 
-    sourceSets {
-        getByName("main") {
-            res.directories.clear()
-            res.directories.addAll(
-                listOf(
-                    "src/main/res",
-                    "src/main/res-features/auth",
-                    "src/main/res-features/mainmenu",
-                    "src/main/res-features/game-single",
-                    "src/main/res-features/game-multi",
-                    "src/main/res-features/shared"
-                )
-            )
-        }
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -59,9 +42,14 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
+}
+
 dependencies {
     implementation(platform(libs.firebase.bom))
-    implementation(libs.androidx.compose.ui.viewbinding)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
     implementation(libs.appcompat)
