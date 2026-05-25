@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.amibar.boggle.donuteasteregg.DonutActivity
+import com.amibar.boggle.ui.donuteasteregg.DonutActivity
 import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.views.BoggleBoard
 import com.amibar.boggle.views.BoggleUiState
