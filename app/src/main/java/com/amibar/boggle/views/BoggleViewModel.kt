@@ -59,9 +59,11 @@ open class BoggleViewModel(initialGame: BoggleGame = BoggleGame()) : ViewModel()
 
     open fun submitWord() {
         if (_game.isEnded) return
+        val submittedWord = _game.word
         val result = _game.submitWord()
         _uiState.update { it.copy(
-            feedbackMessageResId = result.messageId
+            feedbackMessageResId = result.messageId,
+            lastSubmittedWord = submittedWord
         ) }
         syncState()
     }
@@ -121,6 +123,7 @@ data class BoggleUiState(
     val board: CharArray = CharArray(16),
     val selectedIndices: List<Int> = emptyList(),
     val currentWord: String = "",
+    val lastSubmittedWord: String = "",
     val score: Int = 0,
     val remainingTimeMillis: Long = BoggleGame.GAME_TIME_MILLIS,
     val isGameEnded: Boolean = false,
@@ -135,6 +138,7 @@ data class BoggleUiState(
         if (!board.contentEquals(other.board)) return false
         if (selectedIndices != other.selectedIndices) return false
         if (currentWord != other.currentWord) return false
+        if (lastSubmittedWord != other.lastSubmittedWord) return false
         if (score != other.score) return false
         if (remainingTimeMillis != other.remainingTimeMillis) return false
         if (isGameEnded != other.isGameEnded) return false
@@ -148,6 +152,7 @@ data class BoggleUiState(
         var result = board.contentHashCode()
         result = 31 * result + selectedIndices.hashCode()
         result = 31 * result + currentWord.hashCode()
+        result = 31 * result + lastSubmittedWord.hashCode()
         result = 31 * result + score
         result = 31 * result + remainingTimeMillis.hashCode()
         result = 31 * result + isGameEnded.hashCode()

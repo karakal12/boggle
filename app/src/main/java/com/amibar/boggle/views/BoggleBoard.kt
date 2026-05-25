@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.amibar.boggle.R
 import com.amibar.boggle.engine.BoggleGame
-import com.amibar.boggle.ui.theme.BoggleTheme
 
 @Composable
 fun BoggleBoard(
@@ -92,7 +91,7 @@ fun BoggleBoard(
         }
         Text(
             text = if (state.feedbackMessageResId != null)
-                stringResource(state.feedbackMessageResId, state.currentWord)
+                stringResource(state.feedbackMessageResId, state.lastSubmittedWord)
             else "",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary,
