@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.amibar.boggle.R
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
-import com.amibar.boggle.donuteasteregg.DonutActivity
+import com.amibar.boggle.ui.donuteasteregg.DonutActivity
 import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomDialog
 import com.amibar.boggle.ui.game.singleplayer.SingleplayerActivity
 import com.amibar.boggle.ui.theme.BoggleTheme
