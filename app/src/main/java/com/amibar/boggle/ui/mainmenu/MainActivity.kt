@@ -22,7 +22,7 @@ import com.amibar.boggle.data.PlayerRole
 import com.amibar.boggle.data.User
 import com.amibar.boggle.databinding.ActivityMainBinding
 import com.amibar.boggle.databinding.NavHeaderBinding
-import com.amibar.boggle.ui.DonutActivity
+import com.amibar.boggle.donuteasteregg.DonutActivity
 import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomFragment
 import com.amibar.boggle.ui.game.singleplayer.SingleplayerActivity
 import com.amibar.boggle.utils.base64ToBitmap
@@ -272,8 +272,8 @@ class MainActivity : AppCompatActivity() {
                 FirebaseHandler.signOut()
             }
             R.id.nav_login -> {
-                val loginFragment = LoginFragment()
-                loginFragment.show(supportFragmentManager, "LoginFragment")
+                val loginFragment = LoginDialogFragment()
+                loginFragment.show(supportFragmentManager, LoginDialogFragment.TAG)
             }
             R.id.nav_signup -> {
                 val signUpFragment = SignUpDialogFragment()

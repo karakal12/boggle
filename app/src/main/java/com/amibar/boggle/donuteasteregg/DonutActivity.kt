@@ -1,9 +1,8 @@
-package com.amibar.boggle.ui
+package com.amibar.boggle.donuteasteregg
 
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.appcompat.app.AppCompatActivity
@@ -143,7 +142,7 @@ class DonutActivity : AppCompatActivity() {
     /**
      * Listener class for handling pinch-to-zoom gestures.
      */
-    private inner class OnScaleListener : SimpleOnScaleGestureListener() {
+    private inner class OnScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         /**
          * Called when a scale gesture is detected.
          * Adjusts the distance of the donut from the viewer in the renderer.

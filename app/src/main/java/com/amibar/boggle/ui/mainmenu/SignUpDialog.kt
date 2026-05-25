@@ -43,8 +43,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.amibar.boggle.R
+import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.utils.uriToBitmap
 
 @Composable
@@ -135,7 +137,7 @@ fun SignUpDialogContent(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(100.dp).padding( top = 32.dp)
         ) {
             if (previewBitmap != null) {
                 Image(
@@ -199,5 +201,20 @@ fun SignUpDialogContent(
             }
             else -> {}
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignUpDialogContentPreview() {
+    BoggleTheme {
+        SignUpDialogContent(
+            displayNameState = rememberTextFieldState("John Doe"),
+            emailState = rememberTextFieldState("john@example.com"),
+            passwordState = rememberTextFieldState("password123"),
+            selectedImage = null,
+            onImageSelected = {},
+            uiState = SignUpUiState.Idle
+        )
     }
 }

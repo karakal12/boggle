@@ -13,22 +13,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.amibar.boggle.ui.DonutActivity
+import com.amibar.boggle.donuteasteregg.DonutActivity
 import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.views.BoggleBoard
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import com.amibar.boggle.views.BoggleUiState
-import com.amibar.boggle.views.BoggleViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Activity that hosts the single-player Boggle game session.

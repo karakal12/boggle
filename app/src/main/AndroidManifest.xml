@@ -33,7 +33,7 @@
             android:exported="false"
             android:label="Friends List" />
         <activity
-            android:name=".ui.DonutActivity"
+            android:name=".donuteasteregg.DonutActivity"
             android:exported="true"/>
         <service android:name=".services.InvitationService"
             android:exported="false">
