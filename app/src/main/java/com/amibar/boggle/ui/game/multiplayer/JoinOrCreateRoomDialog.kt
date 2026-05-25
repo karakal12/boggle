@@ -1,15 +1,12 @@
 package com.amibar.boggle.ui.game.multiplayer
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -20,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.amibar.boggle.data.PlayerRole
 import com.google.firebase.database.FirebaseDatabase
@@ -28,23 +24,14 @@ import com.google.firebase.database.FirebaseDatabase
 @Composable
 fun JoinOrCreateRoomDialog(
     onDismissRequest: () -> Unit,
+    onJoinRoom: (PlayerRole, String) -> Unit,
     initialRoomCode: String? = null,
     initialPlayerRole: PlayerRole = PlayerRole.Guest,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val roomCodeState = rememberTextFieldState(initialRoomCode ?: "")
     var errorText by remember { mutableStateOf<String?>(null) }
     var isRoomCodeVisible by remember { mutableStateOf(!initialRoomCode.isNullOrEmpty()) }
-
-    fun navigateToMultiplayer(role: PlayerRole, roomCode: String) {
-        val intent = Intent(context, MultiplayerActivity::class.java).apply {
-            putExtra(MultiplayerActivity.ARG_ROOM_CODE, roomCode)
-            putExtra(MultiplayerActivity.ARG_PLAYER_ROLE, role)
-        }
-        context.startActivity(intent)
-        onDismissRequest()
-    }
 
     fun handleJoin() {
         val roomCode = roomCodeState.text.toString()
@@ -53,7 +40,8 @@ fun JoinOrCreateRoomDialog(
         val roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomCode)
         roomRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful && task.result?.exists() == true) {
-                navigateToMultiplayer(PlayerRole.Guest, roomCode)
+                onJoinRoom(PlayerRole.Guest, roomCode)
+                onDismissRequest()
             } else {
                 errorText = "Room not found"
             }
@@ -63,7 +51,8 @@ fun JoinOrCreateRoomDialog(
     fun handleCreate() {
         val roomCode = roomCodeState.text.toString()
         if (roomCode.isBlank()) return
-        navigateToMultiplayer(PlayerRole.Host, roomCode)
+        onJoinRoom(PlayerRole.Host, roomCode)
+        onDismissRequest()
     }
 
     LaunchedEffect(initialRoomCode, initialPlayerRole) {

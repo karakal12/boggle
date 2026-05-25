@@ -5,17 +5,18 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -37,11 +39,14 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -54,14 +59,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.amibar.boggle.R
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
 import com.amibar.boggle.ui.donuteasteregg.DonutActivity
 import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomDialog
-import com.amibar.boggle.ui.game.singleplayer.SingleplayerActivity
+import com.amibar.boggle.ui.game.multiplayer.LobbyScreen
+import com.amibar.boggle.ui.game.multiplayer.MultiplayerEvent
+import com.amibar.boggle.ui.game.multiplayer.MultiplayerViewModel
+import com.amibar.boggle.ui.game.multiplayer.PlayersScores
+import com.amibar.boggle.ui.game.singleplayer.SingleplayerContent
+import com.amibar.boggle.ui.game.singleplayer.SingleplayerEvent
+import com.amibar.boggle.ui.game.singleplayer.SingleplayerViewModel
+import com.amibar.boggle.ui.navigation.FriendList
+import com.amibar.boggle.ui.navigation.MainMenu
+import com.amibar.boggle.ui.navigation.Multiplayer
+import com.amibar.boggle.ui.navigation.Singleplayer
 import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.utils.base64ToBitmap
+import com.amibar.boggle.views.BoggleBoard
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.coroutines.launch
@@ -79,20 +104,6 @@ class MainActivity : AppCompatActivity() {
 
     /** Listener for Firebase Authentication state changes.  */
     private lateinit var authStateListener: AuthStateListener
-
-    /**
-     * Launcher for SingleplayerActivity to receive the final score when the game ends.
-     */
-    private val singleplayerLauncher = registerForActivityResult(
-        StartActivityForResult()
-    ) { result: ActivityResult? ->
-        if (result!!.resultCode == RESULT_OK && result.data != null) {
-            val score =
-                result.data!!.getIntExtra(SingleplayerActivity.EXTRA_SCORE, 0)
-            Toast.makeText(this, "Game finished! Your score: $score", Toast.LENGTH_LONG)
-                .show()
-        }
-    }
 
     /**
      * Launcher for requesting notification permissions (Android 13+).
@@ -115,36 +126,176 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             BoggleTheme {
-                val uiState by viewModel.uiState.collectAsState()
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val navController = rememberNavController()
 
-                MainMenuScreenContent(
-                    uiState = uiState,
-                    drawerState = drawerState,
-                    loginViewModel = loginViewModel,
-                    signUpViewModel = signUpViewModel,
-                    onLogoutClick = { FirebaseHandler.signOut() },
-                    onLoginClick = { viewModel.showDialog(MainMenuDialog.Login) },
-                    onSignUpClick = { viewModel.showDialog(MainMenuDialog.SignUp) },
-                    onDismissDialog = { viewModel.dismissDialog() },
-                    onSingleplayerClick = {
-                        val intent = Intent(this, SingleplayerActivity::class.java)
-                        singleplayerLauncher.launch(intent)
-                    },
-                    onMultiplayerClick = {
-                        if (FirebaseHandler.auth.currentUser != null) {
-                            viewModel.showDialog(MainMenuDialog.JoinOrCreateRoom)
-                        } else {
-                            Toast.makeText(this, "Please sign in to play multiplayer", Toast.LENGTH_SHORT).show()
+                NavHost(navController = navController, startDestination = MainMenu) {
+                    composable<MainMenu> {
+                        val uiState by viewModel.uiState.collectAsState()
+                        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+                        MainMenuScreenContent(
+                            uiState = uiState,
+                            drawerState = drawerState,
+                            loginViewModel = loginViewModel,
+                            signUpViewModel = signUpViewModel,
+                            onLogoutClick = { FirebaseHandler.signOut() },
+                            onLoginClick = { viewModel.showDialog(MainMenuDialog.Login) },
+                            onSignUpClick = { viewModel.showDialog(MainMenuDialog.SignUp) },
+                            onDismissDialog = { viewModel.dismissDialog() },
+                            onSingleplayerClick = {
+                                navController.navigate(Singleplayer)
+                            },
+                            onMultiplayerClick = {
+                                if (FirebaseHandler.auth.currentUser != null) {
+                                    viewModel.showDialog(MainMenuDialog.JoinOrCreateRoom)
+                                } else {
+                                    Toast.makeText(this@MainActivity, "Please sign in to play multiplayer", Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            onFriendsListClick = {
+                                navController.navigate(FriendList)
+                            },
+                            onDonutClick = {
+                                startActivity(Intent(this@MainActivity, DonutActivity::class.java))
+                            },
+                            onJoinRoom = { role, roomCode ->
+                                viewModel.navigateToMultiplayer(roomCode, role)
+                            }
+                        )
+                        
+                        LaunchedEffect(uiState.navEvent) {
+                            uiState.navEvent?.let { (roomCode, role) ->
+                                navController.navigate(Multiplayer(roomCode, role))
+                                viewModel.onNavigated()
+                            }
                         }
-                    },
-                    onFriendsListClick = {
-                        startActivity(Intent(this, FriendListActivity::class.java))
-                    },
-                    onDonutClick = {
-                        startActivity(Intent(this, DonutActivity::class.java))
                     }
-                )
+
+                    composable<Singleplayer> {
+                        val spViewModel: SingleplayerViewModel = viewModel()
+                        val showingDialogState = remember { mutableStateOf(false) }
+                        val uiState by spViewModel.uiState.collectAsStateWithLifecycle()
+
+                        BackHandler {
+                            if (uiState.isGameEnded) {
+                                spViewModel.game.deselectPath()
+                                spViewModel.syncState()
+                                showingDialogState.value = true
+                            } else {
+                                navController.popBackStack()
+                            }
+                        }
+
+                        LaunchedEffect(Unit) {
+                            spViewModel.events.collect { event ->
+                                when (event) {
+                                    is SingleplayerEvent.GameEnded -> {
+                                        Toast.makeText(this@MainActivity, "Game finished! Your score: ${event.score}", Toast.LENGTH_LONG).show()
+                                        showingDialogState.value = true
+                                    }
+                                    is SingleplayerEvent.NavigateToDonutSecret -> {
+                                        startActivity(Intent(this@MainActivity, DonutActivity::class.java))
+                                    }
+                                    is SingleplayerEvent.ShowToast -> {
+                                        Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+
+                        // Handle Lifecycle
+                        androidx.lifecycle.compose.LifecycleResumeEffect(Unit) {
+                            spViewModel.resumeGame()
+                            onPauseOrDispose {
+                                spViewModel.pauseGame()
+                            }
+                        }
+
+                        SingleplayerContent(spViewModel, showingDialogState)
+                    }
+
+                    composable<Multiplayer> { backStackEntry ->
+                        val route = backStackEntry.toRoute<Multiplayer>()
+                        val mpViewModel: MultiplayerViewModel = viewModel(
+                            factory = object : ViewModelProvider.Factory {
+                                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                                    @Suppress("UNCHECKED_CAST")
+                                    return MultiplayerViewModel(route.playerRole, route.roomCode) as T
+                                }
+                            }
+                        )
+                        
+                        val isGameStarted = remember { mutableStateOf(false) }
+                        val results = remember { mutableStateOf<MultiplayerEvent.ResultsReady?>(null) }
+
+                        LaunchedEffect(Unit) {
+                            mpViewModel.events.collect { event ->
+                                when (event) {
+                                    is MultiplayerEvent.GameStarted -> isGameStarted.value = true
+                                    is MultiplayerEvent.GameDestroyed -> navController.popBackStack()
+                                    is MultiplayerEvent.ShowToast -> {
+                                        Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                                    }
+                                    is MultiplayerEvent.ResultsReady -> results.value = event
+                                }
+                            }
+                        }
+
+                        Surface(color = MaterialTheme.colorScheme.surface) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                if (isGameStarted.value) {
+                                    BoggleBoard(viewModel = mpViewModel)
+                                } else {
+                                    LobbyScreen(viewModel = mpViewModel)
+                                }
+
+                                if (results.value != null) {
+                                    AlertDialog(
+                                        onDismissRequest = { /* Don't dismiss by clicking outside */ },
+                                        confirmButton = {
+                                            TextButton(onClick = { navController.popBackStack() }) {
+                                                Text("EXIT")
+                                            }
+                                        },
+                                        title = { Text("Game Over") },
+                                        text = {
+                                            PlayersScores(
+                                                modifier = Modifier.fillMaxHeight(0.8f),
+                                                solutions = results.value!!.solutions,
+                                                playersWords = results.value!!.playersWords,
+                                                onWordClick = { _, path ->
+                                                    mpViewModel.game.selectPath(path)
+                                                    mpViewModel.syncState()
+                                                }
+                                            )
+                                        },
+                                        properties = DialogProperties(usePlatformDefaultWidth = false)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    composable<FriendList> {
+                        val flViewModel: FriendListViewModel = viewModel()
+                        
+                        LaunchedEffect(Unit) {
+                            flViewModel.events.collect { event ->
+                                when (event) {
+                                    is FriendListEvent.ShowToast -> Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                                    is FriendListEvent.NavigateToHostGame -> {
+                                        navController.navigate(Multiplayer(event.roomCode, PlayerRole.Host))
+                                    }
+                                }
+                            }
+                        }
+
+                        FriendListScreen(
+                            viewModel = flViewModel,
+                            onInviteFriend = { /* handled in ViewModel events */ }
+                        )
+                    }
+                }
             }
         }
 
@@ -233,7 +384,8 @@ fun MainMenuScreenContent(
     onSingleplayerClick: () -> Unit = {},
     onMultiplayerClick: () -> Unit = {},
     onFriendsListClick: () -> Unit = {},
-    onDonutClick: () -> Unit = {}
+    onDonutClick: () -> Unit = {},
+    onJoinRoom: (PlayerRole, String) -> Unit = { _, _ -> }
 ) {
     val scope = rememberCoroutineScope()
 
@@ -378,6 +530,7 @@ fun MainMenuScreenContent(
         MainMenuDialog.JoinOrCreateRoom -> {
             JoinOrCreateRoomDialog(
                 onDismissRequest = onDismissDialog,
+                onJoinRoom = onJoinRoom,
                 initialRoomCode = uiState.initialRoomCode,
                 initialPlayerRole = uiState.initialPlayerRole
             )

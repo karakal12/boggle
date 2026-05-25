@@ -15,23 +15,15 @@
         android:supportsRtl="false"
         android:theme="@style/Theme.Boggle">
         <activity
-            android:name=".ui.game.singleplayer.SingleplayerActivity"
-            android:exported="false" />
-        <activity android:name=".ui.game.multiplayer.MultiplayerActivity"
-            android:exported="false"/>
-        <activity
             android:name=".ui.mainmenu.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.mainmenu.FriendListActivity"
-            android:exported="false"
-            android:label="Friends List" />
         <activity
             android:name=".ui.donuteasteregg.DonutActivity"
             android:exported="true"/>

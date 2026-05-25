@@ -51,13 +51,13 @@ sealed interface MultiplayerEvent {
     data class ShowToast(val message: String) : MultiplayerEvent
 }
 
-/**
+ /**
  * ViewModel responsible for managing the state and logic of a multiplayer Boggle session.
  *
  * It handles real-time synchronization with Firebase, including lobby management,
  * board distribution, tracking words found by players, and coordinating the end-of-game result collection.
  *
- * Activities or Fragments observing this ViewModel should listen to the [events] flow
+ * Composables observing this ViewModel should listen to the [events] flow
  * to handle navigation to results, game termination, or UI notifications.
  */
 class MultiplayerViewModel(playerRole: PlayerRole, roomCode: String) : BoggleViewModel() {
@@ -206,7 +206,7 @@ class MultiplayerViewModel(playerRole: PlayerRole, roomCode: String) : BoggleVie
     private fun collectResultsAndFinish() {
         viewModelScope.launch {
             try {
-                val snapshot = _roomRef.awaitValue() ?: return@launch
+                val snapshot = _roomRef.awaitValue()
                 val playersSnapshot = snapshot.child("players")
                 if (playersSnapshot.childrenCount == 0L) return@launch
 
@@ -238,6 +238,20 @@ class MultiplayerViewModel(playerRole: PlayerRole, roomCode: String) : BoggleVie
     private fun finalizeResults(playersWordsMap: Map<User, ArrayList<String>>) {
         viewModelScope.launch {
             _events.send(MultiplayerEvent.ResultsReady(game.solutions.toMap(), playersWordsMap))
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        val userId = FirebaseHandler.currentUserId ?: return
+        if (::_roomRef.isInitialized) {
+            _roomRef.child("players").child(userId).removeValue().addOnCompleteListener {
+                _roomRef.child("players").get().addOnSuccessListener { snapshot ->
+                    if (!snapshot.exists() || snapshot.childrenCount == 0L) {
+                        _roomRef.removeValue()
+                    }
+                }
+            }
         }
     }
 }

@@ -1,11 +1,5 @@
 package com.amibar.boggle.ui.mainmenu
 
-import android.content.Intent
-import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,62 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.amibar.boggle.R
 import com.amibar.boggle.data.User
 import com.amibar.boggle.ui.game.multiplayer.Player
-import com.amibar.boggle.ui.theme.BoggleTheme
-import kotlinx.coroutines.launch
-
-/**
- * Activity for managing and viewing a user's friend list.
- * Allows users to search for others by email, add friends, and invite them to game rooms.
- * Uses Firebase Realtime Database for all persistence.
- */
-class FriendListActivity : AppCompatActivity() {
-    private val viewModel: FriendListViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            FriendListScreen(
-                viewModel = viewModel,
-                onInviteFriend = {
-
-                }
-            )
-        }
-        observeViewModel()
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.events.collect { event ->
-                        when (event) {
-                            is FriendListEvent.ShowToast -> Toast.makeText(
-                                this@FriendListActivity,
-                                event.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            is FriendListEvent.NavigateToHostGame -> {
-                                val intent = Intent(this@FriendListActivity, MainActivity::class.java)
-                                intent.putExtra("roomCode", event.roomCode)
-                                intent.putExtra("action", "host")
-                                startActivity(intent)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
 
 @Composable
 fun FriendListScreen(
@@ -208,15 +148,6 @@ fun Friend(friend: User, modifier: Modifier = Modifier, onClickInvite: () -> Uni
     }
 }
 
-/**
- * Displays a composable dialog that allows the user to invite a friend to a game.
- * Includes a text field for entering a room code and actions to send the invitation or cancel.
- *
- * @param modifier The [Modifier] to be applied to the dialog.
- * @param friend The [User] being invited.
- * @param onDismissRequest Callback invoked when the user attempts to dismiss the dialog.
- * @param onInviteSent Callback invoked with the [User] object when the "Send" button is clicked.
- */
 @Composable
 private fun InviteDialog(
     modifier: Modifier = Modifier,

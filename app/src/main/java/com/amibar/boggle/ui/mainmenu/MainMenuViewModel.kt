@@ -16,12 +16,21 @@ data class MainMenuUiState(
     val currentUser: User? = null,
     val showingDialog: MainMenuDialog = MainMenuDialog.None,
     val initialRoomCode: String? = null,
-    val initialPlayerRole: PlayerRole = PlayerRole.Guest
+    val initialPlayerRole: PlayerRole = PlayerRole.Guest,
+    val navEvent: Pair<String, PlayerRole>? = null
 )
 
 class MainMenuViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MainMenuUiState())
     val uiState = _uiState.asStateFlow()
+
+    fun navigateToMultiplayer(roomCode: String, role: PlayerRole) {
+        _uiState.value = _uiState.value.copy(navEvent = roomCode to role)
+    }
+
+    fun onNavigated() {
+        _uiState.value = _uiState.value.copy(navEvent = null)
+    }
 
     fun showDialog(dialog: MainMenuDialog, roomCode: String? = null, role: PlayerRole = PlayerRole.Guest) {
         _uiState.value = _uiState.value.copy(

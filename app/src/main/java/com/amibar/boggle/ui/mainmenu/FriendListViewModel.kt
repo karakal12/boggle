@@ -30,7 +30,7 @@ sealed interface FriendListEvent {
 }
 
 /**
- * ViewModel for the FriendListActivity.
+ * ViewModel for the FriendList screen.
  * Handles user search, friend list loading, and sending game invitations.
  */
 class FriendListViewModel : ViewModel() {
