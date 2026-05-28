@@ -1,4 +1,4 @@
-package com.amibar.boggle.views
+package com.amibar.boggle.ui.shared
 
 import androidx.lifecycle.ViewModel
 import com.amibar.boggle.engine.BoggleGame
@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Locale
+import kotlin.math.ceil
 
 /**
  * ViewModel for the Boggle game, managing the game state and logic.
@@ -88,7 +89,7 @@ open class BoggleViewModel(initialGame: BoggleGame = BoggleGame()) : ViewModel()
         val fullPath = candidatePaths.shuffled().first()
         val currentPathLength = currentPath.length
         val remainingLength = fullPath.length - currentPathLength
-        val revealCount = currentPathLength + kotlin.math.ceil(remainingLength / 2.0).toInt()
+        val revealCount = currentPathLength + ceil(remainingLength / 2.0).toInt()
 
         if (revealCount >= fullPath.length) return
 
@@ -127,6 +128,7 @@ data class BoggleUiState(
     val score: Int = 0,
     val remainingTimeMillis: Long = BoggleGame.GAME_TIME_MILLIS,
     val isGameEnded: Boolean = false,
+    val isPaused: Boolean = false,
     val hintsAvailable: Int = 0,
     val feedbackMessageResId: Int? = null,
     val foundWords: List<String> = emptyList()
@@ -142,6 +144,7 @@ data class BoggleUiState(
         if (score != other.score) return false
         if (remainingTimeMillis != other.remainingTimeMillis) return false
         if (isGameEnded != other.isGameEnded) return false
+        if (isPaused != other.isPaused) return false
         if (hintsAvailable != other.hintsAvailable) return false
         if (feedbackMessageResId != other.feedbackMessageResId) return false
         if (foundWords != other.foundWords) return false
@@ -156,6 +159,7 @@ data class BoggleUiState(
         result = 31 * result + score
         result = 31 * result + remainingTimeMillis.hashCode()
         result = 31 * result + isGameEnded.hashCode()
+        result = 31 * result + isPaused.hashCode()
         result = 31 * result + hintsAvailable
         result = 31 * result + (feedbackMessageResId ?: 0)
         result = 31 * result + foundWords.hashCode()

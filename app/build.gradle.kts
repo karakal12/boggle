@@ -81,7 +81,7 @@ dependencies {
 
 dokka {
     moduleName.set("Boggle")
-    
+
     dokkaPublications.configureEach {
         outputDirectory.set(file("${project.rootDir}/docs"))
     }

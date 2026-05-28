@@ -30,6 +30,8 @@ class GLDonutRenderer : GLSurfaceView.Renderer {
 
     // Projection matrix to handle perspective and aspect ratio
     private val projectionMatrix = FloatArray(16)
+    // Model matrix to handle rotation and translation
+    private val modelMatrix = FloatArray(16)
 
     // Rotation angles for the three axes (A=X, B=Y, Z=Z)
     @Volatile
@@ -144,11 +146,15 @@ class GLDonutRenderer : GLSurfaceView.Renderer {
         // Use our shader program
         GLES20.glUseProgram(program)
 
-        // Pass uniforms (rotation angles, distance, projection) to the GPU
-        GLES20.glUniform1f(GLES20.glGetUniformLocation(program, "uA"), angleA)
-        GLES20.glUniform1f(GLES20.glGetUniformLocation(program, "uB"), angleB)
-        GLES20.glUniform1f(GLES20.glGetUniformLocation(program, "uC"), angleZ)
-        GLES20.glUniform1f(GLES20.glGetUniformLocation(program, "uDistance"), donutDistance)
+        // Calculate model matrix: translate then rotate (X, Y, then Z)
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.translateM(modelMatrix, 0, 0f, 0f, -donutDistance)
+        Matrix.rotateM(modelMatrix, 0, Math.toDegrees(angleA.toDouble()).toFloat(), 1f, 0f, 0f)
+        Matrix.rotateM(modelMatrix, 0, Math.toDegrees(angleB.toDouble()).toFloat(), 0f, 1f, 0f)
+        Matrix.rotateM(modelMatrix, 0, Math.toDegrees(angleZ.toDouble()).toFloat(), 0f, 0f, 1f)
+
+        // Pass uniforms to the GPU
+        GLES20.glUniformMatrix4fv(GLES20.glGetUniformLocation(program, "uModel"), 1, false, modelMatrix, 0)
         GLES20.glUniformMatrix4fv(GLES20.glGetUniformLocation(program, "uProjection"), 1, false, projectionMatrix, 0)
 
         // Pass the UV attribute data
@@ -170,10 +176,10 @@ class GLDonutRenderer : GLSurfaceView.Renderer {
     }
 
     companion object {
-        @Language("GLSL")
+
         private val vertexShaderCode = """
             uniform mat4 uProjection;
-            uniform float uA, uB, uC, uDistance;
+            uniform mat4 uModel;
             attribute vec2 aUV; // x = theta (tube angle), y = phi (main ring angle)
             varying vec3 vColor;
             varying float vLight;
@@ -198,35 +204,11 @@ class GLDonutRenderer : GLSurfaceView.Renderer {
                 // The normal is simply the vector from the tube's center to the surface point.
                 vec3 norm = vec3(cos(theta) * cos(phi), cos(theta) * sin(phi), sin(theta));
                 
-                // 3. Rotation Matrices (constructed on GPU)
-                // Rotation around X axis (uA)
-                mat3 rotX = mat3(
-                    1.0, 0.0, 0.0,
-                    0.0, cos(uA), sin(uA),
-                    0.0, -sin(uA), cos(uA)
-                );
-                // Rotation around Y axis (uB)
-                mat3 rotY = mat3(
-                    cos(uB), 0.0, -sin(uB),
-                    0.0, 1.0, 0.0,
-                    sin(uB), 0.0, cos(uB)
-                );
-                // Rotation around Z axis (uC)
-                mat3 rotZ = mat3(
-                    cos(uC), sin(uC), 0.0,
-                    -sin(uC), cos(uC), 0.0,
-                    0.0, 0.0, 1.0
-                );
+                // 3. Transform to View Space and apply rotations to normal
+                vec4 viewPos = uModel * vec4(pos, 1.0);
+                norm = mat3(uModel) * norm;
                 
-                // Apply rotations to position and normal
-                pos = rotX * rotY * rotZ * pos;
-                norm = rotX * rotY * rotZ * norm;
-                
-                // 4. Transform to View Space
-                // Move the donut back by uDistance so it's visible by the camera
-                vec4 viewPos = vec4(pos.x, pos.y, pos.z - uDistance, 1.0);
-                
-                // 5. Transform to Clip Space
+                // 4. Transform to Clip Space
                 gl_Position = uProjection * viewPos;
                 
                 // 6. Simple Lighting

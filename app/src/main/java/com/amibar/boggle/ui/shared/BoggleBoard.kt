@@ -1,4 +1,4 @@
-package com.amibar.boggle.views
+package com.amibar.boggle.ui.shared
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -15,10 +15,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,6 +41,7 @@ import com.amibar.boggle.engine.BoggleGame
 fun BoggleBoard(
     modifier: Modifier = Modifier,
     viewModel: BoggleViewModel = BoggleViewModel(),
+    onPauseClick: () -> Unit = {},
     onWordSubmitted: (String) -> Unit = {}
 ) {
     val state = viewModel.uiState.collectAsState().value
@@ -49,6 +52,9 @@ fun BoggleBoard(
         Row (
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(onClick = onPauseClick) {
+                Icon(Icons.Default.Pause, contentDescription = "Pause Game")
+            }
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = BoggleViewModel.formatTime(state.remainingTimeMillis)

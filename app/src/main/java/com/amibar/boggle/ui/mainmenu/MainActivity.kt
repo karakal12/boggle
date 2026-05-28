@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
@@ -51,8 +54,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -71,7 +76,9 @@ import androidx.navigation.toRoute
 import com.amibar.boggle.R
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
+import com.amibar.boggle.data.User
 import com.amibar.boggle.ui.donuteasteregg.DonutActivity
+import com.amibar.boggle.ui.donuteasteregg.donutWrapped
 import com.amibar.boggle.ui.game.multiplayer.JoinOrCreateRoomDialog
 import com.amibar.boggle.ui.game.multiplayer.LobbyScreen
 import com.amibar.boggle.ui.game.multiplayer.MultiplayerEvent
@@ -84,9 +91,9 @@ import com.amibar.boggle.ui.navigation.FriendList
 import com.amibar.boggle.ui.navigation.MainMenu
 import com.amibar.boggle.ui.navigation.Multiplayer
 import com.amibar.boggle.ui.navigation.Singleplayer
+import com.amibar.boggle.ui.shared.BoggleBoard
 import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.utils.base64ToBitmap
-import com.amibar.boggle.views.BoggleBoard
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.coroutines.launch
@@ -128,13 +135,15 @@ class MainActivity : AppCompatActivity() {
             BoggleTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = MainMenu) {
+                NavHost(navController = navController, startDestination = MainMenu, modifier = Modifier.safeDrawingPadding()) {
                     composable<MainMenu> {
                         val uiState by viewModel.uiState.collectAsState()
+                        val currentUser by FirebaseHandler.userDataFlow.collectAsState()
                         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
                         MainMenuScreenContent(
                             uiState = uiState,
+                            currentUser = currentUser,
                             drawerState = drawerState,
                             loginViewModel = loginViewModel,
                             signUpViewModel = signUpViewModel,
@@ -182,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                                 spViewModel.syncState()
                                 showingDialogState.value = true
                             } else {
-                                navController.popBackStack()
+                                spViewModel.pauseGame()
                             }
                         }
 
@@ -212,6 +221,11 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         SingleplayerContent(spViewModel, showingDialogState)
+                        SingleplayerContent(
+                            viewModel = spViewModel,
+                            showingDialogState = showingDialogState,
+                            onExit = { navController.popBackStack() }
+                        )
                     }
 
                     composable<Multiplayer> { backStackEntry ->
@@ -344,8 +358,7 @@ class MainActivity : AppCompatActivity() {
      * Sets up the listener that updates the UI when the user signs in or out.
      */
     private fun setupAuthStateListener() {
-        authStateListener = AuthStateListener { auth ->
-            viewModel.updateCurrentUser(auth.currentUser)
+        authStateListener = AuthStateListener { _ ->
             FirebaseHandler.updateUserData()
         }
     }
@@ -373,6 +386,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainMenuScreenContent(
     uiState: MainMenuUiState,
+    currentUser: User?,
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     loginViewModel: LoginViewModel? = null,
@@ -389,22 +403,27 @@ fun MainMenuScreenContent(
 ) {
     val scope = rememberCoroutineScope()
 
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch {
+            drawerState.close()
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            val user = uiState.currentUser
-            val profileBitmap = remember(user?.profileImageBase64) {
-                user?.profileImageBase64?.let { base64ToBitmap(it)?.asImageBitmap() }
+            val profileBitmap = remember(currentUser?.profileImageBase64) {
+                currentUser?.profileImageBase64?.let { base64ToBitmap(it)?.asImageBitmap() }
             }
             ModalDrawerSheet {
                 Column {
                     DrawerHeader(
                         profilePicture = profileBitmap,
-                        name = user?.displayName,
-                        email = user?.email
+                        name = currentUser?.displayName,
+                        email = currentUser?.email
                     )
                     Spacer(Modifier.height(12.dp))
-                    if (uiState.currentUser != null) {
+                    if (currentUser != null) {
                         NavigationDrawerItem(
                             icon = { Icon(painterResource(R.drawable.ic_logout), null) },
                             label = { Text("Logout") },
@@ -554,11 +573,14 @@ fun DrawerHeader(profilePicture: ImageBitmap?, name: String?, email: String?, mo
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                if (profilePicture != null && !name.isNullOrEmpty() && !email.isNullOrEmpty()) {
-                    Icon(
+                if (profilePicture != null) {
+                    Image(
                         bitmap = profilePicture,
                         contentDescription = "Profile Picture",
-                        modifier = Modifier.size(64.dp)
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                 } else {
                     Icon(
@@ -587,7 +609,8 @@ fun DrawerHeader(profilePicture: ImageBitmap?, name: String?, email: String?, mo
 private fun MainMenuScreenContentPreview() {
     BoggleTheme {
         MainMenuScreenContent(
-            MainMenuUiState()
+            MainMenuUiState(),
+            null
         )
     }
 }

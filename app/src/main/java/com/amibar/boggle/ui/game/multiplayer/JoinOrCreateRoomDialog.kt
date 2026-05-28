@@ -21,6 +21,10 @@ import androidx.compose.ui.unit.dp
 import com.amibar.boggle.data.PlayerRole
 import com.google.firebase.database.FirebaseDatabase
 
+internal enum class JoinOrCreateRoomDialogState {
+    IDLE, JOIN, HOST
+}
+
 @Composable
 fun JoinOrCreateRoomDialog(
     onDismissRequest: () -> Unit,
@@ -31,7 +35,7 @@ fun JoinOrCreateRoomDialog(
 ) {
     val roomCodeState = rememberTextFieldState(initialRoomCode ?: "")
     var errorText by remember { mutableStateOf<String?>(null) }
-    var isRoomCodeVisible by remember { mutableStateOf(!initialRoomCode.isNullOrEmpty()) }
+    var state by remember { mutableStateOf(JoinOrCreateRoomDialogState.IDLE) }
 
     fun handleJoin() {
         val roomCode = roomCodeState.text.toString()
@@ -71,51 +75,45 @@ fun JoinOrCreateRoomDialog(
         title = { Text("Multiplayer") },
         text = {
             Column {
-                if (!isRoomCodeVisible) {
+                if (state != JoinOrCreateRoomDialogState.HOST) {
                     Button(
-                        onClick = { isRoomCodeVisible = true },
+                        onClick = {
+                            if (state != JoinOrCreateRoomDialogState.JOIN)
+                                state = JoinOrCreateRoomDialogState.JOIN
+                            else
+                                onJoinRoom(PlayerRole.Guest, roomCodeState.text.toString())
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Join Room")
                     }
                     Spacer(Modifier.height(8.dp))
+                }
+                if (state != JoinOrCreateRoomDialogState.JOIN) {
                     Button(
-                        onClick = { isRoomCodeVisible = true },
+                        onClick = {
+                            if (state != JoinOrCreateRoomDialogState.HOST)
+                                state = JoinOrCreateRoomDialogState.HOST
+                            else
+                                onJoinRoom(PlayerRole.Host, roomCodeState.text.toString())
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Create Room")
                     }
-                } else {
-                    TextField(
-                        state = roomCodeState,
-                        label = { Text("Enter room code") },
-                        isError = errorText != null,
-                        supportingText = errorText?.let { { Text(it) } },
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
-            }
-        },
-        confirmButton = {
-            if (isRoomCodeVisible) {
-                Column {
-                    Button(
-                        onClick = { handleJoin() },
-                        enabled = roomCodeState.text.isNotBlank(),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Join")
-                    }
-                    Button(
-                        onClick = { handleCreate() },
-                        enabled = roomCodeState.text.isNotBlank(),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Create")
+                if (state != JoinOrCreateRoomDialogState.IDLE) {
+                        TextField(
+                            state = roomCodeState,
+                            label = { Text("Enter room code") },
+                            isError = errorText != null,
+                            supportingText = errorText?.let { { Text(it) } },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
-            }
         },
+        confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
                 Text("Cancel")

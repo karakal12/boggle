@@ -2,7 +2,6 @@ package com.amibar.boggle.ui.shared
 
 import com.amibar.boggle.data.User
 import com.amibar.boggle.engine.BoggleGame
-import com.amibar.boggle.views.BoggleViewModel
 
 /**
  * Shared sample data for use in Compose Previews.

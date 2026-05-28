@@ -1,10 +1,7 @@
 package com.amibar.boggle.ui.mainmenu
 
 import androidx.lifecycle.ViewModel
-import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
-import com.amibar.boggle.data.User
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -13,7 +10,6 @@ enum class MainMenuDialog {
 }
 
 data class MainMenuUiState(
-    val currentUser: User? = null,
     val showingDialog: MainMenuDialog = MainMenuDialog.None,
     val initialRoomCode: String? = null,
     val initialPlayerRole: PlayerRole = PlayerRole.Guest,
@@ -42,30 +38,5 @@ class MainMenuViewModel : ViewModel() {
 
     fun dismissDialog() {
         _uiState.value = _uiState.value.copy(showingDialog = MainMenuDialog.None)
-    }
-
-    fun updateCurrentUser(firebaseUser: FirebaseUser?) {
-        if (firebaseUser == null) {
-            _uiState.value = _uiState.value.copy(currentUser = null)
-            return
-        }
-
-        // Initially populate with what we have from FirebaseUser
-        val initialUser = User(
-            uid = firebaseUser.uid,
-            displayName = firebaseUser.displayName ?: "User",
-            email = firebaseUser.email ?: ""
-        )
-        _uiState.value = _uiState.value.copy(currentUser = initialUser)
-
-        // Then fetch full user data from database
-        FirebaseHandler.userRef?.get()?.addOnCompleteListener { task ->
-            if (task.isSuccessful && task.result != null) {
-                val userData = task.result!!.getValue(User::class.java)
-                if (userData != null) {
-                    _uiState.value = _uiState.value.copy(currentUser = userData)
-                }
-            }
-        }
     }
 }

@@ -3,9 +3,14 @@ package com.amibar.boggle.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Singleton object that centralizes Firebase Authentication and Realtime Database logic.
@@ -23,9 +28,16 @@ object FirebaseHandler {
     /** Instance of Firebase Messaging. */
     val messaging by lazy { FirebaseMessaging.getInstance() }
 
+    private val _userData = MutableStateFlow<User?>(null)
+
+    private var userListener: ValueEventListener? = null
+
+    /** Cached local user data as an observable flow. */
+    val userDataFlow = _userData.asStateFlow()
+
     /** Cached local user data. */
-    var userData: User? = null
-        private set
+    val userData: User?
+        get() = _userData.value
 
     /**
      * Returns the currently authenticated FirebaseUser.
@@ -61,21 +73,41 @@ object FirebaseHandler {
     fun updateUserData() {
         val user = currentUser
         if (user != null) {
-            // First, reload the user to check if they are still valid in Firebase Auth
-            user.reload().addOnCompleteListener { reloadTask ->
-                if (reloadTask.isSuccessful) {
-                    // User is still valid in Auth, now check the database
-                    userRef?.get()?.addOnCompleteListener { dbTask ->
-                        if (dbTask.isSuccessful && dbTask.result?.exists() == true) {
-                            userData = dbTask.result?.getValue(User::class.java)
-                        }
+            // Initially populate with what we have from FirebaseUser if we don't have data yet
+            if (_userData.value == null || _userData.value?.uid != user.uid) {
+                _userData.value = User(
+                    uid = user.uid,
+                    displayName = user.displayName ?: "User",
+                    email = user.email ?: ""
+                )
+            }
+
+            // Remove previous listener if any
+            userListener?.let { userRef?.removeEventListener(it) }
+
+            // Set up a real-time listener for the user data
+            userListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        _userData.value = snapshot.getValue(User::class.java)
                     }
-                } else {
-                    Log.e(TAG, "User reload failed", reloadTask.exception)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "Database listener cancelled", error.toException())
                 }
             }
+            userRef?.addValueEventListener(userListener!!)
+
+            // Also reload the user to check if they are still valid in Firebase Auth
+            user.reload().addOnFailureListener { e ->
+                Log.e(TAG, "User reload failed", e)
+                signOut()
+            }
         } else {
-            userData = null
+            userListener?.let { userRef?.removeEventListener(it) }
+            userListener = null
+            _userData.value = null
         }
     }
 
@@ -84,7 +116,7 @@ object FirebaseHandler {
      */
     fun signOut() {
         auth.signOut()
-        userData = null
+        _userData.value = null
     }
 
     /**

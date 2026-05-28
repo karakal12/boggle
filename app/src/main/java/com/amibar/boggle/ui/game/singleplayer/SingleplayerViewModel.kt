@@ -3,7 +3,7 @@ package com.amibar.boggle.ui.game.singleplayer
 import androidx.lifecycle.viewModelScope
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.GameResult
-import com.amibar.boggle.views.BoggleViewModel
+import com.amibar.boggle.ui.shared.BoggleViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -90,12 +90,18 @@ class SingleplayerViewModel : BoggleViewModel() {
     }
 
     fun resumeGame() {
-        if (!uiState.value.isGameEnded) {
+        if (!uiState.value.isGameEnded && !uiState.value.isPaused) {
             game.startTimer()
         }
     }
 
     fun pauseGame() {
         game.stopTimer()
+        _uiState.update { it.copy(isPaused = true) }
+    }
+
+    fun resumeGameManual() {
+        _uiState.update { it.copy(isPaused = false) }
+        game.startTimer()
     }
 }

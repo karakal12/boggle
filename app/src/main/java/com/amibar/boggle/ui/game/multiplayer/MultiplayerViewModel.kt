@@ -6,10 +6,10 @@ import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.PlayerRole
 import com.amibar.boggle.data.User
 import com.amibar.boggle.engine.BoggleGame
+import com.amibar.boggle.ui.shared.BoggleViewModel
 import com.amibar.boggle.utils.awaitValue
 import com.amibar.boggle.utils.childRemovedFlow
 import com.amibar.boggle.utils.valueFlow
-import com.amibar.boggle.views.BoggleViewModel
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
