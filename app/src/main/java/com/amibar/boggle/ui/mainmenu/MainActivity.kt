@@ -220,8 +220,8 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
-                        SingleplayerContent(spViewModel, showingDialogState)
                         SingleplayerContent(
+                            modifier = Modifier.donutWrapped(),
                             viewModel = spViewModel,
                             showingDialogState = showingDialogState,
                             onExit = { navController.popBackStack() }

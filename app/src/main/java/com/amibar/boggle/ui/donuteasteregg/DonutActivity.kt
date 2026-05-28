@@ -4,6 +4,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,10 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.amibar.boggle.engine.GLDonutRenderer
 
 /**
@@ -85,4 +86,13 @@ fun DonutScreen() {
             // No specific updates needed here
         }
     )
+}
+
+@Composable
+fun AgslDonut(modifier: Modifier = Modifier) {
+    Canvas(
+        modifier = modifier
+    ) {
+
+    }
 }
