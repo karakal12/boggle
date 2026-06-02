@@ -17,7 +17,7 @@ class BoggleApplication : Application() {
         // Load the dictionary from raw resources into memory (Trie structure)
         // This ensures the word list is ready before any game activities are launched.
         Executors.newSingleThreadExecutor().execute {
-            Dictionary.ROOT.init(resources.openRawResource(R.raw.word_list))
+            Dictionary.ROOT.init(resources.openRawResource(R.raw.boggle_dictionary))
         }
         FirebaseHandler.updateUserData()
     }
