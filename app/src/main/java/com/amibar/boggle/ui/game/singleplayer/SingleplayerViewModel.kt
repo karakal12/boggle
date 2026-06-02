@@ -3,6 +3,7 @@ package com.amibar.boggle.ui.game.singleplayer
 import androidx.lifecycle.viewModelScope
 import com.amibar.boggle.data.FirebaseHandler
 import com.amibar.boggle.data.GameResult
+import com.amibar.boggle.engine.BoggleGame
 import com.amibar.boggle.ui.shared.BoggleViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -14,11 +15,11 @@ import java.util.Locale
 
 sealed class SingleplayerEvent {
     data class GameEnded(val score: Int) : SingleplayerEvent()
-    object NavigateToDonutSecret : SingleplayerEvent()
+    object ActivateDonutSecret : SingleplayerEvent()
     data class ShowToast(val message: String) : SingleplayerEvent()
 }
 
-class SingleplayerViewModel : BoggleViewModel() {
+class SingleplayerViewModel(initialGame: BoggleGame = BoggleGame()) : BoggleViewModel(initialGame) {
     private val _events = Channel<SingleplayerEvent>()
     val events = _events.receiveAsFlow()
 
@@ -39,14 +40,11 @@ class SingleplayerViewModel : BoggleViewModel() {
     }
 
     override fun submitWord() {
-        if (game.isEnded) return
+        super.submitWord()
 
-        val word = game.word
-        val result = game.submitWord()
-
-        if (word.equals("donut", ignoreCase = true)) {
+        if (_uiState.value.lastSubmittedWord.equals("donut", ignoreCase = true)) {
             viewModelScope.launch {
-                _events.send(SingleplayerEvent.NavigateToDonutSecret)
+                _events.send(SingleplayerEvent.ActivateDonutSecret)
             }
         }
 
@@ -55,8 +53,7 @@ class SingleplayerViewModel : BoggleViewModel() {
                 score = game.score,
                 currentWord = "",
                 selectedIndices = emptyList(),
-                foundWords = game.foundWords.toList(),
-                feedbackMessageResId = result.messageId
+                foundWords = game.foundWords.toList()
             )
         }
     }

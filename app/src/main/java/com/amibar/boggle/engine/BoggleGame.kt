@@ -404,7 +404,7 @@ class BoggleGame @JvmOverloads constructor(
                 charArrayOf('E', 'E', 'G', 'H', 'N', 'W'),
                 charArrayOf('A', 'F', 'F', 'K', 'P', 'S'),
                 charArrayOf('H', 'L', 'N', 'N', 'R', 'Z'),
-                charArrayOf('D', 'E', 'I', 'L', 'R', 'X')
+                charArrayOf('D', 'E', 'I', 'L', 'R', 'X'),
             )
 
             /**

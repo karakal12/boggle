@@ -11,7 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,9 +55,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -94,8 +100,10 @@ import com.amibar.boggle.ui.navigation.Singleplayer
 import com.amibar.boggle.ui.shared.BoggleBoard
 import com.amibar.boggle.ui.theme.BoggleTheme
 import com.amibar.boggle.utils.base64ToBitmap
+import com.amibar.boggle.utils.conditional
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -181,12 +189,28 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     composable<Singleplayer> {
-                        val spViewModel: SingleplayerViewModel = viewModel()
+                        val spViewModel: SingleplayerViewModel = viewModel(
+//                            factory = object : ViewModelProvider.Factory {
+//                                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//                                    @Suppress("UNCHECKED_CAST")
+//                                    return SingleplayerViewModel(initialGame = BoggleGame(
+//                                        "DONUTTTTTTTTTTTT".toCharArray()
+//                                    )
+//                                    ) as T
+//                                }
+//                            }
+                        )
                         val showingDialogState = remember { mutableStateOf(false) }
                         val uiState by spViewModel.uiState.collectAsStateWithLifecycle()
 
+                        var isDonut by remember { mutableStateOf(false) }
+
+                        val whiteOverlayAlpha = remember { Animatable(0f) }
+
                         BackHandler {
-                            if (uiState.isGameEnded) {
+                            if (isDonut){
+                                isDonut = false
+                            } else if (uiState.isGameEnded) {
                                 spViewModel.game.deselectPath()
                                 spViewModel.syncState()
                                 showingDialogState.value = true
@@ -202,8 +226,22 @@ class MainActivity : AppCompatActivity() {
                                         Toast.makeText(this@MainActivity, "Game finished! Your score: ${event.score}", Toast.LENGTH_LONG).show()
                                         showingDialogState.value = true
                                     }
-                                    is SingleplayerEvent.NavigateToDonutSecret -> {
-                                        startActivity(Intent(this@MainActivity, DonutActivity::class.java))
+                                    is SingleplayerEvent.ActivateDonutSecret -> {
+//                                        startActivity(Intent(this@MainActivity, DonutActivity::class.java))
+                                        whiteOverlayAlpha.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(durationMillis = 1000)
+                                        )
+
+                                        isDonut = true
+
+                                        delay(500)
+
+                                        whiteOverlayAlpha.animateTo(
+                                            targetValue = 0f,
+                                            animationSpec = tween(durationMillis = 400)
+                                        )
+
                                     }
                                     is SingleplayerEvent.ShowToast -> {
                                         Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
@@ -221,11 +259,20 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         SingleplayerContent(
-                            modifier = Modifier.donutWrapped(),
+                            modifier = Modifier.conditional(isDonut) { donutWrapped() },
                             viewModel = spViewModel,
                             showingDialogState = showingDialogState,
                             onExit = { navController.popBackStack() }
                         )
+
+                        if (whiteOverlayAlpha.value > 0f) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(whiteOverlayAlpha.value)
+                                    .background(Color.White)
+                            )
+                        }
                     }
 
                     composable<Multiplayer> { backStackEntry ->
