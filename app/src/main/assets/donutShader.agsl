@@ -1,6 +1,6 @@
 // PreviewType: size
 uniform float2 size;
-uniform mat4 translationMatrix;
+uniform mat4 transformationMatrix;
 uniform shader composable;
 
 const float PI = 3.14159265359;
@@ -33,16 +33,17 @@ half4 main(float2 fragCoord) {
 
   // --- transformations ---
 
-  camera = (translationMatrix * float4(camera, 1.0)).xyz;
-  rayDir = (translationMatrix * float4(rayDir, 0.0)).xyz;
-  lightPos = (translationMatrix * float4(lightPos, 1.0)).xyz;
+  camera = (transformationMatrix * float4(camera, 1.0)).xyz;
+  rayDir = (transformationMatrix * float4(rayDir, 0.0)).xyz;
+  lightPos = (transformationMatrix * float4(lightPos, 1.0)).xyz;
 
   // --- ray marching loop ---
 
   float distanceTraveled = 0;
   const int maxSteps = 100;
   const float surfaceThreshold = .001;
-  const float maxDistance = 30;
+  float3 absTranslation = abs(transformationMatrix[3].xyz);
+  float maxDistance = 30 + max(absTranslation.x, max(absTranslation.y, absTranslation.z));
 
   float3 currentPos;
   float currentDistance = 0;

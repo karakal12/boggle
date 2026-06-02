@@ -149,7 +149,7 @@ internal fun Modifier.donutWrapped() = composed(NoInspectorInfo, factory = {
             val matrix = getMatrix()
             try {
                 shader.setFloatUniform("size", size.width, size.height)
-                shader.setFloatUniform("translationMatrix", matrix)
+                shader.setFloatUniform("transformationMatrix", matrix)
             } catch (_: IllegalArgumentException) {}
 
             renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable").asComposeRenderEffect()
